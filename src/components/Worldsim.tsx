@@ -227,7 +227,7 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
         <div className="instrument">
           <div className="instrument-head">
             <div style={{ display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
-              <span className="eyebrow">Grid import · running bill · indoor temperature</span>
+              <span className="eyebrow">Grid import · billed demand · indoor temperature</span>
               <span className="num" style={{ fontSize: 10.5, color: "var(--ink-hi)" }}>{n ? stamp(traces[0].series.t[Math.min(cursor, n - 1)]) : ""}</span>
             </div>
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>

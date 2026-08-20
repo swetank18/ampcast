@@ -1,11 +1,13 @@
 import { Frontier, MVChart, Reliability, TargetSearch } from "@/components/MethodCharts";
-import { loadBundle } from "@/lib/data";
+import { loadBundleFromDb } from "@/lib/data";
 import { inr } from "@/lib/format";
 
 export const metadata = { title: "Method — Aethergrid" };
 
-export default function MethodPage() {
-  const b = loadBundle();
+export const revalidate = 300;
+
+export default async function MethodPage() {
+  const b = await loadBundleFromDb();
   const cals = Object.values(b.calibration).sort((x, y) => x.building.localeCompare(y.building));
 
   return (
@@ -200,7 +202,8 @@ export default function MethodPage() {
         </section>
 
         <p className="note" style={{ textAlign: "center", padding: "6px 0 20px" }}>
-          Simulation, tariff engine and controller: Python, HiGHS, LightGBM. Bundle generated{" "}
+          Simulation, tariff engine and controller: Python, HiGHS, LightGBM. Served from{" "}
+          {b.source === "neon" ? "Neon Postgres" : "the bundled export"}. Bundle generated{" "}
           {new Date(b.generated_at).toISOString().slice(0, 16).replace("T", " ")} UTC.
         </p>
       </main>
