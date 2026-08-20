@@ -243,6 +243,7 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
             <StripChart
               traces={traces}
               ceilingKw={bundle.demand_target_kw}
+              floorKva={(bundle.tariff.contract_demand_kva * bundle.tariff.billing_demand_floor_pct) / 100}
               cursor={cursor}
               onCursor={(i) => { setPlaying(false); setCursor(i); }}
               upTo={upTo}

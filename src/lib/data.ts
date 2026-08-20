@@ -40,13 +40,16 @@ export const CONTROLLER_ORDER = [
 
 /** Series colours are re-picked for the dark instrument panel; the export's
  *  colours were chosen for white matplotlib figures and go muddy on ink. */
+/** Colour is functional and the rule is strict: nothing is warm unless it costs
+ *  rupees. The ceiling and its breaches own the hot end of the palette, so every
+ *  controller — ours included — sits in the cool range. */
 export const TRACE: Record<string, { color: string; short: string }> = {
-  no_control: { color: "#7C8794", short: "No control" },
-  rule_based: { color: "#8B93C9", short: "Rule based" },
-  mpc_mean: { color: "#4FA3D1", short: "MPC · mean forecast" },
-  ours: { color: "#FFB454", short: "Ours · q95" },
-  mpc_oracle_rolling: { color: "#5FB49C", short: "MPC · perfect forecast" },
-  oracle: { color: "#3E8E7E", short: "Oracle · whole month" },
+  no_control: { color: "#5a6b85", short: "No control" },
+  rule_based: { color: "#be95ff", short: "Rule based" },
+  mpc_mean: { color: "#4589ff", short: "MPC · mean forecast" },
+  ours: { color: "#3ddbd9", short: "Ours · q95" },
+  mpc_oracle_rolling: { color: "#6fdc8c", short: "MPC · perfect forecast" },
+  oracle: { color: "#42be65", short: "Oracle · whole month" },
 };
 
 export function seriesUrl(id: string): string {
