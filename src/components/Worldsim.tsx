@@ -86,9 +86,16 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
   useEffect(() => {
     if (!playing || !n) return;
     let raf = 0;
-    let last = performance.now();
+    // The first frame's timestamp can predate this line: requestAnimationFrame
+    // reports the time the frame *began*, which may be before the effect ran.
+    // Seeding `last` from performance.now() therefore produced a negative first
+    // delta, which walked the cursor to -1 and indexed the series out of bounds.
+    // That is the crash on "Replay month". Seed from the first frame instead,
+    // and never let a delta go backwards.
+    let last: number | null = null;
     const tick = (now: number) => {
-      const dt = now - last;
+      if (last === null) { last = now; raf = requestAnimationFrame(tick); return; }
+      const dt = Math.max(0, now - last);
       last = now;
       const from = headRef.current >= n - 1 ? 0 : headRef.current;
       const next = from + dt * 0.09 * speed;      // 1x is about 16 s for a month
@@ -108,8 +115,11 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
     return () => cancelAnimationFrame(raf);
   }, [playing, n, speed]);
 
-  const upTo = Math.min(head, n - 1);
-  const at = Math.min(cursor ?? Math.max(0, n - 1), Math.max(0, n - 1));
+  const last = Math.max(0, n - 1);
+  const upTo = Math.max(0, Math.min(head, last));
+  // clamped at both ends: nothing downstream should be able to index off either
+  // edge of a series, whatever the transport does
+  const at = Math.max(0, Math.min(cursor ?? last, last));
   const ours = byController[HERO];
   const base = byController[BASE];
   const mean = byController[MEAN];
@@ -129,9 +139,9 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
   const cursorRow = traces.map((tr) => ({
     label: TRACE[tr.id].short,
     color: tr.color,
-    kw: tr.series.grid_kw[at],
-    bill: tr.series.bill_cum[at],
-    t: tr.series.t_indoor[at],
+    kw: tr.series.grid_kw[at] ?? 0,
+    bill: tr.series.bill_cum[at] ?? 0,
+    t: tr.series.t_indoor[at] ?? 0,
   }));
 
   return (

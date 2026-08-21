@@ -171,9 +171,13 @@ export default function ForecastSwitch({
   useEffect(() => {
     if (!playing || !n) return;
     let raf = 0;
-    let last = performance.now();
+    // seeded from the first frame, not from performance.now(): a frame timestamp
+    // can predate this line, and the negative delta that produced walked the
+    // cursor to -1 and took the page down
+    let last: number | null = null;
     const tick = (now: number) => {
-      const dt = now - last;
+      if (last === null) { last = now; raf = requestAnimationFrame(tick); return; }
+      const dt = Math.max(0, now - last);
       last = now;
       const from = headRef.current >= n - 1 ? 0 : headRef.current;
       const next = from + dt * 0.09 * speed;      // 1x is about 16 s for the month
@@ -266,8 +270,9 @@ export default function ForecastSwitch({
     [run, ceilingKw],
   );
 
-  const upTo = Math.min(head, Math.max(0, n - 1));
-  const i = Math.min(cursor ?? Math.max(0, n - 1), Math.max(0, n - 1));
+  const lastIdx = Math.max(0, n - 1);
+  const upTo = Math.max(0, Math.min(head, lastIdx));
+  const i = Math.max(0, Math.min(cursor ?? lastIdx, lastIdx));
   const breachesSoFar = useMemo(() => {
     let c = 0;
     for (const b of breachIdx) { if (b > upTo) break; c++; }
