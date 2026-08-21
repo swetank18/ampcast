@@ -223,6 +223,14 @@ export interface ModelEvidence {
     tier3?: Record<string, number | null>;
     tier4?: Record<string, number | string | Record<string, unknown>>;
   };
+  /** the same ablation on other buildings; present once more than one has run */
+  cross_building?: {
+    building: string; label: string; demand_target_kw: number;
+    ours_pinball: number; ours_coverage: number; ours_breaches: number;
+    ours_bill_inr: number; ours_headroom_kw: number;
+    no_model_breaches: number; no_model_bill_inr: number; no_model_headroom_kw: number;
+    seasonal_naive_breaches: number | null; persistence_breaches: number | null;
+  }[];
   model_card?: string;
   missing: string[];
 }

@@ -262,6 +262,68 @@ export default async function ModelPage() {
           )}
         </section>
 
+        {/* -------------------------------------------------- does it generalise */}
+        {m?.cross_building && m.cross_building.length > 1 && (
+          <section className="card">
+            <div className="card-head">
+              <h2>Does it hold on another building?</h2>
+              <span className="eyebrow">same experiment · different meter · different ceiling</span>
+            </div>
+            <p style={{ maxWidth: "76ch", marginBottom: 11 }}>
+              One building is an anecdote. The same eight forecasters, the same optimiser and the same protocol were
+              run on other buildings in the set, each with its own demand ceiling found by the same bisection. What
+              matters is not whether our pinball loss is identical everywhere — it is not, these are very different
+              buildings — but whether the <i>system</i> still collapses when the forecast is removed.
+            </p>
+            <div className="table-scroll">
+              <table className="grid-table">
+                <thead>
+                  <tr>
+                    <th>Building</th><th>Ceiling kW</th><th>Our pinball</th><th>Our cov 90%</th>
+                    <th>Breaches: ours</th><th>no model</th><th>persistence</th>
+                    <th>Headroom gained kW</th><th>Bill vs no model ₹</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {m.cross_building.map((c) => (
+                    <tr key={c.building} data-hero={c.building === m.building}>
+                      <td>{c.label}</td>
+                      <td>{Math.round(c.demand_target_kw)}</td>
+                      <td>{c.ours_pinball.toFixed(3)}</td>
+                      <td>{c.ours_coverage.toFixed(3)}</td>
+                      <td style={{ color: c.ours_breaches > 0 ? "var(--ceiling)" : "var(--ours)" }}>{c.ours_breaches}</td>
+                      <td style={{ color: c.no_model_breaches > 0 ? "var(--ceiling)" : undefined }}>{c.no_model_breaches}</td>
+                      <td style={{ color: (c.persistence_breaches ?? 0) > 0 ? "var(--ceiling)" : undefined }}>
+                        {c.persistence_breaches ?? "—"}
+                      </td>
+                      <td>{(c.ours_headroom_kw - c.no_model_headroom_kw).toFixed(1)}</td>
+                      <td style={{ color: c.no_model_bill_inr - c.ours_bill_inr < 0 ? "var(--ceiling)" : undefined }}>
+                        {inr(c.no_model_bill_inr - c.ours_bill_inr)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="note" style={{ marginTop: 9 }}>
+              &ldquo;No model&rdquo; is the static margin: one constant for the whole month, which is what a site does
+              today without a forecaster. &ldquo;Headroom gained&rdquo; is the capacity the forecast hands back to the
+              optimiser relative to that constant, at the same fixed ceiling.
+            </p>
+            <p style={{ marginTop: 9, maxWidth: "76ch" }}>
+              <b style={{ color: "var(--ceiling)" }}>The assembly hall does not reproduce the office result, and that
+              is the honest headline of this table.</b> It is the event-driven building in the set — median-forecast
+              MAPE 0.69, genuinely unpredictable — and on it the constant holds the ceiling while we take one breach
+              and end ₹1,041 worse off. Two reasons, both structural rather than lucky: the ceiling is found by
+              bisecting with <i>our</i> forecaster, so we sit at the tightest point it can hold and anything more
+              conservative clears it by doing less; and on a load this erratic a wide constant margin is a defensible
+              forecast. What survives on both buildings is capacity: the forecast hands back{" "}
+              {m.cross_building.map((c) => `${Math.round(c.ours_headroom_kw - c.no_model_headroom_kw)} kW`).join(" and ")}{" "}
+              of usable headroom, and persistence is catastrophic on both.
+            </p>
+          </section>
+        )}
+
         {/* ------------------------------------------------------------ cold start */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))", gap: 12 }}>
           <section className="card">
