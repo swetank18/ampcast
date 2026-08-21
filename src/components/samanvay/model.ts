@@ -604,6 +604,7 @@ export interface ControllerRow {
   peak: number;
   breaches: number;
   bill: number;
+  saving: number;         // ₹/month against the schedule the society already runs
   share: number | null;   // share of the available saving actually captured
   note: string;
 }
@@ -622,12 +623,48 @@ export function controllerTable(day: Day): ControllerRow[] {
   const mpcBill = billingDemand(mpcPeak) * DEMAND_RATE + day.dayRupees * DAYS_IN_MONTH * 1.004;
 
   return [
-    { key: "none", name: "No control", peak: day.peakGhost, breaches: day.ghostCrossings.length, bill: g, share: share(g), note: "The schedule the society already runs." },
-    { key: "rule", name: "Rule based", peak: rulePeak, breaches: Math.max(0, day.ghostCrossings.length - 1), bill: ruleBill, share: share(ruleBill), note: "Everything waits until 22:00, then switches on together." },
-    { key: "mpc", name: "MPC on the mean", peak: mpcPeak, breaches: day.fcCrossings.length, bill: mpcBill, share: share(mpcBill), note: "Aims at the ceiling with the mean forecast. Half its errors are above it." },
-    { key: "ours", name: "Ours, q95", peak: day.peakPlan, breaches: 0, bill: ours, share: share(ours), note: "Substitutes the 95th percentile into the capacity constraint." },
-    { key: "oracle", name: "Perfect foresight", peak: oraclePeak, breaches: 0, bill: oracle, share: 1, note: "Knows the month in advance. The ceiling on what any controller can do." },
+    { key: "none", name: "No control", peak: day.peakGhost, breaches: day.ghostCrossings.length, bill: g, saving: 0, share: share(g), note: "The schedule the society already runs." },
+    { key: "rule", name: "Rule based", peak: rulePeak, breaches: Math.max(0, day.ghostCrossings.length - 1), bill: ruleBill, saving: g - ruleBill, share: share(ruleBill), note: "Everything waits until 22:00, then switches on together." },
+    { key: "mpc", name: "MPC on the mean", peak: mpcPeak, breaches: day.fcCrossings.length, bill: mpcBill, saving: g - mpcBill, share: share(mpcBill), note: "Aims at the ceiling with the mean forecast. Half its errors are above it." },
+    { key: "ours", name: "Ours, q95", peak: day.peakPlan, breaches: 0, bill: ours, saving: g - ours, share: share(ours), note: "Substitutes the 95th percentile into the capacity constraint." },
+    { key: "oracle", name: "Perfect foresight", peak: oraclePeak, breaches: 0, bill: oracle, saving: available, share: 1, note: "Knows the month in advance. The ceiling on what any controller can do." },
   ];
+}
+
+/**
+ * The prize, and how much of it is actually on the table.
+ *
+ * `available` is the whole distance from the schedule the society already runs
+ * to a controller that knows the month in advance. Nothing can beat it, so it
+ * is the honest denominator: a percentage against the current bill would flatter
+ * us, and a percentage against zero would be meaningless.
+ */
+export interface SavingSplit {
+  available: number;
+  captured: number;
+  missed: number;
+  share: number;
+  perFlat: number;
+  perFlatAvailable: number;
+}
+
+export function achievableSaving(rows: ControllerRow[]): SavingSplit {
+  const none = rows.find((r) => r.key === "none");
+  const ours = rows.find((r) => r.key === "ours");
+  const oracle = rows.find((r) => r.key === "oracle");
+  if (!none || !ours || !oracle) {
+    return { available: 0, captured: 0, missed: 0, share: 0, perFlat: 0, perFlatAvailable: 0 };
+  }
+  const available = Math.max(0, none.bill - oracle.bill);
+  const captured = Math.max(0, none.bill - ours.bill);
+  return {
+    available,
+    captured,
+    missed: Math.max(0, available - captured),
+    share: available <= 0 ? 0 : captured / available,
+    perFlat: captured / FLATS,
+    perFlatAvailable: available / FLATS,
+  };
 }
 
 /** Fairness: who was asked, and how often. A month that always defers the same

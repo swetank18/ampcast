@@ -12,7 +12,7 @@
 import { useMemo, useRef, useState } from "react";
 import {
   CEILING, DAYS_IN_MONTH, DEMAND_RATE, N, RELIABILITY, TOD, type Carpet, type ControllerRow,
-  type Day, billingDemand, hhmm, inr, span, todAt,
+  type Day, type SavingSplit, billingDemand, hhmm, inr, span, todAt,
 } from "./model";
 
 const INK = "#111111";
@@ -265,9 +265,9 @@ export function CompareChart({ day, split, onSplit }: { day: Day; split: number;
               <line x1={cxAt(t)} y1={yAt(day.fcOnly[t])} x2={cxAt(t)} y2={yAt(CEILING)} stroke={CEIL} strokeWidth={1} />
             </g>
           ))}
-          <text x={CPAD_L + 10} y={CPAD_T + 104} fontSize={10.5} letterSpacing="1.4" fill={INK3}>FORECAST-ONLY CONTROLLER</text>
-          <text x={CPAD_L + 10} y={CPAD_T + 132} fontSize={26} fontWeight={300} fill={INK}>{day.peakFc.toFixed(1)}</text>
-          <text x={CPAD_L + 10} y={CPAD_T + 148} fontSize={10.5} fill={INK3}>
+          <text x={CPAD_L + 10} y={CPAD_T + 104} fontSize={10.5} letterSpacing="1.4" fill={INK3} stroke="#FFFFFF" strokeWidth={3.5} paintOrder="stroke">FORECAST-ONLY CONTROLLER</text>
+          <text x={CPAD_L + 10} y={CPAD_T + 132} fontSize={26} fontWeight={300} fill={INK} stroke="#FFFFFF" strokeWidth={3.5} paintOrder="stroke">{day.peakFc.toFixed(1)}</text>
+          <text x={CPAD_L + 10} y={CPAD_T + 148} fontSize={10.5} fill={INK3} stroke="#FFFFFF" strokeWidth={3.5} paintOrder="stroke">
             peak kVA · {day.fcCrossings.length} crossing{day.fcCrossings.length === 1 ? "" : "s"}
           </text>
         </g>
@@ -275,9 +275,9 @@ export function CompareChart({ day, split, onSplit }: { day: Day; split: number;
         <g clipPath="url(#sv-right)">
           <path d={path(day.plan)} fill="none" stroke={INK} strokeWidth={1.8} />
           <circle cx={cxAt(day.peakIdx)} cy={yAt(day.peakPlan)} r={3.4} fill={INK} />
-          <text x={CW - CPAD_R - 10} y={CPAD_T + 104} textAnchor="end" fontSize={10.5} letterSpacing="1.4" fill={INK3}>THIS SYSTEM</text>
-          <text x={CW - CPAD_R - 10} y={CPAD_T + 132} textAnchor="end" fontSize={26} fontWeight={300} fill={INK}>{day.peakPlan.toFixed(1)}</text>
-          <text x={CW - CPAD_R - 10} y={CPAD_T + 148} textAnchor="end" fontSize={10.5} fill={SAVED}>peak kVA · no crossings</text>
+          <text x={CW - CPAD_R - 10} y={CPAD_T + 104} textAnchor="end" fontSize={10.5} letterSpacing="1.4" fill={INK3} stroke="#FFFFFF" strokeWidth={3.5} paintOrder="stroke">THIS SYSTEM</text>
+          <text x={CW - CPAD_R - 10} y={CPAD_T + 132} textAnchor="end" fontSize={26} fontWeight={300} fill={INK} stroke="#FFFFFF" strokeWidth={3.5} paintOrder="stroke">{day.peakPlan.toFixed(1)}</text>
+          <text x={CW - CPAD_R - 10} y={CPAD_T + 148} textAnchor="end" fontSize={10.5} fill={SAVED} stroke="#FFFFFF" strokeWidth={3.5} paintOrder="stroke">peak kVA · no crossings</text>
         </g>
 
         {Array.from({ length: 13 }, (_, i) => i * 8).filter((t) => t < N).map((t) => (
@@ -351,7 +351,8 @@ export function ControllerTable({ rows }: { rows: ControllerRow[] }) {
     <table className="sv-table">
       <thead>
         <tr>
-          <th>Controller</th><th>Peak kVA</th><th>Crossings</th><th>Bill ₹/month</th><th>Share of the saving</th>
+          <th>Controller</th><th>Peak kVA</th><th>Crossings</th><th>Bill ₹/month</th>
+          <th>Saving ₹/month</th><th>Share of the saving</th>
         </tr>
       </thead>
       <tbody>
@@ -364,6 +365,7 @@ export function ControllerTable({ rows }: { rows: ControllerRow[] }) {
             <td>{r.peak.toFixed(1)}</td>
             <td style={{ color: r.breaches > 0 ? CEIL : INK }}>{r.breaches}</td>
             <td>{inr(r.bill)}</td>
+            <td style={{ color: r.saving > 0 ? SAVED : INK3 }}>{r.saving > 0 ? inr(r.saving) : "—"}</td>
             <td>{r.share === null ? "—" : `${(r.share * 100).toFixed(0)}%`}</td>
           </tr>
         ))}
@@ -419,6 +421,60 @@ export function CautionDial({ day }: { day: Day }) {
           : q > 0.97
             ? "Above q97 the margin is buying safety nobody needed, and the comfort budget pays for it."
             : "The operating band. Safety is a property of the quantile, not of the reporting."}
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------- the achievable saving */
+
+/**
+ * How much of the prize is actually on the table, and how much of it this
+ * controller takes. The denominator is perfect foresight rather than the
+ * current bill, because that is the only number no controller can beat.
+ */
+export function AchievableSaving({ split, label }: { split: SavingSplit; label: string }) {
+  const pct = Math.round(split.share * 100);
+  return (
+    <div className="sv-card">
+      <header>
+        <h3>Achievable saving</h3>
+        <span className="sv-eyebrow">{label} · no control → perfect foresight</span>
+      </header>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18, marginBottom: 12 }}>
+        <div>
+          <div className="sv-eyebrow" style={{ marginBottom: 3 }}>On the table</div>
+          <div className="sv-big">₹{inr(split.available)}<em>a month</em></div>
+          <div className="sv-note" style={{ marginTop: 3 }}>₹{inr(split.perFlatAvailable)} a flat, if the forecast were perfect</div>
+        </div>
+        <div>
+          <div className="sv-eyebrow" style={{ marginBottom: 3 }}>Taken by this system</div>
+          <div className="sv-big" style={{ color: SAVED }}>₹{inr(split.captured)}<em>{pct}%</em></div>
+          <div className="sv-note" style={{ marginTop: 3 }}>₹{inr(split.perFlat)} a flat, on a forecast that exists</div>
+        </div>
+        <div>
+          <div className="sv-eyebrow" style={{ marginBottom: 3 }}>Left behind</div>
+          <div className="sv-big" style={{ color: INK3 }}>₹{inr(split.missed)}<em>{100 - pct}%</em></div>
+          <div className="sv-note" style={{ marginTop: 3 }}>Only reachable by knowing the month in advance</div>
+        </div>
+      </div>
+
+      <div style={{ height: 16, display: "flex", border: `1px solid ${INK}`, borderRadius: 2, overflow: "hidden" }}>
+        <div style={{ width: `${pct}%`, background: SAVED }} />
+        <div style={{ flex: 1, background: "#EFEDE9", borderLeft: `1px solid ${INK}` }} />
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 5 }}>
+        <span className="sv-note">No control · ₹0</span>
+        <span className="sv-note" style={{ color: SAVED, fontWeight: 600 }}>{pct}% captured</span>
+        <span className="sv-note">Perfect foresight · ₹{inr(split.available)}</span>
+      </div>
+
+      <p className="sv-note" style={{ marginTop: 10 }}>
+        The gap between the two controllers on the chart above is worth{" "}
+        <b>₹{inr(split.captured)}</b> a month to sixty flats. The gap between this system and the oracle is worth{" "}
+        <b>₹{inr(split.missed)}</b>, and closing it would take a forecast with no error at all — which is why the
+        remaining work is calibration rather than accuracy.
       </p>
     </div>
   );

@@ -17,12 +17,13 @@ import { useSearchParams } from "next/navigation";
 import {
   CEILING, CONTRACT_KVA, DAYS_IN_MONTH, DAY_OF_MONTH, DEMAND_RATE, ENERGY_RATE, FLATS, N, SCENARIOS,
   SPEC, TOD_ROWS, type Day, type Home, type ScenarioKey, type Status,
-  billingDemand, buildCarpet, buildDay, buildHomes, controllerTable, fairness, hhmm, inr, monthBill,
-  phaseOf, scenarioOf, skyOf, span,
+  achievableSaving, billingDemand, buildCarpet, buildDay, buildHomes, controllerTable, fairness, hhmm,
+  inr, monthBill, phaseOf, scenarioOf, skyOf, span,
 } from "./model";
 import { IsoScene, TileScene, SceneLegend } from "./scene";
 import {
-  CalibrationPlot, CautionDial, CompareChart, ControllerTable, FairnessBars, MonthCarpet, TimelineChart,
+  AchievableSaving, CalibrationPlot, CautionDial, CompareChart, ControllerTable, FairnessBars,
+  MonthCarpet, TimelineChart,
 } from "./charts";
 
 type Tab = "NOW" | "TIMELINE" | "COMPARE" | "EVIDENCE";
@@ -514,6 +515,7 @@ function CompareTab({
           optimiser. The only difference is which number out of the forecast enters the capacity constraint: the mean on
           the left, the 95th percentile on the right.
         </p>
+        <AchievableSaving split={achievableSaving(rows)} label={day.sc.label} />
         <div className="sv-card">
           <header><h3>Five controllers, one month</h3><span className="sv-eyebrow">{day.sc.label}</span></header>
           <ControllerTable rows={rows} />
@@ -528,6 +530,9 @@ function CompareTab({
             <div className="sv-row"><span>Crossings</span><span>{day.fcCrossings.length} → 0</span></div>
             <div className="sv-row"><span>Margin</span><span>fixed → adaptive</span></div>
             <div className="sv-row"><span>Failure mode</span><span>silent → visible</span></div>
+            <div className="sv-row" style={{ color: "#1E7A4B" }}>
+              <span>Achievable saving taken</span><span>{(achievableSaving(rows).share * 100).toFixed(0)}%</span>
+            </div>
           </div>
           <p className="sv-note" style={{ marginTop: 9 }}>
             A controller aimed at the mean is above its own target half the time by construction. On an ordinary day
