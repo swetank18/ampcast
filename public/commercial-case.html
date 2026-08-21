@@ -1,0 +1,543 @@
+<meta charset="UTF-8">
+<title>Samanvay Commercial Case</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@500;700;900&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0a0d12; --panel:#12161d; --panel-2:#171c25; --line:#232a35; --line-soft:#1a2028;
+  --text:#e6e9ef; --muted:#8891a3; --muted-2:#5b6474;
+  --copper:#d99a3f; --copper-dim:#7a5a2c; --cyan:#4fc3dc; --cyan-dim:#245a66;
+  --ok:#3ecf8e; --warn:#e0a83e; --bad:#e2645c;
+  --radius:3px;
+}
+*{box-sizing:border-box;}
+html{background:var(--bg);}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Source Sans 3", system-ui, sans-serif; font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:"Chivo",sans-serif; text-wrap:balance; margin:0; color:var(--text);}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+a{color:var(--cyan);}
+::selection{background:var(--copper); color:#1a1102;}
+:focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+
+.wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--cyan); display:flex; align-items:center; gap:8px; margin-bottom:14px;
+}
+.eyebrow::before{content:""; width:16px; height:1px; background:var(--cyan);}
+
+/* ---------- hero ---------- */
+.hero{padding:76px 0 40px 0; border-bottom:1px solid var(--line);}
+.hero h1{font-size:clamp(30px,4.4vw,46px); font-weight:900; letter-spacing:-.015em; line-height:1.08; max-width:15ch;}
+.hero .accent{color:var(--copper);}
+.hero p.lede{font-size:18px; color:var(--muted); max-width:60ch; margin-top:18px;}
+.hero-meta{display:flex; gap:28px; margin-top:32px; flex-wrap:wrap;}
+.hero-meta .m{font-family:"JetBrains Mono",monospace; font-size:12.5px; color:var(--muted-2);}
+.hero-meta .m b{display:block; color:var(--text); font-size:20px; font-weight:700; margin-bottom:2px;}
+
+/* ---------- node nav (circuit diagram) ---------- */
+.circuit-section{padding:44px 0 56px 0; border-bottom:1px solid var(--line);}
+.circuit-label{font-size:12px; color:var(--muted-2); text-align:center; margin-top:8px; font-family:"JetBrains Mono",monospace; letter-spacing:.04em;}
+#circuit{width:100%; height:auto; display:block; cursor:default;}
+.node-hit{cursor:pointer;}
+.node-circle{fill:var(--panel); stroke:var(--line); stroke-width:1.5; transition:stroke .25s, fill .25s;}
+.node-hit:hover .node-circle, .node-hit.active .node-circle{stroke:var(--copper); fill:var(--panel-2);}
+.node-hit.active .node-circle{stroke:var(--cyan);}
+.node-label{font-family:"JetBrains Mono",monospace; font-size:12px; fill:var(--muted); text-anchor:middle; transition:fill .25s;}
+.node-hit:hover .node-label, .node-hit.active .node-label{fill:var(--text);}
+.node-num{font-family:"JetBrains Mono",monospace; font-size:10px; fill:var(--muted-2); text-anchor:middle;}
+.trace{fill:none; stroke:var(--line); stroke-width:1.5;}
+.pulse{fill:var(--cyan); filter:drop-shadow(0 0 4px var(--cyan));}
+
+/* ---------- sections ---------- */
+section.panel{padding:64px 0; border-bottom:1px solid var(--line); scroll-margin-top:24px;}
+section.panel:last-of-type{border-bottom:none;}
+.panel h2{font-size:clamp(24px,3vw,32px); font-weight:900; letter-spacing:-.01em; max-width:20ch;}
+.panel .dek{color:var(--muted); font-size:16px; max-width:62ch; margin-top:10px;}
+.panel-body{margin-top:34px; display:grid; gap:20px;}
+
+/* buyer ladder */
+.tier{
+  display:grid; grid-template-columns:64px 1fr; gap:20px; padding:22px 0; border-top:1px solid var(--line-soft);
+}
+.tier:first-child{border-top:none;}
+.tier-n{font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--copper); padding-top:2px;}
+.tier h3{font-size:18px; font-weight:700; margin-bottom:6px;}
+.tier p{color:var(--muted); margin:0 0 12px 0; max-width:66ch;}
+.tier-stats{display:flex; gap:22px; flex-wrap:wrap;}
+.tier-stat{font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--muted-2);}
+.tier-stat b{color:var(--text); font-size:14px; display:block;}
+
+/* calculator */
+.calc{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+.calc-tabs{display:flex; border-bottom:1px solid var(--line);}
+.calc-tab{
+  flex:1; padding:14px 18px; background:none; border:none; color:var(--muted); font-family:"JetBrains Mono",monospace;
+  font-size:12.5px; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; border-bottom:2px solid transparent;
+}
+.calc-tab.active{color:var(--copper); border-bottom-color:var(--copper); background:var(--panel-2);}
+.calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:0;}
+@media (max-width:720px){.calc-grid{grid-template-columns:1fr;}}
+.calc-inputs{padding:26px; display:flex; flex-direction:column; gap:18px; border-right:1px solid var(--line);}
+@media (max-width:720px){.calc-inputs{border-right:none; border-bottom:1px solid var(--line);}}
+.field label{display:flex; justify-content:space-between; font-size:12.5px; color:var(--muted); margin-bottom:7px;}
+.field label .fv{color:var(--cyan); font-family:"JetBrains Mono",monospace;}
+.field input[type=range]{width:100%; accent-color:var(--copper);}
+.field input[type=number], .field select{
+  width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text); padding:8px 10px;
+  border-radius:var(--radius); font-family:"JetBrains Mono",monospace; font-size:13.5px;
+}
+.field .assumption{font-size:11px; color:var(--muted-2); margin-top:5px;}
+.fee-toggle{display:flex; gap:8px;}
+.fee-toggle button{
+  flex:1; padding:8px; background:var(--bg); border:1px solid var(--line); color:var(--muted);
+  font-family:"JetBrains Mono",monospace; font-size:11.5px; border-radius:var(--radius); cursor:pointer;
+}
+.fee-toggle button.active{border-color:var(--copper); color:var(--copper); background:var(--panel-2);}
+.calc-outputs{padding:26px; display:flex; flex-direction:column; gap:16px; background:var(--panel-2);}
+.out-row{display:flex; justify-content:space-between; align-items:baseline; padding-bottom:12px; border-bottom:1px dashed var(--line);}
+.out-row:last-child{border-bottom:none; padding-bottom:0;}
+.out-row .k{font-size:12.5px; color:var(--muted);}
+.out-row .v{font-family:"JetBrains Mono",monospace; font-size:19px; font-weight:700;}
+.out-row.hero-out .v{font-size:27px; color:var(--copper);}
+.out-row .sub{display:block; font-size:11px; color:var(--muted-2); margin-top:2px; font-weight:400;}
+
+/* data honesty */
+.paths{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+@media (max-width:760px){.paths{grid-template-columns:1fr;}}
+.path{background:var(--panel); padding:24px;}
+.path .tag{font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.08em; padding:3px 8px; border-radius:2px; display:inline-block; margin-bottom:12px;}
+.tag.now{background:color-mix(in srgb, var(--ok) 18%, transparent); color:var(--ok);}
+.tag.fallback{background:color-mix(in srgb, var(--cyan) 16%, transparent); color:var(--cyan);}
+.tag.future{background:color-mix(in srgb, var(--warn) 18%, transparent); color:var(--warn);}
+.path h4{font-size:16px; margin-bottom:8px;}
+.path p{font-size:13.5px; color:var(--muted); margin:0;}
+.callout{
+  margin-top:20px; padding:18px 20px; background:var(--panel-2); border-left:2px solid var(--cyan);
+  font-size:14.5px; color:var(--text);
+}
+.callout b{color:var(--cyan);}
+
+/* wedge / competitive */
+.compare{width:100%; border-collapse:collapse; font-size:14px;}
+.compare th, .compare td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line-soft);}
+.compare th{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-2); font-weight:600;}
+.compare td{color:var(--muted);}
+.compare tr.us td{color:var(--text);}
+.compare tr.us td:first-child{color:var(--copper); font-weight:700;}
+.check{color:var(--ok);} .cross{color:var(--muted-2);}
+
+/* milestone */
+.milestone-box{
+  display:grid; grid-template-columns:auto 1fr; gap:24px; align-items:start; padding:28px;
+  background:var(--panel); border:1px solid var(--copper-dim); border-radius:var(--radius);
+}
+@media (max-width:600px){.milestone-box{grid-template-columns:1fr;}}
+.milestone-box .num{font-family:"JetBrains Mono",monospace; font-size:34px; color:var(--copper); font-weight:700;}
+.milestone-box h4{font-size:17px; margin-bottom:8px;}
+.milestone-box p{color:var(--muted); margin:0; font-size:14.5px;}
+
+footer{padding:36px 0 60px 0; text-align:center;}
+footer p{font-family:"JetBrains Mono",monospace; font-size:11.5px; color:var(--muted-2); letter-spacing:.03em;}
+</style>
+
+<div class="wrap hero">
+  <div class="eyebrow">Commercial case</div>
+  <h1>The AI isn't sold to a resident. It's sold to whoever already manages the transformer<span class="accent">.</span></h1>
+  <p class="lede">Samanvay coordinates flexible load across a shared distribution transformer so a society of sixty flats can add EV charging without tripping it, without commanding a single resident's appliance. This is the buyer, the numbers, and the honest data story behind it.</p>
+  <div class="hero-meta">
+    <div class="m"><b>₹608</b>/kVA monthly demand charge, TN</div>
+    <div class="m"><b>6.0%</b>peak shave, ceiling found by bisection</div>
+    <div class="m"><b>0.4&ndash;0.6</b>target coincidence factor</div>
+  </div>
+</div>
+
+<div class="wrap circuit-section">
+  <svg id="circuit" viewBox="0 0 1024 300" xmlns="http://www.w3.org/2000/svg" role="navigation" aria-label="Section map">
+    <path class="trace" d="M 90 150 L 262 90"></path>
+    <path class="trace" d="M 90 150 L 262 210"></path>
+    <path class="trace" d="M 262 90 L 434 150"></path>
+    <path class="trace" d="M 262 210 L 434 150"></path>
+    <path class="trace" d="M 434 150 L 646 90"></path>
+    <path class="trace" d="M 434 150 L 646 210"></path>
+    <path class="trace" d="M 646 90 L 858 150"></path>
+    <path class="trace" d="M 646 210 L 858 150"></path>
+    <path class="trace" d="M 858 150 L 960 150"></path>
+    <circle class="node-circle" cx="90" cy="150" r="26" style="stroke:var(--copper)"></circle>
+    <text class="node-label" x="90" y="196" style="fill:var(--copper)">SOCIETY</text>
+
+    <g class="node-hit" data-target="ladder" tabindex="0" role="button" aria-label="Buyer ladder">
+      <circle class="node-circle" cx="262" cy="90" r="24"></circle>
+      <text class="node-num" x="262" y="80">01</text>
+      <text class="node-label" x="262" y="97">BUYER</text>
+    </g>
+    <g class="node-hit" data-target="calc" tabindex="0" role="button" aria-label="Calculator">
+      <circle class="node-circle" cx="262" cy="210" r="24"></circle>
+      <text class="node-num" x="262" y="200">02</text>
+      <text class="node-label" x="262" y="217">CALC</text>
+    </g>
+    <circle class="node-circle" cx="434" cy="150" r="20" style="stroke:var(--cyan)"></circle>
+    <text class="node-label" x="434" y="180" style="fill:var(--cyan); font-size:11px">COORDINATOR</text>
+
+    <g class="node-hit" data-target="data" tabindex="0" role="button" aria-label="Data and trust">
+      <circle class="node-circle" cx="646" cy="90" r="24"></circle>
+      <text class="node-num" x="646" y="80">03</text>
+      <text class="node-label" x="646" y="97">DATA</text>
+    </g>
+    <g class="node-hit" data-target="wedge" tabindex="0" role="button" aria-label="Competitive wedge">
+      <circle class="node-circle" cx="646" cy="210" r="24"></circle>
+      <text class="node-num" x="646" y="200">04</text>
+      <text class="node-label" x="646" y="217">WEDGE</text>
+    </g>
+    <g class="node-hit" data-target="next" tabindex="0" role="button" aria-label="Next milestone">
+      <circle class="node-circle" cx="858" cy="150" r="24"></circle>
+      <text class="node-num" x="858" y="140">05</text>
+      <text class="node-label" x="858" y="157">NEXT</text>
+    </g>
+    <circle class="node-circle" cx="960" cy="150" r="14" style="stroke:var(--ok)"></circle>
+    <circle class="pulse" cx="90" cy="150" r="4" opacity="0" id="pulseDot"></circle>
+  </svg>
+  <div class="circuit-label">society &rarr; coordinator &rarr; five things a buyer needs to hear &rarr; grid. click a node.</div>
+</div>
+
+<section class="panel wrap" id="ladder">
+  <div class="eyebrow">01 &middot; who pays, in order</div>
+  <h2>The buyer ladder</h2>
+  <p class="dek">Not "will people use this." Three specific buyers, in the order they actually close, each with a different sales motion.</p>
+  <div class="panel-body">
+    <div class="tier">
+      <div class="tier-n">TIER 1</div>
+      <div>
+        <h3>Bulk HT societies &middot; close first</h3>
+        <p>Single HT connection billed on maximum demand. Facility management already sells the society an O&amp;M subscription for lifts, pumps, security &mdash; this is a new line on an existing invoice, not a new vendor to vet. Rupee savings are direct and provable against the bill engine.</p>
+        <div class="tier-stats">
+          <div class="tier-stat">SALES CYCLE<b>Weeks&ndash;months</b></div>
+          <div class="tier-stat">DEAL SIZE<b>₹50k&ndash;3L / yr</b></div>
+          <div class="tier-stat">PROOF NEEDED<b>Bill engine, matched to the rupee</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="tier">
+      <div class="tier-n">TIER 2</div>
+      <div>
+        <h3>DISCOMs &middot; the venture-scale thesis</h3>
+        <p>Pitched as deferred capex, not software. A transformer upgrade costs lakhs and an outage; we defer a share of that spend. RDSS has already funded DT-level metering nationally &mdash; the instrumentation this depends on is being installed regardless of whether Samanvay exists.</p>
+        <div class="tier-stats">
+          <div class="tier-stat">SALES CYCLE<b>12&ndash;24 months</b></div>
+          <div class="tier-stat">DEAL SIZE<b>Feeder / circle scale</b></div>
+          <div class="tier-stat">PROOF NEEDED<b>One published pilot with real breach &amp; capex numbers</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="tier">
+      <div class="tier-n">TIER 3</div>
+      <div>
+        <h3>New&#8209;build developers &middot; the compounding play</h3>
+        <p>State EV&#8209;ready housing mandates make this a launch differentiator. Sold once to the developer, converts to a recurring RWA subscription post&#8209;handover. No retrofit friction &mdash; the submetering goes in at construction.</p>
+        <div class="tier-stats">
+          <div class="tier-stat">SALES CYCLE<b>Per project</b></div>
+          <div class="tier-stat">DEAL SIZE<b>Higher LTV per society</b></div>
+          <div class="tier-stat">PROOF NEEDED<b>"EV&#8209;ready" as a marketable claim</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel wrap" id="calc">
+  <div class="eyebrow">02 &middot; put your own numbers in</div>
+  <h2>The savings, on your building</h2>
+  <p class="dek">Not a number we picked for the slide. The same arithmetic the coordinator runs, live, in the browser &mdash; every assumption is labeled and editable.</p>
+  <div class="panel-body">
+    <div class="calc">
+      <div class="calc-tabs">
+        <button class="calc-tab active" data-mode="ht">Bulk HT &middot; demand charge</button>
+        <button class="calc-tab" data-mode="tf">Transformer&#8209;constrained &middot; capex deferral</button>
+      </div>
+
+      <div class="calc-grid" id="htPanel">
+        <div class="calc-inputs">
+          <div class="field">
+            <label>Flats in the society <span class="fv mono" id="ht_flats_v">60</span></label>
+            <input type="range" id="ht_flats" min="20" max="400" value="60" step="10">
+          </div>
+          <div class="field">
+            <label>Contract demand (kVA) <span class="fv mono" id="ht_contract_v">500</span></label>
+            <input type="range" id="ht_contract" min="100" max="1500" value="500" step="10">
+          </div>
+          <div class="field">
+            <label>Peak shave achieved <span class="fv mono" id="ht_shave_v">6.0%</span></label>
+            <input type="range" id="ht_shave" min="2" max="10" value="6" step="0.5">
+            <div class="assumption">Typical range 4&ndash;8%, from ceiling&#8209;bisection against a comfort budget.</div>
+          </div>
+          <div class="field">
+            <label>Demand charge <span class="fv mono" id="ht_rate_v">₹608/kVA</span></label>
+            <input type="range" id="ht_rate" min="300" max="900" value="608" step="1">
+            <div class="assumption">Default is the TN order. Edit for your state's tariff.</div>
+          </div>
+          <div class="field">
+            <label>Fee model</label>
+            <div class="fee-toggle">
+              <button class="active" data-fee="perf">Performance &middot; % of saving</button>
+              <button data-fee="flat">Flat &middot; ₹/flat/mo</button>
+            </div>
+          </div>
+          <div class="field" id="ht_perf_field">
+            <label>Fee, share of verified saving <span class="fv mono" id="ht_feepct_v">20%</span></label>
+            <input type="range" id="ht_feepct" min="10" max="35" value="20" step="1">
+          </div>
+          <div class="field" id="ht_flat_field" style="display:none">
+            <label>Flat fee <span class="fv mono" id="ht_flatfee_v">₹15/flat/mo</span></label>
+            <input type="range" id="ht_flatfee" min="5" max="60" value="15" step="1">
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div class="out-row hero-out">
+            <span class="k">Society keeps, per year<span class="sub">after Samanvay's fee</span></span>
+            <span class="v mono" id="ht_net">&mdash;</span>
+          </div>
+          <div class="out-row"><span class="k">Peak reduced</span><span class="v mono" id="ht_kva">&mdash;</span></div>
+          <div class="out-row"><span class="k">Demand charge saved / yr</span><span class="v mono" id="ht_gross">&mdash;</span></div>
+          <div class="out-row"><span class="k">Samanvay's fee / yr</span><span class="v mono" id="ht_fee">&mdash;</span></div>
+        </div>
+      </div>
+
+      <div class="calc-grid" id="tfPanel" style="display:none">
+        <div class="calc-inputs">
+          <div class="field">
+            <label>Flats sharing the transformer <span class="fv mono" id="tf_flats_v">60</span></label>
+            <input type="range" id="tf_flats" min="20" max="400" value="60" step="10">
+          </div>
+          <div class="field">
+            <label>Transformer rating (kVA) <span class="fv mono" id="tf_rating_v">250</span></label>
+            <input type="range" id="tf_rating" min="100" max="1000" value="250" step="10">
+          </div>
+          <div class="field">
+            <label>EV penetration <span class="fv mono" id="tf_ev_v">20%</span></label>
+            <input type="range" id="tf_ev" min="0" max="60" value="20" step="5">
+          </div>
+          <div class="field">
+            <label>Upgrade cost <span class="fv mono" id="tf_cost_v">₹1,200/kVA</span></label>
+            <input type="range" id="tf_cost" min="600" max="2500" value="1200" step="50">
+            <div class="assumption">Incremental transformer upgrade cost, civil work excluded &mdash; a stated assumption, edit for your discom's figures.</div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div class="out-row hero-out">
+            <span class="k">Capex deferred<span class="sub">avoided transformer upgrade spend</span></span>
+            <span class="v mono" id="tf_capex">&mdash;</span>
+          </div>
+          <div class="out-row"><span class="k">Uncoordinated EV coincident load</span><span class="v mono" id="tf_ev_kw">&mdash;<span class="sub">assumed 0.7 coincidence, 3.3kW/charger</span></span></div>
+          <div class="out-row"><span class="k">Recovered via coordination</span><span class="v mono" id="tf_rec_kw">&mdash;<span class="sub">assumed 60% recoverable</span></span></div>
+          <div class="out-row"><span class="k">New headroom on the transformer</span><span class="v mono" id="tf_margin">&mdash;</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel wrap" id="data">
+  <div class="eyebrow">03 &middot; said before anyone asks</div>
+  <h2>Where the data actually comes from</h2>
+  <p class="dek">Not the discom's smart meter API. It doesn't have a public interface for third parties yet, and we say that plainly rather than let a judge catch it.</p>
+  <div class="panel-body">
+    <div class="paths">
+      <div class="path">
+        <span class="tag now">Path A &middot; now</span>
+        <h4>Society&#8209;owned submeters</h4>
+        <p>Every bulk HT society already sub&#8209;meters each flat to generate its own internal bill. That data belongs to the society, not the discom. Getting access is a contract with the RWA or FM company, not a regulatory filing.</p>
+      </div>
+      <div class="path">
+        <span class="tag fallback">Path C &middot; fallback</span>
+        <h4>Retrofit CT clamp + ESP32</h4>
+        <p>For transformer&#8209;constrained societies with no submetering. A non&#8209;invasive current clamp plus a ~$5 microcontroller, publishing over MQTT &mdash; the same pattern behind Emporia Vue and Sense. Proven engineering, not a research problem.</p>
+      </div>
+      <div class="path">
+        <span class="tag future">Path B &middot; future</span>
+        <h4>Discom smart meters</h4>
+        <p>7.24 crore installed and growing under RDSS. No standard third&#8209;party access API exists yet. We're positioned to converge on it once it does &mdash; not betting the product on it arriving.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <b>We don't need smart&#8209;meter&#8209;grade data.</b> The coordinator runs on aggregate active power per flat at 15&#8209;minute resolution, plus a handful of availability flags for flexible devices. High&#8209;resolution, appliance&#8209;level data is used once, offline, to train the archetype models &mdash; it never has to be collected live again. That's a design choice, not a limitation.
+    </div>
+  </div>
+</section>
+
+<section class="panel wrap" id="wedge">
+  <div class="eyebrow">04 &middot; why not something already on the market</div>
+  <h2>The wedge</h2>
+  <p class="dek">Adjacent categories exist. Naming them is the credible move &mdash; pretending the space is empty is the one a judge who knows the space will catch.</p>
+  <div class="panel-body">
+    <table class="compare">
+      <thead><tr><th>Category</th><th>What it does</th><th>What it doesn't</th></tr></thead>
+      <tbody>
+        <tr><td>AMI / smart&#8209;meter vendors</td><td>Instruments the meter</td><td class="cross">Does not coordinate load</td></tr>
+        <tr><td>Commercial ESCOs</td><td>Demand&#8209;charge reduction, single large HT consumer</td><td class="cross">Not built for distributed residential coordination</td></tr>
+        <tr><td>Global DERMS / behavioral analytics</td><td>The validated reference category, utility&#8209;side</td><td class="cross">Not localized to Indian tariffs, appliances, societies</td></tr>
+        <tr class="us"><td>Samanvay</td><td>Deterministic, auditable dispatch <span class="check">&#10003;</span> &nbsp;fairness ledger <span class="check">&#10003;</span></td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="border-left-color:var(--copper)">
+      <b>A black box that defers the same six flats every month gets thrown out at the next general body meeting.</b> That's a real Indian RWA governance dynamic. Nobody adjacent sells explainability and fairness as the product &mdash; we track cumulative kWh deferred and comfort deviation per household, and allocate to equalise it, reported as Jain's fairness index.
+    </div>
+  </div>
+</section>
+
+<section class="panel wrap" id="next">
+  <div class="eyebrow">05 &middot; the highest&#8209;leverage next step</div>
+  <h2>What we're asking for</h2>
+  <p class="dek">Not a bigger model. One real data&#8209;sharing agreement.</p>
+  <div class="panel-body">
+    <div class="milestone-box">
+      <div class="num">01</div>
+      <div>
+        <h4>One society or FM company's submeter data, shared with permission</h4>
+        <p>Six to twelve months of real flat&#8209;wise billing data, validated against our forecaster on top of the published research datasets. This answers "is this real" better than any dataset citation can, because it's our own pilot, not someone else's study &mdash; and it's the same proof point an investor asks for first, because it's the leading indicator that a real sale is close behind it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <p>SAMANVAY &middot; every figure above is computed in this page from the inputs shown, not fetched, not fabricated.</p>
+</footer>
+
+<script>
+(function(){
+  var nodes = document.querySelectorAll('.node-hit');
+  var sections = {};
+  nodes.forEach(function(n){
+    var id = n.getAttribute('data-target');
+    sections[id] = document.getElementById(id);
+    function go(){
+      document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+      pulseTo(n);
+    }
+    n.addEventListener('click', go);
+    n.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
+  });
+
+  var dot = document.getElementById('pulseDot');
+  function pulseTo(node){
+    var cx = node.querySelector('circle').getAttribute('cx');
+    var cy = node.querySelector('circle').getAttribute('cy');
+    dot.setAttribute('opacity','1');
+    dot.animate([
+      {cx:90, cy:150, offset:0},
+    ],{duration:1});
+    var anim = dot.animate([
+      {transform:'translate(0px,0px)'},
+      {transform:'translate('+(cx-90)+'px,'+(cy-150)+'px)'}
+    ],{duration:650, easing:'ease-in-out'});
+    anim.onfinish = function(){ dot.setAttribute('opacity','0'); };
+  }
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        nodes.forEach(function(n){ n.classList.toggle('active', n.getAttribute('data-target')===e.target.id); });
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  Object.keys(sections).forEach(function(id){ if(sections[id]) io.observe(sections[id]); });
+
+  // ---------------- calculator ----------------
+  var fmt = new Intl.NumberFormat('en-IN', {maximumFractionDigits:0});
+  function rupee(n){ return '₹' + fmt.format(Math.round(n)); }
+
+  var calcTabs = document.querySelectorAll('.calc-tab');
+  calcTabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      calcTabs.forEach(function(x){ x.classList.remove('active'); });
+      t.classList.add('active');
+      var mode = t.getAttribute('data-mode');
+      document.getElementById('htPanel').style.display = mode==='ht' ? 'grid' : 'none';
+      document.getElementById('tfPanel').style.display = mode==='tf' ? 'grid' : 'none';
+    });
+  });
+
+  var feeMode = 'perf';
+  document.querySelectorAll('.fee-toggle button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.fee-toggle button').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      feeMode = b.getAttribute('data-fee');
+      document.getElementById('ht_perf_field').style.display = feeMode==='perf' ? 'block' : 'none';
+      document.getElementById('ht_flat_field').style.display = feeMode==='flat' ? 'block' : 'none';
+      calcHT();
+    });
+  });
+
+  function bind(id, suffix, cb){
+    var el = document.getElementById(id);
+    var out = document.getElementById(id+'_v');
+    el.addEventListener('input', function(){ out.textContent = el.value + (suffix||''); cb(); });
+  }
+
+  function calcHT(){
+    var flats = +document.getElementById('ht_flats').value;
+    var contract = +document.getElementById('ht_contract').value;
+    var shave = +document.getElementById('ht_shave').value;
+    var rate = +document.getElementById('ht_rate').value;
+    var feepct = +document.getElementById('ht_feepct').value;
+    var flatfee = +document.getElementById('ht_flatfee').value;
+
+    var kvaShaved = contract * (shave/100);
+    var annualGross = kvaShaved * rate * 12;
+    var annualFee = feeMode==='perf' ? annualGross * (feepct/100) : flats * flatfee * 12;
+    var net = annualGross - annualFee;
+
+    document.getElementById('ht_kva').textContent = kvaShaved.toFixed(1) + ' kVA';
+    document.getElementById('ht_gross').textContent = rupee(annualGross);
+    document.getElementById('ht_fee').textContent = rupee(annualFee);
+    document.getElementById('ht_net').textContent = rupee(net);
+  }
+  ['ht_flats','ht_contract','ht_shave','ht_rate','ht_feepct','ht_flatfee'].forEach(function(id){
+    var suffix = id==='ht_shave' ? '%' : (id==='ht_rate' ? '' : '');
+    document.getElementById(id).addEventListener('input', function(){
+      if(id==='ht_flats') document.getElementById('ht_flats_v').textContent = this.value;
+      if(id==='ht_contract') document.getElementById('ht_contract_v').textContent = this.value;
+      if(id==='ht_shave') document.getElementById('ht_shave_v').textContent = (+this.value).toFixed(1)+'%';
+      if(id==='ht_rate') document.getElementById('ht_rate_v').textContent = '₹'+this.value+'/kVA';
+      if(id==='ht_feepct') document.getElementById('ht_feepct_v').textContent = this.value+'%';
+      if(id==='ht_flatfee') document.getElementById('ht_flatfee_v').textContent = '₹'+this.value+'/flat/mo';
+      calcHT();
+    });
+  });
+
+  function calcTF(){
+    var flats = +document.getElementById('tf_flats').value;
+    var rating = +document.getElementById('tf_rating').value;
+    var ev = +document.getElementById('tf_ev').value;
+    var cost = +document.getElementById('tf_cost').value;
+
+    var evKw = flats * (ev/100) * 3.3 * 0.7;
+    var recKw = evKw * 0.6;
+    var capex = recKw * cost;
+    var marginPct = rating>0 ? (recKw/rating*100) : 0;
+
+    document.getElementById('tf_ev_kw').childNodes[0].textContent = evKw.toFixed(1) + ' kW ';
+    document.getElementById('tf_rec_kw').childNodes[0].textContent = recKw.toFixed(1) + ' kW ';
+    document.getElementById('tf_capex').textContent = rupee(capex);
+    document.getElementById('tf_margin').textContent = '+' + marginPct.toFixed(1) + '%';
+  }
+  ['tf_flats','tf_rating','tf_ev','tf_cost'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', function(){
+      if(id==='tf_flats') document.getElementById('tf_flats_v').textContent = this.value;
+      if(id==='tf_rating') document.getElementById('tf_rating_v').textContent = this.value;
+      if(id==='tf_ev') document.getElementById('tf_ev_v').textContent = this.value+'%';
+      if(id==='tf_cost') document.getElementById('tf_cost_v').textContent = '₹'+this.value+'/kVA';
+      calcTF();
+    });
+  });
+
+  calcHT(); calcTF();
+})();
+</script>
