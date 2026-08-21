@@ -44,6 +44,10 @@
 
 .sv *, .sv *::before, .sv *::after { box-sizing: border-box; }
 .sv button { font: inherit; color: inherit; cursor: pointer; }
+/* The rest of this site is a dark instrument panel and its globals set heading
+ * colour to a near-white. Take it back explicitly rather than by specificity
+ * accident, or every card title on this page renders invisible on paper. */
+.sv h1, .sv h2, .sv h3 { color: var(--ink); letter-spacing: 0; }
 .sv h1, .sv h2, .sv h3, .sv p, .sv figure { margin: 0; }
 
 /* --------------------------------------------------------------- the stage */
@@ -69,13 +73,13 @@
   height: 56px;
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 0 20px;
+  gap: 13px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--rule);
   background: var(--card);
 }
 .sv-mark { width: 11px; height: 11px; background: var(--ink); flex: none; }
-.sv-wordmark { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.sv-wordmark { display: flex; align-items: baseline; gap: 9px; min-width: 0; overflow: hidden; }
 .sv-wordmark b {
   font: 600 15px/1 var(--sans);
   letter-spacing: .18em;
@@ -83,12 +87,15 @@
 }
 .sv-wordmark span {
   font-size: 10.5px;
-  letter-spacing: .06em;
+  letter-spacing: .04em;
   color: var(--ink-3);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sv-chip {
+  flex: none;
   border: 1px solid var(--rule);
   background: var(--paper);
   border-radius: 2px;
@@ -103,6 +110,7 @@ button.sv-chip:hover { border-color: var(--ink-3); background: var(--card); }
 button.sv-chip[aria-expanded="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 
 .sv-lock {
+  flex: none;
   display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid rgba(30, 122, 75, .35);
   background: var(--saved-wash);
@@ -114,14 +122,14 @@ button.sv-chip[aria-expanded="true"] { background: var(--ink); border-color: var
   white-space: nowrap;
 }
 
-.sv-tabs { display: flex; gap: 0; margin-left: auto; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+.sv-tabs { display: flex; gap: 0; margin-left: auto; flex: none; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
 .sv-tabs button {
   border: none;
   background: var(--paper);
-  padding: 7px 15px;
+  padding: 7px 11px;
   font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: .14em;
+  letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--ink-3);
   border-right: 1px solid var(--rule);
@@ -131,8 +139,8 @@ button.sv-chip[aria-expanded="true"] { background: var(--ink); border-color: var
 .sv-tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
 .sv-tabs kbd {
   font: inherit;
-  opacity: .5;
-  margin-left: 7px;
+  opacity: .45;
+  margin-left: 5px;
 }
 
 .sv-zoom { display: flex; align-items: center; gap: 0; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; flex: none; }

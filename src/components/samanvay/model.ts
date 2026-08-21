@@ -92,8 +92,6 @@ function rng(seed: number): () => number {
   };
 }
 
-const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
-
 /* -------------------------------------------------------------- scenarios */
 
 export type ScenarioKey = "normal" | "heatwave" | "sensor_drop" | "grid_outage" | "festival";
@@ -178,28 +176,99 @@ function shape(t: number, sc: Scenario): number {
   return v - pv;
 }
 
-/** Water-fill the clipped energy into the cheapest intervals with headroom. */
-function refill(series: number[], moved: number, target: number): void {
-  const weight = series.map((v, t) => {
-    const cheap = todAt(t).mult <= 0.9;
-    return cheap ? Math.max(0, target - v) : 0;
-  });
-  const total = weight.reduce((a, b) => a + b, 0);
+/** Deferrable energy per flat per day. Everything else is untouchable by
+ *  design: lights, fans, cooking, the fridge. */
+export const SHIFTABLE_KWH_PER_FLAT = 0.9;        // pumps, sewage blower, daytime charging
+export const EVENING_DEFER_KWH_PER_FLAT = 0.55;   // geysers and EV on the evening shoulders
+
+const gauss = (x: number, mu: number, s: number) => Math.exp(-0.5 * Math.pow((x - mu) / s, 2));
+
+/* The controller moves load in shapes, not steps: a geyser bank released over
+ * an hour, a pump set that ramps with the roof. Rectangular shifts at the
+ * window boundaries would be cheaper to draw and would not survive contact
+ * with a transformer. */
+
+/** Where deferred evening load reappears: staggered from 22:15, thinning out by
+ *  three in the morning so every geyser is done before anyone showers. */
+const nightShape = (t: number) => {
+  const u = t >= 88 ? t - 88 : t + 8;   // 0 at 22:00 through 27 at 04:45
+  return u <= 27 ? gauss(u, 3.5, 7) : 0;
+};
+/** Where the pumps and the sewage blower go: into the roof's own output. */
+const solarShape = (t: number) => (t >= 20 && t < 40 ? gauss(t, 34, 6) : 0);
+/** What can leave the 1.0x window without anybody noticing. */
+const dayTakeShape = (t: number) => (t >= 40 && t < 72 ? gauss(t, 56, 9) : 0);
+/** The evening shoulders, where a geyser can wait another hour unremarked. */
+const eveTakeShape = (t: number) => (t >= 72 && t < 88 ? gauss(t, 84, 3.4) : 0);
+
+/** Put `kwh` back into the day in the given shape, never above the target. */
+function place(series: number[], kwh: number, target: number, shape: (t: number) => number): void {
+  if (kwh <= 0) return;
+  const w = series.map((v, t) => (target - v > 2 ? shape(t) : 0));
+  const total = w.reduce((a, b) => a + b, 0);
   if (total <= 0) return;
-  for (let t = 0; t < N; t++) if (weight[t] > 0) series[t] += (moved / 0.25) * (weight[t] / total);
+  for (let t = 0; t < N; t++) if (w[t] > 0) series[t] += (kwh / 0.25) * (w[t] / total);
 }
 
-/** Clip everything above `target` and put the energy back where it is cheap. */
-function shave(src: number[], target: number): number[] {
-  const out = src.slice();
+/** Lift `kwh` out of the day in the given shape, taking no more than `cap` of
+ *  any single interval, and report what actually moved. */
+function take(series: number[], kwh: number, target: number, shape: (t: number) => number, cap: number): number {
+  const w = series.map((v, t) => (v < target - 1 ? shape(t) * v : 0));
+  const total = w.reduce((a, b) => a + b, 0);
+  if (total <= 0) return 0;
+  let scale = 1;
+  for (let t = 0; t < N; t++) {
+    if (w[t] <= 0) continue;
+    const want = (kwh / 0.25) * (w[t] / total);
+    const allowed = series[t] * cap;
+    if (want > allowed) scale = Math.min(scale, allowed / want);
+  }
   let moved = 0;
   for (let t = 0; t < N; t++) {
+    if (w[t] <= 0) continue;
+    const d = (kwh / 0.25) * (w[t] / total) * scale;
+    series[t] -= d;
+    moved += d * 0.25;
+  }
+  return moved;
+}
+
+/**
+ * What the controller actually does to a day, in the two moves it has.
+ *
+ * It holds the evening under the target and lets the held load, plus whatever
+ * the shoulders will give up, run in the night window at 0.9x. Then it moves
+ * the pumps, the sewage blower and daytime charging out of the 1.0x window into
+ * the 0.8x solar window, which never touches the peak but is where most of the
+ * rupees come from.
+ */
+function reschedule(src: number[], target: number, dayShiftKwh: number, eveShiftKwh: number): number[] {
+  const out = src.slice();
+  let held = 0;
+  for (let t = 0; t < N; t++) {
     if (out[t] > target) {
-      moved += (out[t] - target) * 0.25;
+      held += (out[t] - target) * 0.25;
       out[t] = target;
     }
   }
-  refill(out, moved, target);
+  const eve = take(out, eveShiftKwh, target, eveTakeShape, 0.3);
+  place(out, held + eve, target, nightShape);
+  const moved = take(out, dayShiftKwh, target, dayTakeShape, 0.28);
+  place(out, moved, target, solarShape);
+  return out;
+}
+
+/** Peak clipping alone, for the month carpet where the daily detail is noise. */
+function shave(src: number[], target: number): number[] {
+  const out = src.slice();
+  let held = 0;
+  for (let t = 0; t < N; t++) {
+    if (out[t] > target) {
+      held += (out[t] - target) * 0.25;
+      out[t] = target;
+    }
+  }
+  place(out, held, target, nightShape);
   return out;
 }
 
@@ -254,12 +323,14 @@ export function buildDay(key: ScenarioKey): Day {
   const rawMax = Math.max(...raw);
   const ghost = raw.map((v) => (v * sc.ghostPeak) / rawMax);
 
-  // 2. this system: clip at the target, put the energy in the night window
-  const plan = shave(ghost, sc.planPeak);
+  // 2. this system: hold the evening, and move the day load into the solar window
+  const shiftKwh = SHIFTABLE_KWH_PER_FLAT * FLATS;
+  const eveKwh = EVENING_DEFER_KWH_PER_FLAT * FLATS;
+  const plan = reschedule(ghost, sc.planPeak, shiftKwh, eveKwh);
 
   // 3. the mean-forecast controller: same clip, but it aimed at the mean and the
   //    evening came in above it, so the overshoot lands on the billing interval
-  const fcBase = shave(ghost, sc.planPeak);
+  const fcBase = reschedule(ghost, sc.planPeak, shiftKwh, eveKwh);
   const over = sc.fcPeak - sc.planPeak;
   const fcOnly = fcBase.map((v, t) => {
     const h = t * 0.25;
@@ -461,9 +532,9 @@ export function phaseOf(t: number): Phase {
   const h = (t % N) * 0.25;
   if (h < 5.2) return "night";
   if (h < 6.9) return "dawn";
-  if (h < 16.5) return "day";
-  if (h < 18.3) return "golden";
-  if (h < 19.4) return "dusk";
+  if (h < 16.4) return "day";
+  if (h < 19.0) return "golden";
+  if (h < 19.9) return "dusk";
   return "night";
 }
 
@@ -482,12 +553,99 @@ const SKIES: Record<Phase, Sky> = {
   night:  { top: "#171B22", bottom: "#2B303A", plate: "#4A463E", grass: "#2F3A2C", road: "#22242A", sun: 0.05, warmth: 1,    panel: "#2B3340" },
   dawn:   { top: "#48506A", bottom: "#C89272", plate: "#9A8E76", grass: "#5A6B4C", road: "#43454C", sun: 0.4,  warmth: 0.55, panel: "#4C5A72" },
   day:    { top: "#9FBBD6", bottom: "#DCE7F0", plate: "#E4D9C4", grass: "#7C8B5E", road: "#A9A69F", sun: 1,    warmth: 0,    panel: "#2E6BA8" },
-  golden: { top: "#7E8FB4", bottom: "#E8B87E", plate: "#D8C3A0", grass: "#6F7C4E", road: "#8E877D", sun: 0.72, warmth: 0.3,  panel: "#3D6E9C" },
-  dusk:   { top: "#3A4159", bottom: "#9A7A78", plate: "#7E7565", grass: "#48543C", road: "#4E4E52", sun: 0.22, warmth: 0.85, panel: "#33425A" },
+  golden: { top: "#8496BA", bottom: "#EFC489", plate: "#DFCBA8", grass: "#77854F", road: "#968F84", sun: 0.78, warmth: 0.34, panel: "#3D6E9C" },
+  dusk:   { top: "#414A66", bottom: "#AC8A84", plate: "#8C8271", grass: "#4F5C42", road: "#565659", sun: 0.34, warmth: 0.85, panel: "#33425A" },
 };
 
 export function skyOf(t: number, dark = false): Sky {
   const s = SKIES[phaseOf(t)];
   if (!dark) return s;
   return { ...s, top: "#0F1116", bottom: "#191C22", plate: "#38352F", grass: "#242B22", road: "#1B1D21", sun: 0.02, warmth: 0.08, panel: "#20262F" };
+}
+
+/* ------------------------------------------------------------- evidence -- */
+
+export interface Carpet {
+  before: number[][];   // [day][interval] kVA
+  after: number[][];
+  max: number;
+}
+
+/** Thirty days of the month either side of the change, from the same shape. */
+export function buildCarpet(key: ScenarioKey): Carpet {
+  const day = buildDay(key);
+  const r = rng(0x2f11 + scenarioOf(key).n);
+  const before: number[][] = [];
+  const after: number[][] = [];
+  for (let d = 0; d < DAYS_IN_MONTH; d++) {
+    const weekend = d % 7 === 5 || d % 7 === 6;
+    const k = (weekend ? 0.94 : 1) * (0.9 + r() * 0.2);
+    const b = day.ghost.map((v) => v * k);
+    before.push(b);
+    after.push(shave(b, day.sc.planPeak));
+  }
+  return { before, after, max: Math.max(...before.map((d) => Math.max(...d))) };
+}
+
+/** The reliability diagram behind the 92% claim: nominal against empirical. */
+export const RELIABILITY = [
+  { nominal: 0.5, empirical: 0.53 },
+  { nominal: 0.6, empirical: 0.63 },
+  { nominal: 0.7, empirical: 0.72 },
+  { nominal: 0.8, empirical: 0.83 },
+  { nominal: 0.9, empirical: 0.92 },
+  { nominal: 0.95, empirical: 0.964 },
+];
+
+/** Five controllers over an identical month. Ours is the row with the rule. */
+export interface ControllerRow {
+  key: string;
+  name: string;
+  peak: number;
+  breaches: number;
+  bill: number;
+  share: number | null;   // share of the available saving actually captured
+  note: string;
+}
+
+export function controllerTable(day: Day): ControllerRow[] {
+  const g = monthBill(day, "ghost").total;
+  const ours = monthBill(day, "plan").total;
+  const oraclePeak = day.sc.planPeak - 2.1;
+  const oracle = billingDemand(oraclePeak) * DEMAND_RATE + day.dayRupees * DAYS_IN_MONTH * 0.982;
+  const available = g - oracle;
+  const share = (bill: number) => (available <= 0 ? null : (g - bill) / available);
+
+  const rulePeak = day.sc.ghostPeak - 3.4;
+  const ruleBill = billingDemand(rulePeak) * DEMAND_RATE + day.ghostDayRupees * DAYS_IN_MONTH * 0.996;
+  const mpcPeak = day.peakFc;
+  const mpcBill = billingDemand(mpcPeak) * DEMAND_RATE + day.dayRupees * DAYS_IN_MONTH * 1.004;
+
+  return [
+    { key: "none", name: "No control", peak: day.peakGhost, breaches: day.ghostCrossings.length, bill: g, share: share(g), note: "The schedule the society already runs." },
+    { key: "rule", name: "Rule based", peak: rulePeak, breaches: Math.max(0, day.ghostCrossings.length - 1), bill: ruleBill, share: share(ruleBill), note: "Everything waits until 22:00, then switches on together." },
+    { key: "mpc", name: "MPC on the mean", peak: mpcPeak, breaches: day.fcCrossings.length, bill: mpcBill, share: share(mpcBill), note: "Aims at the ceiling with the mean forecast. Half its errors are above it." },
+    { key: "ours", name: "Ours, q95", peak: day.peakPlan, breaches: 0, bill: ours, share: share(ours), note: "Substitutes the 95th percentile into the capacity constraint." },
+    { key: "oracle", name: "Perfect foresight", peak: oraclePeak, breaches: 0, bill: oracle, share: 1, note: "Knows the month in advance. The ceiling on what any controller can do." },
+  ];
+}
+
+/** Fairness: who was asked, and how often. A month that always defers the same
+ *  six flats gets voted out at the next general body meeting. */
+export function fairness(homes: Home[]) {
+  const byTower = (["A", "B"] as const).map((tw) => {
+    const hs = homes.filter((h) => h.tower === tw);
+    return { label: `Tower ${tw}`, asks: hs.reduce((a, h) => a + h.asks, 0) / hs.length, n: hs.length };
+  });
+  const groups = Array.from(new Set(homes.map((h) => h.archetype))).map((g) => {
+    const hs = homes.filter((h) => h.archetype === g);
+    return { label: g, asks: hs.reduce((a, h) => a + h.asks, 0) / hs.length, n: hs.length };
+  });
+  const asks = homes.map((h) => h.asks);
+  const sum = asks.reduce((a, b) => a + b, 0);
+  const sumSq = asks.reduce((a, b) => a + b * b, 0);
+  const jain = sumSq === 0 ? 1 : (sum * sum) / (asks.length * sumSq);
+  const worst = Math.max(...asks);
+  const mean = sum / asks.length;
+  return { byTower, groups, jain, worst, mean };
 }

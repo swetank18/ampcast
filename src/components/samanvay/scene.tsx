@@ -55,9 +55,9 @@ const STATE_COLOUR: Record<HomeState, string> = {
 /* -------------------------------------------------------------- one house */
 
 function House({
-  home, state, sky, dark, onOpen,
+  home, state, sky, onOpen,
 }: {
-  home: Home; state: HomeState; sky: Sky; dark: boolean; onOpen: (h: Home) => void;
+  home: Home; state: HomeState; sky: Sky; onOpen: (h: Home) => void;
 }) {
   const [px, py] = plot(home.col, home.row);
   const hw = 19, hh = 10.5, H = 23, rise = 14;
@@ -249,7 +249,7 @@ export function IsoScene({
       })}
 
       {sorted.map((h) => (
-        <House key={h.i} home={h} state={homeState(h, t, day, override)} sky={sky} dark={dark} onOpen={onOpen} />
+        <House key={h.i} home={h} state={homeState(h, t, day, override)} sky={sky} onOpen={onOpen} />
       ))}
 
       <ConnectionNode load={dark ? 17.5 : load} dark={dark} />

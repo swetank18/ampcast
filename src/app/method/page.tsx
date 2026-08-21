@@ -21,6 +21,7 @@ export default async function MethodPage() {
           </span>
         </div>
         <nav className="acts" aria-label="Sections">
+          <a href="/samanvay">Society</a>
           <a href="/worldsim">World sim</a>
           <a href="/model">Model</a>
           <a href="/method" aria-current="page">Method</a>

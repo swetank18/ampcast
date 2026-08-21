@@ -64,6 +64,7 @@ export default async function ModelPage() {
           </span>
         </div>
         <nav className="acts" aria-label="Sections">
+          <a href="/samanvay">Society</a>
           <a href="/worldsim">World sim</a>
           <a href="/model" aria-current="page">Model</a>
           <a href="/method">Method</a>
