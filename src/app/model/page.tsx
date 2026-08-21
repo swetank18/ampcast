@@ -312,15 +312,21 @@ export default async function ModelPage() {
               optimiser relative to that constant, at the same fixed ceiling.
             </p>
             <p style={{ marginTop: 9, maxWidth: "76ch" }}>
-              <b style={{ color: "var(--ceiling)" }}>The assembly hall does not reproduce the office result, and that
-              is the honest headline of this table.</b> It is the event-driven building in the set — median-forecast
-              MAPE 0.69, genuinely unpredictable — and on it the constant holds the ceiling while we take one breach
-              and end ₹1,041 worse off. Two reasons, both structural rather than lucky: the ceiling is found by
+              <b style={{ color: "var(--ceiling)" }}>Only the office tower reproduces the headline, and that is the
+              honest reading of this table.</b> It is the building where the ceiling actually binds and the load is
+              predictable. On the two campus buildings the no-model constant already holds the ceiling on this month,
+              and we finish a few hundred rupees behind it. Part of that is structural: the ceiling is found by
               bisecting with <i>our</i> forecaster, so we sit at the tightest point it can hold and anything more
-              conservative clears it by doing less; and on a load this erratic a wide constant margin is a defensible
-              forecast. What survives on both buildings is capacity: the forecast hands back{" "}
-              {m.cross_building.map((c) => `${Math.round(c.ours_headroom_kw - c.no_model_headroom_kw)} kW`).join(" and ")}{" "}
-              of usable headroom, and persistence is catastrophic on both.
+              conservative clears it by scheduling less.
+            </p>
+            <p style={{ marginTop: 9, maxWidth: "76ch" }}>
+              What does hold on all three: the forecast hands back{" "}
+              {m.cross_building.map((c) => `${Math.round(c.ours_headroom_kw - c.no_model_headroom_kw)} kW`).join(", ")}{" "}
+              of usable capacity against that constant, and a badly calibrated forecast destroys the ceiling
+              everywhere — persistence takes{" "}
+              {m.cross_building.map((c) => c.persistence_breaches).join(", ")} breaches. So the claim the evidence
+              supports is: <b>a forecast buys capacity, a badly calibrated one is worse than none, and whether a good
+              forecast also buys rupees depends on whether the ceiling binds.</b>
             </p>
           </section>
         )}
