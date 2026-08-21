@@ -1,5 +1,5 @@
 import {
-  ExchangeRate, FeatureGroups, FoldSpread, MoneyRow, ShapBars, StaticMargin, WorstEvening,
+  AblationTable, ExchangeRate, FeatureGroups, FoldSpread, MoneyRow, ShapBars, StaticMargin, WorstEvening,
 } from "@/components/ModelCharts";
 import ForecastSwitch from "@/components/ForecastSwitch";
 import { loadBundleFromDb } from "@/lib/data";
@@ -113,6 +113,13 @@ export default async function ModelPage() {
               index={b.ablation_index}
               ceilingKw={b.demand_target_kw}
               demandRate={b.tariff.demand_charge_per_kva}
+              fixed={[
+                ["Demand ceiling", `${Math.round(b.demand_target_kw)} kW`],
+                ["Risk substitution", "base q95 · solar q05"],
+                ["MILP horizon", "16 h · 15-min steps"],
+                ["Comfort budget", `${(b.demand_target_search.comfort_budget_pct ?? 2).toFixed(1)}% of intervals`],
+                ["Tariff", `${b.tariff.state} · ₹${b.tariff.demand_charge_per_kva}/kVA`],
+              ]}
             />
           </section>
         ) : null}
@@ -131,34 +138,10 @@ export default async function ModelPage() {
                 thing varies: the file the base-load quantiles are read from. Forecast quality on the left, what the
                 transformer and the bill did on the right.
               </p>
-              <div className="table-scroll">
-                <table className="grid-table">
-                  <thead>
-                    <tr>
-                      <th>Forecaster feeding the optimiser</th>
-                      <th>Pinball</th><th>Cov 90%</th><th>Breaches</th><th>Peak kVA</th>
-                      <th>Bill ₹</th><th>Usable headroom kW</th><th>Comfort %</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {abl.rows.map((r) => (
-                      <tr key={r.key} data-hero={r.key === OURS}>
-                        <td>
-                          <span className="swatch" style={{ background: rowColour(r.key) }} />
-                          {r.forecaster}
-                        </td>
-                        <td>{r.key === "static_margin" ? `${r.pinball_mean.toFixed(3)}*` : r.pinball_mean.toFixed(3)}</td>
-                        <td>{r.key === "static_margin" ? `${r.coverage_90.toFixed(3)}*` : r.coverage_90.toFixed(3)}</td>
-                        <td style={{ color: r.ceiling_breaches > 0 ? "var(--ceiling)" : undefined }}>{r.ceiling_breaches}</td>
-                        <td>{r.peak_kva.toFixed(1)}</td>
-                        <td>{inr(r.bill_inr)}</td>
-                        <td>{r.usable_headroom_kw.toFixed(1)}</td>
-                        <td>{r.comfort_violation_pct.toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <AblationTable
+                byStress={abl.stress_rows ?? { none: abl.rows }}
+                oursKey={OURS}
+              />
               {constant && (
                 <p style={{ marginTop: 12, maxWidth: "76ch" }}>
                   <b style={{ color: "var(--ceiling)" }}>Replace the forecaster with a constant</b> and the same
@@ -316,7 +299,7 @@ export default async function ModelPage() {
                     <p className="note" style={{ marginTop: 8 }}>
                       What survives the transfer is the property the controller actually depends on: coverage on a
                       building the model has never seen, against a nominal 0.90. What does not survive is sharpness.
-                      So the deployment answer is a fortnight of seasonal naive at a new site, the pooled model's
+                      So the deployment answer is a fortnight of seasonal naive at a new site, the pooled model&rsquo;s
                       interval from day one, and a site-specific model once there is a season of data — rather than a
                       transfer claim the numbers do not support.
                     </p>

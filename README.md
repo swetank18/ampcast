@@ -1,3 +1,24 @@
+# Aethergrid — the dashboard
+
+Next.js 16 + React 19 viewer over the study in `../demand-control`. It renders
+numbers; it never computes money. Everything on screen was produced by that
+repo's scripts and exported by `eval/export_web.py` into `src/lib/bundle.json`
+and `public/data/**`.
+
+Three pages: **/model** (the evidence — including a forecaster switch that
+replays the ablation), **/worldsim** (five controllers across four scenarios),
+**/method** (how it was done).
+
+Read `../demand-control/docs/system_overview.md` for the full explanation of the
+dashboard and the models underneath it.
+
+```bash
+npm install
+npm run dev            # reads the bundled export; DATABASE_URL (Neon) optional
+```
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

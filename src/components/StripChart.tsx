@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Series } from "@/lib/types";
-import { dayLabel, inr, stamp } from "@/lib/format";
+import { dayLabel } from "@/lib/format";
 
 export interface Trace {
   id: string;
@@ -36,15 +36,6 @@ function niceTicks(lo: number, hi: number, n = 4): number[] {
   const out: number[] = [];
   for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v);
   return out;
-}
-
-/** Path builder that skips points past the replay head, so the traces draw in
- *  as the month plays rather than appearing whole. */
-function linePath(values: number[], upTo: number, x: (i: number) => number, y: (v: number) => number) {
-  let d = "";
-  const n = Math.min(upTo + 1, values.length);
-  for (let i = 0; i < n; i++) d += `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(values[i]).toFixed(1)}`;
-  return d;
 }
 
 /** Billed demand as the month has seen it so far: a running maximum in kVA,
@@ -113,7 +104,43 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
       tLo: tLo - pad,
       tHi: tHi + pad,
     };
-  }, [traces, ceilingKw]);
+  }, [traces, ratchets, ceilingKw, floorKva]);
+
+  /**
+   * Every path is built once, for the whole month, and the replay is a clip
+   * rectangle sliding across it. The previous version rebuilt a dozen
+   * thousand-point paths on every animation frame, which on a laptop reads as
+   * the page reloading rather than as a month playing.
+   */
+  const paths = useMemo(() => {
+    if (!scales) return null;
+    const poly = (vals: number[], y: (v: number) => number) =>
+      vals.length ? vals.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("") : "";
+    return traces.map((tr) => ({
+      id: tr.id,
+      color: tr.color,
+      hero: tr.id === heroId,
+      grid: poly(tr.series.grid_kw, scales.gy),
+      bill: poly(ratchets[tr.id], scales.by),
+      temp: poly(tr.series.t_indoor, scales.ty),
+      breaches: tr.series.grid_kw.reduce<{ i: number; y: number }[]>((acc, v, i) => {
+        if (v > ceilingKw) acc.push({ i, y: scales.gy(v) });
+        return acc;
+      }, []),
+    }));
+  }, [traces, ratchets, scales, x, heroId, ceilingKw]);
+
+  const comfortBand = useMemo(() => {
+    if (!scales || !traces.length) return "";
+    const hero = traces.find((t) => t.id === heroId) ?? traces[0];
+    return (
+      hero.series.t_hi.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${scales.ty(v).toFixed(1)}`).join("") +
+      hero.series.t_lo.map((_, k, a) => {
+        const j = a.length - 1 - k;
+        return `L${x(j).toFixed(1)},${scales.ty(a[j]).toFixed(1)}`;
+      }).join("") + "Z"
+    );
+  }, [traces, scales, x, heroId]);
 
   const dayTicks = useMemo(() => {
     if (!traces.length) return [];
@@ -129,16 +156,6 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
     }
     return out;
   }, [traces]);
-
-  const breaches = useMemo(
-    () =>
-      traces.map((tr) => ({
-        id: tr.id,
-        color: tr.color,
-        idx: tr.series.grid_kw.map((v, i) => (v > ceilingKw ? i : -1)).filter((i) => i >= 0),
-      })),
-    [traces, ceilingKw],
-  );
 
   const pick = useCallback(
     (clientX: number) => {
@@ -159,12 +176,13 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
     return () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
   }, [pick]);
 
-  if (!scales || !traces.length) {
+  if (!scales || !paths || !traces.length) {
     return <div ref={wrapRef} style={{ height: 420 }} />;
   }
 
+  const head = Math.min(upTo, n - 1);
+  const revealW = Math.max(0, x(head) - PAD.l);
   const cx = x(Math.min(cursor, n - 1));
-  const hero = traces.find((t) => t.id === heroId) ?? traces[0];
   const totalH = H_GRID + H_BILL + H_TEMP + AXIS_H;
 
   const axisLabel = (yy: number, text: string) => (
@@ -190,6 +208,10 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
           <clipPath id="plot">
             <rect x={PAD.l} y={0} width={innerW} height={H_GRID} />
           </clipPath>
+          {/* the replay head: everything drawn so far lives inside this rect */}
+          <clipPath id="reveal">
+            <rect x={PAD.l} y={0} width={revealW} height={totalH} />
+          </clipPath>
         </defs>
 
         {/* ---------------------------------------------------- panel 1: kW */}
@@ -205,17 +227,30 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
             <rect x={PAD.l} y={0} width={innerW} height={scales.gy(ceilingKw)} fill="url(#forbidden)" />
           </g>
 
-          {traces.map((tr) => (
-            <path
-              key={tr.id}
-              d={linePath(tr.series.grid_kw, upTo, x, scales.gy)}
-              fill="none"
-              stroke={tr.color}
-              strokeWidth={tr.id === heroId ? 1.7 : 1.1}
-              strokeOpacity={tr.id === heroId ? 1 : 0.82}
-              strokeLinejoin="round"
-            />
-          ))}
+          <g clipPath="url(#reveal)">
+            {paths.map((p) => (
+              <path
+                key={p.id}
+                d={p.grid}
+                fill="none"
+                stroke={p.color}
+                strokeWidth={p.hero ? 1.7 : 1.1}
+                strokeOpacity={p.hero ? 1 : 0.82}
+                strokeLinejoin="round"
+              />
+            ))}
+            {paths.map((p) =>
+              p.breaches.map((b) => (
+                <path
+                  key={`${p.id}-${b.i}`}
+                  d={`M${x(b.i) - 4},${b.y - 9} L${x(b.i) + 4},${b.y - 9} L${x(b.i)},${b.y - 2} Z`}
+                  fill={p.color}
+                  stroke="var(--void)"
+                  strokeWidth="0.6"
+                />
+              )),
+            )}
+          </g>
 
           <line
             x1={PAD.l} x2={w - PAD.r}
@@ -225,18 +260,6 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
           <text x={PAD.l + 6} y={scales.gy(ceilingKw) - 6} fill="var(--ceiling)" fontSize="9.5" fontFamily="var(--mono)" fontWeight="600" letterSpacing="0.1em">
             DEMAND CEILING {Math.round(ceilingKw)} kW
           </text>
-
-          {breaches.map((b) =>
-            b.idx.filter((i) => i <= upTo).map((i) => (
-              <path
-                key={`${b.id}-${i}`}
-                d={`M${x(i) - 4},${scales.gy(traces.find((t) => t.id === b.id)!.series.grid_kw[i]) - 9} L${x(i) + 4},${scales.gy(traces.find((t) => t.id === b.id)!.series.grid_kw[i]) - 9} L${x(i)},${scales.gy(traces.find((t) => t.id === b.id)!.series.grid_kw[i]) - 2} Z`}
-                fill={b.color}
-                stroke="var(--void)"
-                strokeWidth="0.6"
-              />
-            )),
-          )}
           <text x={PAD.l - 8} y={12} textAnchor="end" fill="var(--dim)" fontSize="9" fontFamily="var(--mono)" fontWeight="600">kW</text>
         </g>
 
@@ -244,9 +267,11 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
         <g transform={`translate(0, ${H_GRID})`}>
           <line x1={PAD.l} x2={w - PAD.r} y1={0} y2={0} stroke="var(--rule-2)" strokeWidth="1" />
           <line x1={PAD.l} x2={w - PAD.r} y1={scales.by(floorKva)} y2={scales.by(floorKva)} stroke="var(--rule-2)" strokeWidth="1" strokeDasharray="2 3" />
-          {traces.map((tr) => (
-            <path key={tr.id} d={linePath(ratchets[tr.id], upTo, x, scales.by)} fill="none" stroke={tr.color} strokeWidth={tr.id === heroId ? 1.9 : 1.2} strokeOpacity={tr.id === heroId ? 1 : 0.8} />
-          ))}
+          <g clipPath="url(#reveal)">
+            {paths.map((p) => (
+              <path key={p.id} d={p.bill} fill="none" stroke={p.color} strokeWidth={p.hero ? 1.9 : 1.2} strokeOpacity={p.hero ? 1 : 0.8} />
+            ))}
+          </g>
           {axisLabel(scales.by(scales.rHi), `${Math.round(scales.rHi)}`)}
           {axisLabel(scales.by(floorKva), `${Math.round(floorKva)}`)}
           <text x={PAD.l - 8} y={12} textAnchor="end" fill="var(--dim)" fontSize="9" fontFamily="var(--mono)" fontWeight="600">kVA</text>
@@ -258,20 +283,12 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
         {/* ------------------------------------------ panel 3: indoor °C */}
         <g transform={`translate(0, ${H_GRID + H_BILL})`}>
           <line x1={PAD.l} x2={w - PAD.r} y1={0} y2={0} stroke="var(--rule-2)" strokeWidth="1" />
-          <path
-            d={
-              hero.series.t_hi.map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${scales.ty(v).toFixed(1)}`).join("") +
-              hero.series.t_lo.map((v, i, a) => `L${x(a.length - 1 - i).toFixed(1)},${scales.ty(a[a.length - 1 - i]).toFixed(1)}`).join("") +
-              "Z"
-            }
-            fill="var(--ours)"
-            fillOpacity="0.07"
-            stroke="var(--rule-2)"
-            strokeWidth="0.7"
-          />
-          {traces.map((tr) => (
-            <path key={tr.id} d={linePath(tr.series.t_indoor, upTo, x, scales.ty)} fill="none" stroke={tr.color} strokeWidth={tr.id === heroId ? 1.5 : 1} strokeOpacity={tr.id === heroId ? 1 : 0.75} />
-          ))}
+          <path d={comfortBand} fill="var(--ours)" fillOpacity="0.07" stroke="var(--rule-2)" strokeWidth="0.7" />
+          <g clipPath="url(#reveal)">
+            {paths.map((p) => (
+              <path key={p.id} d={p.temp} fill="none" stroke={p.color} strokeWidth={p.hero ? 1.5 : 1} strokeOpacity={p.hero ? 1 : 0.75} />
+            ))}
+          </g>
           {axisLabel(scales.ty(scales.tHi - 0.6), `${Math.round(scales.tHi - 0.6)}`)}
           {axisLabel(scales.ty(scales.tLo + 0.6), `${Math.round(scales.tLo + 0.6)}`)}
           <text x={PAD.l - 8} y={12} textAnchor="end" fill="var(--dim)" fontSize="9" fontFamily="var(--mono)" fontWeight="600">°C</text>
@@ -290,9 +307,13 @@ export default function StripChart({ traces, ceilingKw, floorKva, cursor, onCurs
 
         {/* -------------------------------------------------- time cursor */}
         <line x1={cx} x2={cx} y1={0} y2={H_GRID + H_BILL + H_TEMP} stroke="var(--ink-hi)" strokeWidth="1" strokeOpacity="0.45" />
-        {traces.map((tr) => (
-          <circle key={tr.id} cx={cx} cy={scales.gy(tr.series.grid_kw[Math.min(cursor, n - 1)])} r={tr.id === heroId ? 3 : 2} fill={tr.color} stroke="var(--void)" strokeWidth="1" />
-        ))}
+        {traces.map((tr) => {
+          const v = tr.series.grid_kw[Math.min(cursor, n - 1)];
+          if (!Number.isFinite(v)) return null;
+          return (
+            <circle key={tr.id} cx={cx} cy={scales.gy(v)} r={tr.id === heroId ? 3 : 2} fill={tr.color} stroke="var(--void)" strokeWidth="1" />
+          );
+        })}
       </svg>
     </div>
   );

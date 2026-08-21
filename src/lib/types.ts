@@ -129,6 +129,7 @@ export interface AblationRow {
   bill_inr: number;
   usable_headroom_kw: number;
   comfort_violation_pct: number;
+  sharpness_90: number;
   worst_breach_kw: number;
   first_breach_at: string | null;
   bill_vs_ours: number;
@@ -163,6 +164,8 @@ export interface ModelEvidence {
       held_fixed: string[]; varied: string;
     };
     rows: AblationRow[];
+    /** the same experiment under each injected failure; "none" is the calm month */
+    stress_rows?: Record<string, AblationRow[]>;
   };
   frontier?: {
     monotonicity: Record<string, { n: number; rho: number; p: number; monotonic: boolean }>;

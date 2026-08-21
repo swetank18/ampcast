@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 /**
  * Charts for the evidence page.
  *
@@ -296,5 +298,79 @@ export function MoneyRow({ impact }: { impact: NonNullable<ModelEvidence["impact
         </div>
       ))}
     </div>
+  );
+}
+
+
+const STRESS_LABEL: Record<string, string> = {
+  none: "Normal month",
+  heatwave: "Heatwave",
+  sensor_dropout: "Sensor dropout",
+  outage: "Grid outage",
+};
+
+const STRESS_NOTE: Record<string, string> = {
+  none: "June 2017 as it happened.",
+  heatwave: "+6 °C and +25% base load for three days. Note the last column: under a shock that is in nobody's inputs, what defends the ceiling is interval width, not sharpness — which is why seasonal naive rides it out and we do not.",
+  sensor_dropout: "The forecast input freezes for two hours.",
+  outage: "Grid import forced to zero for two hours.",
+};
+
+/** The ablation table, with the stress cases it was also run under. The heatwave
+ *  column is the one that goes against us; putting it behind a toggle rather
+ *  than leaving it out is the whole posture of this page. */
+export function AblationTable({ byStress, oursKey }: {
+  byStress: Record<string, AblationRow[]>;
+  oursKey: string;
+}) {
+  const keys = Object.keys(byStress).sort((a, b) => (a === "none" ? -1 : b === "none" ? 1 : a.localeCompare(b)));
+  const [stress, setStress] = useState(keys[0] ?? "none");
+  const rows = byStress[stress] ?? [];
+
+  return (
+    <>
+      {keys.length > 1 && (
+        <div style={{ display: "flex", gap: 4, marginBottom: 10, flexWrap: "wrap" }}>
+          {keys.map((k) => (
+            <button
+              key={k}
+              type="button"
+              className="btn btn-ghost"
+              aria-pressed={stress === k}
+              onClick={() => setStress(k)}
+              style={{ opacity: stress === k ? 1 : 0.6 }}
+            >
+              {STRESS_LABEL[k] ?? k}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="table-scroll">
+        <table className="grid-table">
+          <thead>
+            <tr>
+              <th>Forecaster feeding the optimiser</th>
+              <th>Pinball</th><th>Cov 90%</th><th>Breaches</th><th>Peak kVA</th>
+              <th>Bill ₹</th><th>Usable headroom kW</th><th>Interval kW</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.key} data-hero={r.key === oursKey}>
+                <td><span className="swatch" style={{ background: rowColour(r.key) }} />{r.forecaster}</td>
+                <td>{r.key === "static_margin" ? `${r.pinball_mean.toFixed(3)}*` : r.pinball_mean.toFixed(3)}</td>
+                <td>{r.key === "static_margin" ? `${r.coverage_90.toFixed(3)}*` : r.coverage_90.toFixed(3)}</td>
+                <td style={{ color: r.ceiling_breaches > 0 ? "var(--ceiling)" : undefined }}>{r.ceiling_breaches}</td>
+                <td>{r.peak_kva.toFixed(1)}</td>
+                <td>{inr(r.bill_inr)}</td>
+                <td>{r.usable_headroom_kw.toFixed(1)}</td>
+                <td>{r.sharpness_90 == null ? "—" : r.sharpness_90.toFixed(1)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="note" style={{ marginTop: 9 }}>{STRESS_NOTE[stress] ?? ""}</p>
+    </>
   );
 }

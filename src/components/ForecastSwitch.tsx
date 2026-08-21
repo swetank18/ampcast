@@ -12,6 +12,12 @@
  * `eval/ablation.py` already ran with the optimiser, the tariff, the physics and
  * the seed held fixed, so what you see when you flip the switch is the
  * experiment, not an animation of one.
+ *
+ * On drawing: the paths are built once per run and then revealed by animating a
+ * clip rectangle. Rebuilding four thousand path points on every frame -- which
+ * is what the obvious implementation does -- drops the replay to a stutter that
+ * reads as the page reloading. Per frame this now moves one rect, one line and
+ * two dots.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -23,6 +29,7 @@ const PAD = { l: 46, r: 12, t: 10 };
 const H_LOAD = 210;
 const H_BAND = 150;
 const AXIS_H = 20;
+const SPEEDS = [0.5, 1, 2, 4];
 
 /** Ours is the only cool highlight; anything that breaches owns the hot end. */
 function colourFor(key: string, breaches: number): string {
@@ -41,41 +48,54 @@ function ticks(lo: number, hi: number, n = 4): number[] {
 }
 
 export default function ForecastSwitch({
-  index, ceilingKw, demandRate,
+  index, ceilingKw, demandRate, fixed = [],
 }: {
   index: AblationIndexEntry[];
   ceilingKw: number;
   demandRate: number;
+  /** What is held constant across every option, shown so nobody has to take on
+   *  trust that only the forecaster changed. */
+  fixed?: [string, string][];
 }) {
   const [key, setKey] = useState(OURS);
   const [runs, setRuns] = useState<Record<string, AblationRun>>({});
   const [failed, setFailed] = useState<string[]>([]);
-  // refs so the background prefetch can see what has already arrived without
-  // restarting itself every time one does
-  const runsRef = useRef(runs);
-  const failedRef = useRef(failed);
-  runsRef.current = runs;
-  failedRef.current = failed;
-  const [cursor, setCursor] = useState(0);
+  // null means "wherever the month ends", so a freshly loaded run lands on its
+  // last interval without an effect having to push it there
+  const [cursor, setCursor] = useState<number | null>(null);
   const [head, setHead] = useState(1e9);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
   const [w, setW] = useState(900);
   const wrap = useRef<HTMLDivElement>(null);
-  const raf = useRef<number | null>(null);
   const dragging = useRef(false);
+  const headRef = useRef(1e9);
+
+  /** Switching forecaster resets the transport, in the handler rather than in an
+   *  effect reacting to the change. */
+  const applyKey = useCallback((k: string) => {
+    setKey(k);
+    setPlaying(false);
+    setCursor(null);
+    setHead(1e9);
+    headRef.current = 1e9;
+  }, []);
 
   // `#f=persistence` opens straight into one forecaster, and clicking writes the
   // hash back. On stage that is a bookmark that survives a click going astray;
-  // in review it is a link to the exact view being argued about.
+  // in review it is a link to the exact view being argued about. The hash can
+  // only be read after mount -- reading it in the initial state would render
+  // something different on the server and break hydration.
   useEffect(() => {
     const want = new URLSearchParams(window.location.hash.slice(1)).get("f");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see above
     if (want && index.some((e) => e.key === want)) setKey(want);
   }, [index]);
 
   const choose = useCallback((k: string) => {
-    setKey(k);
+    applyKey(k);
     history.replaceState(null, "", `#f=${k}`);
-  }, []);
+  }, [applyKey]);
 
   useEffect(() => {
     const el = wrap.current;
@@ -109,14 +129,15 @@ export default function ForecastSwitch({
   // Then quietly pull the other six in the background, one at a time. Eight
   // months come to about 1.4 MB in total, and having them resident means the
   // switch is instant on stage rather than a blank panel over a conference
-  // network — which is the difference between a demo and an apology.
+  // network -- which is the difference between a demo and an apology.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       for (const e of index) {
         if (cancelled) return;
-        if (runsRef.current[e.key] || failedRef.current.includes(e.key)) continue;
         try {
+          // whatever the on-demand loader already pulled is served from the
+          // browser cache, so this does not need to know what it has
           const res = await fetch(`/data/ablation/${e.key}.json`);
           if (!res.ok) throw new Error(String(res.status));
           const run = (await res.json()) as AblationRun;
@@ -133,29 +154,44 @@ export default function ForecastSwitch({
   const ref = runs[OURS];
   const n = run?.series.t.length ?? 0;
 
-  // land on the end of the month when a run arrives, so the rolling calibration
-  // readouts show a number at rest rather than the dash they would show at t=0,
-  // where a 24-hour window has nothing in it yet
-  useEffect(() => { setHead(1e9); setPlaying(false); }, [key]);
-  useEffect(() => { if (n) setCursor(n - 1); }, [key, n]);
+  const seek = useCallback((i: number, stop = true) => {
+    if (stop) setPlaying(false);
+    headRef.current = i;
+    setHead(i);
+    setCursor(i);
+  }, []);
+
+  const showAll = useCallback(() => {
+    setPlaying(false);
+    headRef.current = 1e9;
+    setHead(1e9);
+    setCursor(null);
+  }, []);
 
   useEffect(() => {
     if (!playing || !n) return;
+    let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
       const dt = now - last;
       last = now;
-      setHead((h) => {
-        const next = (h > n ? 0 : h) + dt * 0.09;
-        if (next >= n - 1) { setPlaying(false); setCursor(n - 1); return 1e9; }
-        setCursor(Math.floor(next));
-        return next;
-      });
-      raf.current = requestAnimationFrame(tick);
+      const from = headRef.current >= n - 1 ? 0 : headRef.current;
+      const next = from + dt * 0.09 * speed;      // 1x is about 16 s for the month
+      if (next >= n - 1) {
+        headRef.current = 1e9;
+        setHead(1e9);
+        setCursor(null);
+        setPlaying(false);
+        return;
+      }
+      headRef.current = next;
+      setHead(next);
+      setCursor(Math.floor(next));
+      raf = requestAnimationFrame(tick);
     };
-    raf.current = requestAnimationFrame(tick);
-    return () => { if (raf.current) cancelAnimationFrame(raf.current); };
-  }, [playing, n]);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, n, speed]);
 
   const innerW = Math.max(120, w - PAD.l - PAD.r);
   const x = useCallback((i: number) => PAD.l + (i / Math.max(1, n - 1)) * innerW, [innerW, n]);
@@ -164,9 +200,9 @@ export default function ForecastSwitch({
     const el = wrap.current;
     if (!el || !n) return;
     const r = el.getBoundingClientRect();
-    onScrub(Math.max(0, Math.min(n - 1, Math.round(((clientX - r.left - PAD.l) / innerW) * (n - 1)))));
-    function onScrub(i: number) { setPlaying(false); setCursor(i); }
-  }, [innerW, n]);
+    const i = Math.round(((clientX - r.left - PAD.l) / innerW) * (n - 1));
+    seek(Math.max(0, Math.min(n - 1, i)));
+  }, [innerW, n, seek]);
 
   useEffect(() => {
     const move = (e: PointerEvent) => dragging.current && pick(e.clientX);
@@ -199,28 +235,51 @@ export default function ForecastSwitch({
     };
   }, [run, ref, ceilingKw]);
 
-  const upTo = Math.min(head, n - 1);
-  const i = Math.min(cursor, Math.max(0, n - 1));
+  /** Built once per run and per width, then revealed by the clip rect. This is
+   *  the whole reason the replay is smooth. */
+  const paths = useMemo(() => {
+    if (!run || !scales) return null;
+    const poly = (vals: number[], y: (v: number) => number) =>
+      vals.length ? vals.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("") : "";
+    const band = run.band;
+    const fan = band && band.q95.length
+      ? band.q95.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${scales.by(v).toFixed(1)}`).join("") +
+        band.q05.map((_, k, a) => {
+          const j = a.length - 1 - k;
+          return `L${x(j).toFixed(1)},${scales.by(band.q05[j]).toFixed(1)}`;
+        }).join("") + "Z"
+      : "";
+    return {
+      grid: poly(run.series.grid_kw, scales.gy),
+      ghost: ref && key !== OURS ? poly(ref.series.grid_kw, scales.gy) : "",
+      fan,
+      actual: band ? poly(band.actual, scales.by) : "",
+    };
+  }, [run, ref, key, scales, x]);
 
-  const line = (vals: number[], y: (v: number) => number, limit = upTo) => {
-    let d = "";
-    const stop = Math.min(limit + 1, vals.length);
-    for (let k = 0; k < stop; k++) d += `${k ? "L" : "M"}${x(k).toFixed(1)},${y(vals[k]).toFixed(1)}`;
-    return d;
-  };
+  /** Indices of every block over the ceiling, so the count at the replay head is
+   *  a walk over at most a hundred numbers rather than over the whole month. */
+  const breachIdx = useMemo(
+    () => (run
+      ? run.series.grid_kw.reduce<number[]>((acc, v, i) => { if (v > ceilingKw) acc.push(i); return acc; }, [])
+      : []),
+    [run, ceilingKw],
+  );
 
+  const upTo = Math.min(head, Math.max(0, n - 1));
+  const i = Math.min(cursor ?? Math.max(0, n - 1), Math.max(0, n - 1));
   const breachesSoFar = useMemo(() => {
-    if (!run) return 0;
     let c = 0;
-    for (let k = 0; k <= upTo && k < run.series.grid_kw.length; k++) if (run.series.grid_kw[k] > ceilingKw) c++;
+    for (const b of breachIdx) { if (b > upTo) break; c++; }
     return c;
-  }, [run, upTo, ceilingKw]);
+  }, [breachIdx, upTo]);
 
   const entry = index.find((e) => e.key === key);
   const ours = index.find((e) => e.key === OURS);
   const colour = colourFor(key, entry?.breaches ?? 0);
   const hit = run?.band?.q95_hit_24h?.[i];
   const cov = run?.band?.coverage_24h?.[i];
+  const revealW = Math.max(0, x(upTo) - PAD.l);
 
   return (
     <div>
@@ -229,6 +288,7 @@ export default function ForecastSwitch({
         {index.map((e) => (
           <button
             key={e.key}
+            type="button"
             className="btn btn-ghost"
             aria-pressed={key === e.key}
             onClick={() => choose(e.key)}
@@ -252,12 +312,53 @@ export default function ForecastSwitch({
             </span>
             <span className="num" style={{ fontSize: 10.5, color: "var(--dim)" }}>{n ? stamp(run!.series.t[i]) : ""}</span>
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            <button className="btn btn-primary" onClick={() => { if (head >= n - 1) setHead(0); setPlaying((p) => !p); }}>
-              {playing ? "Pause" : "Replay month"}
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <button type="button" className="btn btn-ghost" onClick={() => seek(0)} title="Back to 1 June" aria-label="Restart">
+              &#8635;
             </button>
-            <button className="btn" onClick={() => { setPlaying(false); setHead(1e9); setCursor(n - 1); }}>Show all</button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => { if (headRef.current >= n - 1) { headRef.current = 0; setHead(0); setCursor(0); } setPlaying((p) => !p); }}
+            >
+              {playing ? "Pause" : head >= n - 1 ? "Replay month" : "Resume"}
+            </button>
+            <button type="button" className="btn" onClick={showAll}>Show all</button>
           </div>
+        </div>
+
+        {/* ----------------------------------------------------- transport */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
+          padding: "7px 10px", borderBottom: "1px solid var(--rule)", background: "var(--void)",
+        }}>
+          <span className="eyebrow" style={{ flex: "none" }}>Speed</span>
+          <div style={{ display: "flex", gap: 2, flex: "none" }}>
+            {SPEEDS.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className="btn btn-ghost"
+                aria-pressed={speed === s}
+                onClick={() => setSpeed(s)}
+                style={{ padding: "3px 7px", opacity: speed === s ? 1 : 0.55 }}
+              >
+                {s}&times;
+              </button>
+            ))}
+          </div>
+          <input
+            type="range"
+            min={0}
+            max={Math.max(0, n - 1)}
+            value={i}
+            onChange={(e) => seek(Number(e.target.value))}
+            aria-label="Position in the billing month"
+            style={{ flex: 1, minWidth: 160, accentColor: "var(--ours)" }}
+          />
+          <span className="num" style={{ flex: "none", fontSize: 10.5, color: "var(--dim)", minWidth: 96, textAlign: "right" }}>
+            {n ? `${Math.round(((i + 1) / n) * 100)}% of month` : "—"}
+          </span>
         </div>
 
         <div
@@ -266,12 +367,12 @@ export default function ForecastSwitch({
           style={{ padding: "6px 10px 8px", cursor: "crosshair", touchAction: "none" }}
           onPointerDown={(e) => { dragging.current = true; pick(e.clientX); }}
         >
-          {!run || !scales ? (
+          {!run || !scales || !paths ? (
             <div style={{ height: H_LOAD + H_BAND + AXIS_H, display: "grid", placeItems: "center" }}>
               {failed.includes(key) && (
                 <p className="note">
                   <b>/data/ablation/{key}.json</b> did not load. It is written by{" "}
-                  <b>eval/export_web.py</b> from the run that produced the table below — the numbers in that
+                  <b>eval/export_web.py</b> from the run that produced the table below &mdash; the numbers in that
                   table are unaffected.
                 </p>
               )}
@@ -285,6 +386,10 @@ export default function ForecastSwitch({
                   <line x1="0" y1="0" x2="0" y2="7" stroke="var(--ceiling)" strokeWidth="1" opacity="0.22" />
                 </pattern>
                 <clipPath id="fs-plot"><rect x={PAD.l} y={0} width={innerW} height={H_LOAD} /></clipPath>
+                {/* the replay: everything drawn so far lives inside this rect */}
+                <clipPath id="fs-reveal">
+                  <rect x={PAD.l} y={0} width={revealW} height={H_LOAD + H_BAND} />
+                </clipPath>
               </defs>
 
               {/* ------------------------------------------- panel 1: outcome */}
@@ -297,43 +402,42 @@ export default function ForecastSwitch({
               <g clipPath="url(#fs-plot)">
                 <rect x={PAD.l} y={0} width={innerW} height={scales.gy(ceilingKw)} fill="url(#fs-forbidden)" />
               </g>
-              {ref && key !== OURS && (
-                <path d={line(ref.series.grid_kw, scales.gy)} fill="none" stroke="var(--ours)" strokeWidth="1" strokeOpacity="0.4" />
-              )}
-              <path d={line(run.series.grid_kw, scales.gy)} fill="none" stroke={colour} strokeWidth="1.7" strokeLinejoin="round" />
+
+              <g clipPath="url(#fs-reveal)">
+                {paths.ghost && (
+                  <path d={paths.ghost} fill="none" stroke="var(--ours)" strokeWidth="1" strokeOpacity="0.4" />
+                )}
+                {paths.grid && (
+                  <path d={paths.grid} fill="none" stroke={colour} strokeWidth="1.7" strokeLinejoin="round" />
+                )}
+                {breachIdx.map((k) => (
+                  <path
+                    key={k}
+                    d={`M${x(k) - 4},${scales.gy(run.series.grid_kw[k]) - 9} L${x(k) + 4},${scales.gy(run.series.grid_kw[k]) - 9} L${x(k)},${scales.gy(run.series.grid_kw[k]) - 2} Z`}
+                    fill="var(--ceiling)" stroke="var(--void)" strokeWidth="0.6"
+                  />
+                ))}
+              </g>
+
               <line x1={PAD.l} x2={w - PAD.r} y1={scales.gy(ceilingKw)} y2={scales.gy(ceilingKw)}
                     stroke="var(--ceiling)" strokeWidth="1.6" strokeDasharray="7 4" />
               <text x={PAD.l + 6} y={scales.gy(ceilingKw) - 6} fill="var(--ceiling)" fontSize="9.5"
                     fontFamily="var(--mono)" fontWeight="600" letterSpacing="0.1em">
                 DEMAND CEILING {Math.round(ceilingKw)} kW
               </text>
-              {run.series.grid_kw.map((v, k) =>
-                v > ceilingKw && k <= upTo ? (
-                  <path key={k}
-                        d={`M${x(k) - 4},${scales.gy(v) - 9} L${x(k) + 4},${scales.gy(v) - 9} L${x(k)},${scales.gy(v) - 2} Z`}
-                        fill="var(--ceiling)" stroke="var(--void)" strokeWidth="0.6" />
-                ) : null,
-              )}
               <text x={PAD.l - 8} y={12} textAnchor="end" fill="var(--dim)" fontSize="9" fontFamily="var(--mono)" fontWeight="600">kW</text>
 
               {/* --------------------------------------------- panel 2: the fan */}
               <g transform={`translate(0, ${H_LOAD})`}>
                 <line x1={PAD.l} x2={w - PAD.r} y1={0} y2={0} stroke="var(--rule-2)" strokeWidth="1" />
-                {run.band ? (
+                {paths.fan ? (
                   <>
-                    <path
-                      d={
-                        run.band.q95.slice(0, Math.floor(upTo) + 1).map((v, k) => `${k ? "L" : "M"}${x(k).toFixed(1)},${scales.by(v).toFixed(1)}`).join("") +
-                        run.band.q05.slice(0, Math.floor(upTo) + 1).map((_, k, a) => {
-                          const j = a.length - 1 - k;
-                          return `L${x(j).toFixed(1)},${scales.by(run.band!.q05[j]).toFixed(1)}`;
-                        }).join("") + "Z"
-                      }
-                      fill={colour} fillOpacity="0.15" stroke={colour} strokeOpacity="0.4" strokeWidth="0.7"
-                    />
-                    <path d={line(run.band.actual, scales.by)} fill="none" stroke="var(--ink-hi)" strokeWidth="1.2" />
+                    <g clipPath="url(#fs-reveal)">
+                      <path d={paths.fan} fill={colour} fillOpacity="0.15" stroke={colour} strokeOpacity="0.4" strokeWidth="0.7" />
+                      {paths.actual && <path d={paths.actual} fill="none" stroke="var(--ink-hi)" strokeWidth="1.2" />}
+                    </g>
                     <text x={PAD.l + 6} y={13} fill="var(--faint)" fontSize="8.5" fontFamily="var(--mono)" letterSpacing="0.08em">
-                      BASE LOAD ONE HOUR AHEAD · BAND IS q05–q95 · WHITE IS WHAT HAPPENED
+                      BASE LOAD ONE HOUR AHEAD &middot; BAND IS q05&ndash;q95 &middot; WHITE IS WHAT HAPPENED
                     </text>
                   </>
                 ) : (
@@ -346,7 +450,9 @@ export default function ForecastSwitch({
 
               {/* --------------------------------------------------- the cursor */}
               <line x1={x(i)} x2={x(i)} y1={0} y2={H_LOAD + H_BAND} stroke="var(--ink-hi)" strokeWidth="1" strokeOpacity="0.45" />
-              <circle cx={x(i)} cy={scales.gy(run.series.grid_kw[i])} r="3" fill={colour} stroke="var(--void)" strokeWidth="1" />
+              {Number.isFinite(run.series.grid_kw[i]) && (
+                <circle cx={x(i)} cy={scales.gy(run.series.grid_kw[i])} r="3" fill={colour} stroke="var(--void)" strokeWidth="1" />
+              )}
             </svg>
           )}
         </div>
@@ -362,16 +468,16 @@ export default function ForecastSwitch({
         <div className="metric">
           <span className="eyebrow">Rolling q95 hit rate</span>
           <strong>{hit == null ? "—" : hit.toFixed(3)}</strong>
-          <span className="sub">last 24 h · nominal <b>0.950</b></span>
+          <span className="sub">last 24 h &middot; nominal <b>0.950</b></span>
         </div>
         <div className="metric">
           <span className="eyebrow">Rolling 90% coverage</span>
           <strong>{cov == null ? "—" : cov.toFixed(3)}</strong>
-          <span className="sub">last 24 h · nominal <b>0.900</b></span>
+          <span className="sub">last 24 h &middot; nominal <b>0.900</b></span>
         </div>
         <div className="metric">
           <span className="eyebrow">Month on this forecaster</span>
-          <strong>₹{entry ? inr(entry.bill_inr) : "—"}</strong>
+          <strong>&#8377;{entry ? inr(entry.bill_inr) : "—"}</strong>
           <span className="sub">
             {key !== OURS && entry && ours
               ? <>{inr(entry.bill_inr - ours.bill_inr)} vs ours</>
@@ -380,10 +486,24 @@ export default function ForecastSwitch({
         </div>
       </div>
 
+      {fixed.length > 0 && (
+        <div style={{
+          display: "flex", flexWrap: "wrap", gap: 1, marginTop: 10,
+          background: "var(--rule)", border: "1px solid var(--rule)", borderRadius: 6, overflow: "hidden",
+        }}>
+          {fixed.map(([k, v]) => (
+            <div key={k} style={{ background: "var(--panel)", padding: "7px 11px", flex: "1 1 150px" }}>
+              <div className="eyebrow">{k}</div>
+              <div className="num" style={{ fontSize: 12.5, color: "var(--ink-hi)", marginTop: 3 }}>{v}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <p className="note" style={{ marginTop: 9 }}>
-        The cyan ghost behind the trace is our run, kept on screen so the divergence is visible rather than
-        remembered. Every breach marker is a {Math.round(demandRate)}₹/kVA block: one of them, standing at the end of
-        the month, prices all thirty days.
+        Those settings are identical on every option above &mdash; only the forecaster moves. The cyan ghost behind the
+        trace is our run, kept on screen so the divergence is visible rather than remembered. Every breach marker is a{" "}
+        {Math.round(demandRate)}&#8377;/kVA block: one of them, standing at the end of the month, prices all thirty days.
       </p>
     </div>
   );

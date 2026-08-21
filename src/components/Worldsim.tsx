@@ -1,24 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StripChart, { type Trace } from "./StripChart";
 import { CONTROLLER_ORDER, TRACE, fetchSeries } from "@/lib/data";
-import { inr, pct, stamp } from "@/lib/format";
+import { inr, stamp } from "@/lib/format";
 import type { Bundle, Run, ScenarioKey, Series } from "@/lib/types";
 
 const HERO = "ours";
 const BASE = "no_control";
 const MEAN = "mpc_mean";
 const DEFAULT_ON = [BASE, MEAN, HERO];
+const SPEEDS = [0.5, 1, 2, 4];
 
 export default function Worldsim({ bundle }: { bundle: Bundle }) {
   const [scenario, setScenario] = useState<ScenarioKey>("none");
   const [on, setOn] = useState<string[]>(DEFAULT_ON);
   const [cache, setCache] = useState<Record<string, Series>>({});
-  const [cursor, setCursor] = useState(0);
+  // null means "the end of the month", so a scenario that has just loaded shows
+  // its final state without an effect having to push the cursor there
+  const [cursor, setCursor] = useState<number | null>(null);
   const [head, setHead] = useState(1e9);
   const [playing, setPlaying] = useState(false);
-  const raf = useRef<number | null>(null);
+  const [speed, setSpeed] = useState(1);
+  const headRef = useRef(1e9);
 
   const runs = useMemo(
     () => bundle.runs.filter((r) => r.scenario === scenario).sort((a, b) => a.order - b.order),
@@ -55,27 +59,57 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
 
   const n = traces[0]?.series.t.length ?? 0;
 
-  useEffect(() => { setHead(1e9); setPlaying(false); setCursor(0); }, [scenario]);
+  /** Changing scenario resets the transport. In the handler, not in an effect
+   *  watching the state it just set. */
+  const chooseScenario = useCallback((k: ScenarioKey) => {
+    setScenario(k);
+    setPlaying(false);
+    setCursor(null);
+    setHead(1e9);
+    headRef.current = 1e9;
+  }, []);
+
+  const seek = useCallback((i: number) => {
+    setPlaying(false);
+    headRef.current = i;
+    setHead(i);
+    setCursor(i);
+  }, []);
+
+  const showAll = useCallback(() => {
+    setPlaying(false);
+    headRef.current = 1e9;
+    setHead(1e9);
+    setCursor(null);
+  }, []);
 
   useEffect(() => {
     if (!playing || !n) return;
+    let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
       const dt = now - last;
       last = now;
-      setHead((h) => {
-        const next = (h > n ? 0 : h) + dt * 0.09; // ~11 s for a month
-        if (next >= n - 1) { setPlaying(false); setCursor(n - 1); return 1e9; }
-        setCursor(Math.floor(next));
-        return next;
-      });
-      raf.current = requestAnimationFrame(tick);
+      const from = headRef.current >= n - 1 ? 0 : headRef.current;
+      const next = from + dt * 0.09 * speed;      // 1x is about 16 s for a month
+      if (next >= n - 1) {
+        headRef.current = 1e9;
+        setHead(1e9);
+        setCursor(null);
+        setPlaying(false);
+        return;
+      }
+      headRef.current = next;
+      setHead(next);
+      setCursor(Math.floor(next));
+      raf = requestAnimationFrame(tick);
     };
-    raf.current = requestAnimationFrame(tick);
-    return () => { if (raf.current) cancelAnimationFrame(raf.current); };
-  }, [playing, n]);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, n, speed]);
 
   const upTo = Math.min(head, n - 1);
+  const at = Math.min(cursor ?? Math.max(0, n - 1), Math.max(0, n - 1));
   const ours = byController[HERO];
   const base = byController[BASE];
   const mean = byController[MEAN];
@@ -95,9 +129,9 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
   const cursorRow = traces.map((tr) => ({
     label: TRACE[tr.id].short,
     color: tr.color,
-    kw: tr.series.grid_kw[Math.min(cursor, n - 1)],
-    bill: tr.series.bill_cum[Math.min(cursor, n - 1)],
-    t: tr.series.t_indoor[Math.min(cursor, n - 1)],
+    kw: tr.series.grid_kw[at],
+    bill: tr.series.bill_cum[at],
+    t: tr.series.t_indoor[at],
   }));
 
   return (
@@ -112,7 +146,7 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
                 key={s.key}
                 className="btn"
                 aria-pressed={scenario === s.key}
-                onClick={() => setScenario(s.key)}
+                onClick={() => chooseScenario(s.key)}
                 style={{ textAlign: "left", padding: "7px 9px" }}
               >
                 {s.label}
@@ -185,12 +219,17 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
             the ceiling.
           </p>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <button className="btn btn-primary" onClick={() => { if (head >= n - 1) setHead(0); setPlaying((p) => !p); }}>
-              {playing ? "Pause" : "Replay month"}
+            <button type="button" className="btn btn-ghost" onClick={() => seek(0)} title="Back to 1 June" aria-label="Restart">
+              &#8635;
             </button>
-            <button className="btn" onClick={() => { setPlaying(false); setHead(1e9); setCursor(n - 1); }}>
-              Show all
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => { if (headRef.current >= n - 1) { headRef.current = 0; setHead(0); setCursor(0); } setPlaying((p) => !p); }}
+            >
+              {playing ? "Pause" : head >= n - 1 ? "Replay month" : "Resume"}
             </button>
+            <button type="button" className="btn" onClick={showAll}>Show all</button>
           </div>
         </div>
 
@@ -228,7 +267,7 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
           <div className="instrument-head">
             <div style={{ display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
               <span className="eyebrow">Grid import · billed demand · indoor temperature</span>
-              <span className="num" style={{ fontSize: 10.5, color: "var(--ink-hi)" }}>{n ? stamp(traces[0].series.t[Math.min(cursor, n - 1)]) : ""}</span>
+              <span className="num" style={{ fontSize: 10.5, color: "var(--ink-hi)" }}>{n ? stamp(traces[0].series.t[at]) : ""}</span>
             </div>
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
               {cursorRow.map((c) => (
@@ -239,13 +278,45 @@ export default function Worldsim({ bundle }: { bundle: Bundle }) {
               ))}
             </div>
           </div>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
+            padding: "7px 10px", borderBottom: "1px solid var(--rule)", background: "var(--void)",
+          }}>
+            <span className="eyebrow" style={{ flex: "none" }}>Speed</span>
+            <div style={{ display: "flex", gap: 2, flex: "none" }}>
+              {SPEEDS.map((sp) => (
+                <button
+                  key={sp}
+                  type="button"
+                  className="btn btn-ghost"
+                  aria-pressed={speed === sp}
+                  onClick={() => setSpeed(sp)}
+                  style={{ padding: "3px 7px", opacity: speed === sp ? 1 : 0.55 }}
+                >
+                  {sp}&times;
+                </button>
+              ))}
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={Math.max(0, n - 1)}
+              value={at}
+              onChange={(e) => seek(Number(e.target.value))}
+              aria-label="Position in the billing month"
+              style={{ flex: 1, minWidth: 160, accentColor: "var(--ours)" }}
+            />
+            <span className="num" style={{ flex: "none", fontSize: 10.5, color: "var(--dim)", minWidth: 96, textAlign: "right" }}>
+              {n ? `${Math.round(((at + 1) / n) * 100)}% of month` : "—"}
+            </span>
+          </div>
           <div style={{ padding: "6px 10px 10px" }}>
             <StripChart
               traces={traces}
               ceilingKw={bundle.demand_target_kw}
               floorKva={(bundle.tariff.contract_demand_kva * bundle.tariff.billing_demand_floor_pct) / 100}
-              cursor={cursor}
-              onCursor={(i) => { setPlaying(false); setCursor(i); }}
+              cursor={at}
+              onCursor={seek}
               upTo={upTo}
               heroId={HERO}
             />
