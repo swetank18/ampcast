@@ -1,0 +1,280 @@
+SAMANVAY — PITCH PACK
+Commercial case, 90 second script, and judge Q&A
+======================================================================
+
+
+PART 1. THE 90 SECOND PITCH
+----------------------------------------------------------------------
+
+Everything you just saw proves the model works. This part answers who
+pays for it.
+
+We're not selling to a resident. A resident sees one thing: their
+geyser starts forty minutes later, with an override button, same as a
+smart plug they already recognize. The complexity lives in a
+coordinator a facility manager operates, same as the lift AMC nobody
+in the building understands either.
+
+Three buyers, in order. Bulk HT societies first: they already pay a
+facility manager for exactly this kind of service, so we're a new
+line on an existing invoice, and the demand charge savings are direct
+rupees. Weeks to close. DISCOMs second, and bigger: we pitch deferred
+transformer capex, not software. A transformer upgrade costs lakhs, we
+defer a share of that for less. The metering this depends on is
+already being installed nationally under RDSS, whether we exist or
+not. New build developers third, selling EV ready societies as a
+launch differentiator.
+
+Put your own numbers in. That's not a projection for the slide. That's
+the same math the coordinator runs.
+
+One gap, before you ask: no discom smart meter API, because it doesn't
+exist for third parties yet. We don't need it. Every bulk HT society
+already sub meters its own flats for billing, that data is ours to
+ask for directly. And we only need aggregate power and a few
+availability flags per flat, not full telemetry. A design choice, not
+a limitation.
+
+What's next isn't a bigger model. It's one real society's data sharing
+agreement. The same proof point that closes the next ten.
+
+
+PART 2. WHAT THIS IS, IN 100 WORDS
+----------------------------------------------------------------------
+
+Samanvay coordinates flexible electricity load across a shared
+distribution transformer in an Indian residential society, so sixty
+flats can add AC, geysers, and EV charging without tripping
+infrastructure sized before any of that existed. Every fifteen
+minutes it forecasts uncontrollable load as a distribution, not a
+point estimate, computes headroom against the transformer limit using
+the ninety fifth percentile forecast, and allocates that headroom
+fairly across households, tracked with a fairness ledger so no single
+flat is deferred every month. Dispatch is deterministic and
+auditable, never a black box or a learned policy. The first paying
+customer is the facility manager, not the resident.
+
+
+PART 3. COMMERCIAL AND BUSINESS QUESTIONS JUDGES WILL ASK
+----------------------------------------------------------------------
+
+1. Won't this be too complex for a normal resident to use?
+No. The resident's entire interface is a notification with an
+override button, the same pattern as a smart plug they already own.
+The optimizer, the forecaster, and the fairness ledger are all
+operated by the facility manager, exactly like the lift AMC or the
+security contract, which no resident understands either and nobody
+asks them to.
+
+2. Is this actually scalable?
+Yes, by design. Household response is local and rule based, so the
+central coordinator only optimizes allocation, not every device. That
+means going from sixty flats to six hundred, or from one society to a
+hundred societies on one discom feeder, is a deployment and data
+pipeline question, not an algorithmic one.
+
+3. Will government or private organisations actually buy this?
+Three buyers, in order of how fast you can close them. Bulk HT
+societies first, through their existing facility management company,
+weeks to months, small deal size. DISCOMs second, pitched as deferred
+transformer capex rather than software, twelve to twenty four months,
+much larger contract value, and this is the one that makes it a
+company rather than a feature. New build developers third, as an EV
+ready differentiator at launch, converting to a recurring subscription
+after handover.
+
+4. Who is the first paying customer, specifically?
+A bulk HT society's facility management company. They already sell an
+O and M subscription for lifts, pumps, and security. This is a new
+line item on an existing invoice, not a new vendor relationship to
+build from nothing.
+
+5. What tool or platform is this built on?
+Python for the forecaster and optimizer, LightGBM for the quantile
+models, a MILP solver for the allocation problem, DuckDB over Parquet
+for storage because the workload is append once and read many, and
+Three.js for the 3D society view with procedural geometry only, no
+imported assets. Edge compute runs the coordinator locally so a
+transformer decision never depends on an internet connection.
+
+6. Where does the data come from, if not a live discom feed?
+Real published research datasets for training: IIT Bombay IRED for
+household load shapes, Low Carbon London for price response behaviour,
+a Hyderabad AC dataset for thermal modelling, iAWE for appliance
+signatures, I-BLEND for common area load, and Open-Meteo for weather.
+All historical, all named, none of it claimed as real time.
+
+7. Will you use the discom's smart meter API?
+Not yet, and we say so directly. Discom smart meters exist at scale,
+over seven crore installed, but there is no standard third party
+access API for that data today. We don't build the product around a
+dependency we don't control.
+
+8. Then how do you get live operational data in a real deployment?
+Two paths. First, every bulk HT society already sub meters each flat
+for its own internal billing. That data belongs to the society, not
+the discom, so getting access is a direct commercial conversation with
+the RWA or the facility manager, no regulator involved. Second, for
+societies without submetering, a low cost retrofit: a current
+transformer clamp plus a small microcontroller publishing over MQTT,
+the same proven pattern behind consumer energy monitors sold
+worldwide.
+
+9. Isn't building your own metering hardware a huge undertaking?
+No, because the system does not need smart meter grade data to
+function. It needs aggregate active power per flat at fifteen minute
+resolution, plus a handful of availability flags for flexible
+devices. The rich, expensive, high resolution data is only used once,
+offline, to train the appliance and archetype models. That's a
+deliberate design choice to keep live deployment cheap, not a
+limitation we're working around.
+
+10. What already exists in this market, and why hasn't someone done
+this?
+Smart metering vendors instrument the meter but don't coordinate load.
+Commercial ESCOs sell demand charge reduction to single large
+industrial consumers, not distributed residential coordination.
+International utility side platforms do something closer to this, but
+aren't localized to Indian tariffs, appliance mix, or Indian society
+governance. We're not claiming an empty market, we're claiming a
+specific, undeveloped wedge inside an adjacent one.
+
+11. What is actually defensible about this, technically or otherwise?
+Deterministic, auditable dispatch, and a fairness ledger. No learned
+policy or black box model decides whose water heater waits, which
+matters because a system that saves money by always deferring the
+same six flats gets the vendor voted out at the next general body
+meeting. Nobody adjacent is selling explainability and fairness as
+the product.
+
+12. What's the revenue model?
+A performance fee as a share of verified demand charge savings for
+bulk HT societies, or a flat monthly subscription per flat where a
+performance fee isn't practical. For DISCOMs, positioned around
+deferred capital expenditure rather than a software licence, priced
+against the capex it avoids.
+
+13. Is this a venture scale business or a small services business?
+Told plainly. The bulk HT society segment alone is a real,
+bootstrappable subscription business, but modest revenue per customer
+on its own. The DISCOM segment is where a venture scale outcome lives,
+and it depends entirely on landing one credible, published pilot with
+real breach and capex deferral numbers, then using that as the
+reference sale for the next twenty DISCOMs.
+
+14. What could actually kill this?
+Discom data access remaining closed longer than expected, if the
+submeter and retrofit paths can't cover enough of the addressable
+market on their own. Said directly rather than glossed over, because
+you cannot coordinate what you cannot measure.
+
+15. What's the single next step that matters most right now?
+Not a bigger model. One real society's or facility management
+company's data sharing agreement, using their own historical
+submeter billing data to validate the forecaster on top of the
+published research datasets. That's the proof point that answers "is
+this real" better than any dataset citation, and it's the same thing
+an early investor would ask for first.
+
+
+PART 4. PRODUCT AND SIMULATION QUESTIONS JUDGES MAY ALSO ASK
+----------------------------------------------------------------------
+
+16. What problem is this actually solving?
+A shared transformer sized before EV charging existed now sees
+everyone's AC, geyser, and charger overlap at seven in the evening.
+Nobody is wasting anything, the coincident load simply exceeds what
+the transformer was built for.
+
+17. Is the demand data real or synthetic?
+Synthetic for the world simulation, built bottom up from real named
+research datasets and archetype behaviour, not measured from any one
+real building, and that distinction is stated openly rather than
+implied.
+
+18. How does a flat's AC actually decide to turn on?
+A real hysteresis thermostat gated by occupancy: if someone is home
+and indoor temperature exceeds the comfort ceiling, the AC switches
+on, and that draw feeds directly into the same physical thermal
+equation that updates indoor temperature, so temperature is a real
+consequence, not a display number.
+
+19. What happens when the transformer overloads?
+It actually sheds load. Non critical common infrastructure like
+streetlights and the water pump gets cut first, then a rotating
+subset of flexible household load, prioritized so it isn't the same
+households every time, and every shed decision is recorded, not
+painted onto the display afterward.
+
+20. What happens during a full grid outage?
+Grid import goes to zero. Security and fire systems are assumed
+battery backed and stay on. Lifts stop, since they have no backup and
+shouldn't run without power regardless.
+
+21. If you run the same scenario twice, is the result identical?
+Yes. Every random element, from which archetype a flat gets to
+weather and occupancy noise, is drawn from a seeded generator, so the
+same seed reproduces the same output exactly.
+
+22. Where is the actual optimization happening, is anything AI here?
+The world simulation itself runs uncontrolled, deliberately, so there
+is a real baseline for a controller to improve against. The
+optimization is the separate quantile forecaster and chance
+constrained allocator, which substitutes the ninety fifth percentile
+of the demand forecast for the mean in the capacity constraint, one
+line of code, and that substitution is the entire safety guarantee.
+
+23. Why not reinforcement learning?
+Across CityLearn 2021 through 2023, the benchmark competition for
+exactly this problem, no top performing team used reinforcement
+learning for scheduling. Winners used forecasting plus classical
+optimization, which is the shape we follow, and we cite the result
+rather than apologise for the choice.
+
+24. How do you know households aren't all peaking at the same time?
+Measured directly as a coincidence factor, peak of the combined load
+divided by the sum of each household's individual peak. It should
+land between 0.4 and 0.6 for a realistic population; if it's near
+1.0, the generator is broken and everything built on it is invalid,
+so it's checked early, not assumed.
+
+25. What assumptions are hand picked versus measured?
+Every appliance rating, thermal parameter, and comfort band is a
+plausible, stated assumption, not measured data, because no dataset of
+that granularity exists to measure from. Labelled as such throughout,
+not implied to be more authoritative than it is.
+
+26. What's the fairness mechanism, specifically?
+A running ledger per household of cumulative kilowatt hours deferred
+and comfort deviation, reported as Jain's fairness index plus the
+worst case household's deviation, with headroom allocated to equalise
+that ledger over time rather than just minimising total cost.
+
+27. Does the household get a real say, or is this forced?
+It's a quota signal, not a command. A resident can override at any
+time, and the system is explicitly tested holding the transformer
+limit with ten to twenty percent of households overriding, so it
+degrades gracefully rather than assuming perfect compliance.
+
+28. What happens to solar power at night?
+Nothing is hardcoded to zero. Output is calculated from real sun
+position astronomy, and it becomes zero as a direct consequence of the
+sun being below the horizon, the same calculation that turns
+streetlights on and off.
+
+29. Is the whole system explainable, or is there a black box anywhere?
+No learned model or LLM sits in the dispatch path. The optimizer is a
+deterministic, auditable calculation, because a decision about whose
+water heater waits has to be explainable line by line, not inferred
+from a black box.
+
+30. What would you fix first with more time?
+Real operational data from one actual society to replace the research
+dataset training entirely, and the two remaining world scales, colony
+and cross society connection, which extend the same simulation to
+multiple transformers and shared generation rather than one society
+in isolation.
+
+
+======================================================================
+End of pack.
