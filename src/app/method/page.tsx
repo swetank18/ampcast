@@ -22,6 +22,7 @@ export default async function MethodPage() {
         </div>
         <nav className="acts" aria-label="Sections">
           <a href="/worldsim">World sim</a>
+          <a href="/model">Model</a>
           <a href="/method" aria-current="page">Method</a>
         </nav>
       </header>
@@ -186,7 +187,7 @@ export default async function MethodPage() {
             <div>
               <h3 style={{ color: "var(--ceiling)", marginBottom: 7 }}>Not real, and stated as such</h3>
               <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12.5, lineHeight: 1.65, color: "var(--ink)" }}>
-                <li><b>The buildings are American.</b> Site Fox is Tempe, Arizona — the hottest site in the set and, at 33.4° N, close to northern India&rsquo;s solar geometry. The load <i>shapes</i> are not Indian: these buildings peak at 14:00, inside the normal window, so the time-of-day lever is weaker here than it would be in a real Indian office and essentially all of our saving comes from the demand charge.</li>
+                <li><b>The buildings are American.</b> Site Fox is Tempe, Arizona — the hottest site in the set and, at 33.4° N, close to northern India&rsquo;s solar geometry. The load <i>shapes</i> are not Indian: these buildings peak at 14:00, inside the normal window, so the time-of-day lever is weaker here than it would be in a real Indian office. And most of the rupees here are not the demand charge: the measured split is ₹1,38,613 a month of energy against ₹25,153 of demand charge, where the energy share comes from the controller using its full comfort band instead of holding a fixed setpoint. The demand-charge line is the smaller one — and the only one that needs a forecast.</li>
                 <li><b>Hourly source data</b> upsampled to 15 minutes with a shape-preserving interpolation, which smooths real sub-hourly variability and understates peaks.</li>
                 <li><b>The split of the meter</b> into base load and HVAC is a changepoint regression, not submetering.</li>
                 <li><b>Rooftop PV is a design scenario</b> — there is no solar meter at this site. Its <i>uncertainty</i> is not invented: the forecast quantiles come from the site&rsquo;s own measured cloud record.</li>
@@ -197,7 +198,9 @@ export default async function MethodPage() {
             We do not claim a validated saving for any real building. We claim that on real meter data, under a real
             published tariff, with a calibrated forecast and a deterministic optimiser, substituting the 95th
             percentile into the demand-ceiling constraint holds a ceiling that the same controller on mean forecasts
-            breaches — and that the resulting difference in the bill is dominated by the demand charge, not by energy.
+            breaches. The demand-charge line of the bill is what that buys, and it is the line that moves when the
+            forecaster is swapped out; the larger energy saving beside it comes from the comfort band and needs no
+            model at all. Both are on the <a href="/model" style={{ color: "var(--ours)" }}>model page</a>, measured.
           </p>
         </section>
 

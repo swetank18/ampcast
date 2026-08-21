@@ -17,6 +17,7 @@ export default async function WorldsimPage() {
         </div>
         <nav className="acts" aria-label="Sections">
           <a href="/worldsim" aria-current="page">World sim</a>
+          <a href="/model">Model</a>
           <a href="/method">Method</a>
         </nav>
       </header>
