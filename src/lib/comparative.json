@@ -1,0 +1,439 @@
+{
+ "generated": "2026-08-27T07:15:01.489786+00:00",
+ "sites": [
+  {
+   "site": "Gator",
+   "country": "USA",
+   "metered": 74,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.8995116173814797,
+   "tMean": 22.498209523809525
+  },
+  {
+   "site": "Panther",
+   "country": "USA",
+   "metered": 105,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.8995116173814797,
+   "tMean": 22.498209523809525
+  },
+  {
+   "site": "Fox",
+   "country": "USA",
+   "metered": 137,
+   "passes": 17,
+   "heating": 0,
+   "cddShare": 0.8725854983689779,
+   "tMean": 24.331113819899436
+  },
+  {
+   "site": "Bull",
+   "country": "USA",
+   "metered": 123,
+   "passes": 6,
+   "heating": 3,
+   "cddShare": 0.7515000421528885,
+   "tMean": 21.161100091547148
+  },
+  {
+   "site": "Rat",
+   "country": "USA",
+   "metered": 305,
+   "passes": 103,
+   "heating": 26,
+   "cddShare": 0.31493732379996525,
+   "tMean": 14.971987194145893
+  },
+  {
+   "site": "Peacock",
+   "country": "USA",
+   "metered": 45,
+   "passes": 3,
+   "heating": 8,
+   "cddShare": 0.292820080058635,
+   "tMean": 14.817026305756766
+  },
+  {
+   "site": "Eagle",
+   "country": "USA",
+   "metered": 106,
+   "passes": 6,
+   "heating": 3,
+   "cddShare": 0.19388979516755522,
+   "tMean": 12.40954268292683
+  },
+  {
+   "site": "Bobcat",
+   "country": "USA",
+   "metered": 35,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.14863107997343877,
+   "tMean": 10.67951145038168
+  },
+  {
+   "site": "Swan",
+   "country": "USA",
+   "metered": 19,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.12688202596027431,
+   "tMean": 15.365302694862203
+  },
+  {
+   "site": "Hog",
+   "country": "USA",
+   "metered": 152,
+   "passes": 21,
+   "heating": 14,
+   "cddShare": 0.10872364499195994,
+   "tMean": 8.919769922291634
+  },
+  {
+   "site": "Cockatoo",
+   "country": "USA",
+   "metered": 117,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.07373308944947286,
+   "tMean": 8.440432586043574
+  },
+  {
+   "site": "Crow",
+   "country": "Canada",
+   "metered": 5,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.06255518242700887,
+   "tMean": 6.670032956685499
+  },
+  {
+   "site": "Moose",
+   "country": "Canada",
+   "metered": 13,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.06255518242700887,
+   "tMean": 6.670032956685499
+  },
+  {
+   "site": "Bear",
+   "country": "USA",
+   "metered": 92,
+   "passes": 44,
+   "heating": 2,
+   "cddShare": 0.051379916875064664,
+   "tMean": 14.956098118381961
+  },
+  {
+   "site": "Mouse",
+   "country": "UK",
+   "metered": 7,
+   "passes": 4,
+   "heating": 0,
+   "cddShare": 0.04550438073621397,
+   "tMean": 11.434981684981684
+  },
+  {
+   "site": "Robin",
+   "country": "UK",
+   "metered": 52,
+   "passes": 27,
+   "heating": 11,
+   "cddShare": 0.04550438073621397,
+   "tMean": 11.434981684981684
+  },
+  {
+   "site": "Shrew",
+   "country": "UK",
+   "metered": 9,
+   "passes": 0,
+   "heating": 0,
+   "cddShare": 0.04550438073621397,
+   "tMean": 11.434981684981684
+  },
+  {
+   "site": "Lamb",
+   "country": "UK",
+   "metered": 146,
+   "passes": 3,
+   "heating": 8,
+   "cddShare": 0.009237123358549048,
+   "tMean": 10.53227408142999
+  },
+  {
+   "site": "Wolf",
+   "country": "Ireland",
+   "metered": 36,
+   "passes": 17,
+   "heating": 2,
+   "cddShare": 0.003314352887088835,
+   "tMean": 9.627964872088583
+  }
+ ],
+ "arms": {
+  "climate": [
+   {
+    "id": "Fox_education_Kris",
+    "site": "Fox",
+    "usage": "Education",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.8725854983689779,
+    "tMean": 24.331113819899436,
+    "hvacShare": 0.375835812181772,
+    "corrTemp": null,
+    "medianLoad": 66.6955311828432,
+    "uaFlagged": true,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 9.063849401539292,
+      "skill": -1.0012248448466607,
+      "cov90": 0.9284722222222223,
+      "pct": 13.5898901182616
+     },
+     "persistence": {
+      "pinball": 12.593710668130086,
+      "skill": -1.7805897429840605,
+      "cov90": 0.9301215277777778,
+      "pct": 18.88239053618888
+     },
+     "climatology": {
+      "pinball": 4.162437276049922,
+      "skill": 0.08096742091364584,
+      "cov90": 0.9211805555555556,
+      "pct": 6.2409537824037455
+     },
+     "seasonal_naive": {
+      "pinball": 4.52915094717095,
+      "skill": 0.0,
+      "cov90": 0.8597222222222223,
+      "pct": 6.790786229371889
+     },
+     "lightgbm_quantile": {
+      "pinball": 3.4842370425499487,
+      "skill": 0.23070856255601002,
+      "cov90": 0.8841471354166667,
+      "pct": 5.2240936997683525
+     }
+    }
+   },
+   {
+    "id": "Bull_education_Dakota",
+    "site": "Bull",
+    "usage": "Education",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.7515000421528885,
+    "tMean": 21.161100091547148,
+    "hvacShare": 0.12811806426305022,
+    "corrTemp": null,
+    "medianLoad": 44.461922442434975,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 3.755571062608857,
+      "skill": -1.778462542773338,
+      "cov90": 0.9145833333333333,
+      "pct": 8.446713179060598
+     },
+     "persistence": {
+      "pinball": 4.862528284266097,
+      "skill": -2.5974163384953,
+      "cov90": 0.9110514322916666,
+      "pct": 10.936387850888885
+     },
+     "climatology": {
+      "pinball": 1.542150129393303,
+      "skill": -0.1409200620679647,
+      "cov90": 0.9236111111111112,
+      "pct": 3.468473796628859
+     },
+     "seasonal_naive": {
+      "pinball": 1.3516723744852837,
+      "skill": 0.0,
+      "cov90": 0.9121527777777778,
+      "pct": 3.0400673210549973
+     },
+     "lightgbm_quantile": {
+      "pinball": 1.060625948099463,
+      "skill": 0.21532320396549565,
+      "cov90": 0.9059353298611111,
+      "pct": 2.3854702852146343
+     }
+    }
+   },
+   {
+    "id": "Rat_education_Lonnie",
+    "site": "Rat",
+    "usage": "Education",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.2300677969747651,
+    "corrTemp": null,
+    "medianLoad": 38.445087370986826,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 6.413576924309517,
+      "skill": -0.3650572321218024,
+      "cov90": 0.909375,
+      "pct": 16.682435553910643
+     },
+     "persistence": {
+      "pinball": 7.959678330807739,
+      "skill": -0.6941274111251214,
+      "cov90": 0.90087890625,
+      "pct": 20.704019356227636
+     },
+     "climatology": {
+      "pinball": 3.794265633209136,
+      "skill": 0.19243351965238142,
+      "cov90": 0.909375,
+      "pct": 9.86931203093724
+     },
+     "seasonal_naive": {
+      "pinball": 4.698394157687039,
+      "skill": 0.0,
+      "cov90": 0.8854166666666666,
+      "pct": 12.221052100489578
+     },
+     "lightgbm_quantile": {
+      "pinball": 2.9639234291394607,
+      "skill": 0.369162456434144,
+      "cov90": 0.9002821180555556,
+      "pct": 7.709498486863191
+     }
+    }
+   }
+  ],
+  "office": [],
+  "demographic": [],
+  "national": [
+   {
+    "id": "IN_Delhi",
+    "site": "IN_Delhi",
+    "usage": "system demand",
+    "country": "IN",
+    "tier": 2,
+    "cddShare": 0.8929708866867471,
+    "tMean": 24.33467807726288,
+    "hvacShare": null,
+    "corrTemp": 0.5907997116842305,
+    "medianLoad": 2962.4804802,
+    "uaFlagged": false,
+    "note": "Delhi city total, 15-min native, all five discoms summed",
+    "nativeMin": 15,
+    "models": {
+     "static_margin": {
+      "pinball": 244.55378837081216,
+      "skill": -2.373203614632101,
+      "cov90": 0.6760416666666667,
+      "pct": 8.255034590280307
+     },
+     "persistence": {
+      "pinball": 148.67601114246062,
+      "skill": -1.0507327305614833,
+      "cov90": 0.8482530381944444,
+      "pct": 5.018632599814578
+     },
+     "climatology": {
+      "pinball": 242.83853464634007,
+      "skill": -2.349544606517995,
+      "cov90": 0.5680555555555555,
+      "pct": 8.197135348886613
+     },
+     "seasonal_naive": {
+      "pinball": 72.49897021039581,
+      "skill": 0.0,
+      "cov90": 0.909375,
+      "pct": 2.4472387478989006
+     },
+     "lightgbm_quantile": {
+      "pinball": 65.43653587058022,
+      "skill": 0.09741427111750744,
+      "cov90": 0.7616102430555556,
+      "pct": 2.2088427690218078
+     }
+    }
+   },
+   {
+    "id": "GB_UKM",
+    "site": "GB_UKM",
+    "usage": "system demand",
+    "country": "GB",
+    "tier": 2,
+    "cddShare": 0.02383998320472399,
+    "tMean": 10.610740108780625,
+    "hvacShare": null,
+    "corrTemp": -0.12564553998497582,
+    "medianLoad": 38485.67219129555,
+    "uaFlagged": false,
+    "note": "Great Britain national, hourly, capital-temperature proxy",
+    "nativeMin": 60,
+    "models": {
+     "static_margin": {
+      "pinball": 1695.603234150682,
+      "skill": -2.7550775814410136,
+      "cov90": 0.8418491484184915,
+      "pct": 4.405803868313837
+     },
+     "persistence": {
+      "pinball": 2222.4594953561636,
+      "skill": -3.921851797984365,
+      "cov90": 0.8800942822384428,
+      "pct": 5.7747711519998495
+     },
+     "climatology": {
+      "pinball": 666.2807649334864,
+      "skill": -0.475543283332029,
+      "cov90": 0.7636426833507125,
+      "pct": 1.7312436732862408
+     },
+     "seasonal_naive": {
+      "pinball": 451.54945467198394,
+      "skill": 0.0,
+      "cov90": 0.8957247132429614,
+      "pct": 1.1732923682027114
+     },
+     "lightgbm_quantile": {
+      "pinball": 378.93243162494036,
+      "skill": 0.16081743050668562,
+      "cov90": 0.8216403806047967,
+      "pct": 0.9846065043152474
+     }
+    }
+   }
+  ]
+ },
+ "correlations": {
+  "cdd_vs_hvac": {
+   "r": 0.30474703627253,
+   "n": 3
+  },
+  "cdd_vs_skill": {
+   "r": -0.9556852645261845,
+   "n": 3
+  },
+  "hvac_vs_skill": {
+   "r": -0.01085507611621159,
+   "n": 3
+  }
+ },
+ "counts": {
+  "passing": 251,
+  "heatingOnly": 77,
+  "sitesWithPasses": 11,
+  "countries": 3
+ }
+}
