@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-27T07:15:01.489786+00:00",
+ "generated": "2026-08-27T08:28:20.642405+00:00",
  "sites": [
   {
    "site": "Gator",
@@ -315,10 +315,811 @@
       "pct": 7.709498486863191
      }
     }
+   },
+   {
+    "id": "Hog_education_Robert",
+    "site": "Hog",
+    "usage": "Education",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.10872364499195994,
+    "tMean": 8.919769922291634,
+    "hvacShare": 0.12835431889829163,
+    "corrTemp": null,
+    "medianLoad": 430.64256228402195,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 38.12321099399112,
+      "skill": -0.742798949694399,
+      "cov90": 0.8972222222222223,
+      "pct": 8.852634257003073
+     },
+     "persistence": {
+      "pinball": 40.3820983932178,
+      "skill": -0.8460637714186414,
+      "cov90": 0.9558919270833334,
+      "pct": 9.377173073428022
+     },
+     "climatology": {
+      "pinball": 26.968725853011073,
+      "skill": -0.23287272676564585,
+      "cov90": 0.8534722222222222,
+      "pct": 6.262438554604451
+     },
+     "seasonal_naive": {
+      "pinball": 21.87470390699745,
+      "skill": 0.0,
+      "cov90": 0.8798611111111111,
+      "pct": 5.079549915126693
+     },
+     "lightgbm_quantile": {
+      "pinball": 10.792340925697069,
+      "skill": 0.5066291652869079,
+      "cov90": 0.9163736979166667,
+      "pct": 2.5061017815928723
+     }
+    }
+   },
+   {
+    "id": "Bear_education_Leonel",
+    "site": "Bear",
+    "usage": "Education",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.051379916875064664,
+    "tMean": 14.956098118381961,
+    "hvacShare": 0.2571102428625631,
+    "corrTemp": null,
+    "medianLoad": 56.23734137602632,
+    "uaFlagged": true,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 15.629415885726633,
+      "skill": -1.669486890526795,
+      "cov90": 0.9138888888888889,
+      "pct": 27.791882587802007
+     },
+     "persistence": {
+      "pinball": 20.356787245026943,
+      "skill": -2.476916673096517,
+      "cov90": 0.9056857638888889,
+      "pct": 36.19799006662313
+     },
+     "climatology": {
+      "pinball": 4.596420581321105,
+      "skill": 0.214936465003165,
+      "cov90": 0.8993055555555556,
+      "pct": 8.17325369381799
+     },
+     "seasonal_naive": {
+      "pinball": 5.854838973433705,
+      "skill": 0.0,
+      "cov90": 0.8861111111111111,
+      "pct": 10.410945521563349
+     },
+     "lightgbm_quantile": {
+      "pinball": 3.0330481070543382,
+      "skill": 0.4819587488542768,
+      "cov90": 0.8727864583333333,
+      "pct": 5.393299243600642
+     }
+    }
+   },
+   {
+    "id": "Robin_education_Kiera",
+    "site": "Robin",
+    "usage": "Education",
+    "country": "GB",
+    "tier": 1,
+    "cddShare": 0.04550438073621397,
+    "tMean": 11.434981684981684,
+    "hvacShare": 0.039642935248464316,
+    "corrTemp": null,
+    "medianLoad": 66.6725042712945,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 5.409755573064819,
+      "skill": -0.317449067523089,
+      "cov90": 0.8944444444444445,
+      "pct": 8.113922871491662
+     },
+     "persistence": {
+      "pinball": 7.001626832863193,
+      "skill": -0.7051207984382861,
+      "cov90": 0.9056586371527777,
+      "pct": 10.501520693407803
+     },
+     "climatology": {
+      "pinball": 2.8175170328174195,
+      "skill": 0.3138441954572846,
+      "cov90": 0.9152777777777777,
+      "pct": 4.225905511742547
+     },
+     "seasonal_naive": {
+      "pinball": 4.106235076878986,
+      "skill": 0.0,
+      "cov90": 0.9020833333333333,
+      "pct": 6.158813324560997
+     },
+     "lightgbm_quantile": {
+      "pinball": 2.060619056461209,
+      "skill": 0.4981731396568221,
+      "cov90": 0.9104058159722223,
+      "pct": 3.0906579541041745
+     }
+    }
+   },
+   {
+    "id": "Wolf_education_Eulalia",
+    "site": "Wolf",
+    "usage": "Education",
+    "country": "IE",
+    "tier": 1,
+    "cddShare": 0.003314352887088835,
+    "tMean": 9.627964872088583,
+    "hvacShare": 0.04147444611563145,
+    "corrTemp": null,
+    "medianLoad": 48.82383456376279,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 8.904597989502735,
+      "skill": -0.16615092780876872,
+      "cov90": 0.9246527777777778,
+      "pct": 18.23821924079629
+     },
+     "persistence": {
+      "pinball": 11.570732006667644,
+      "skill": -0.5153092684148901,
+      "cov90": 0.9327907986111111,
+      "pct": 23.69894153142875
+     },
+     "climatology": {
+      "pinball": 5.26203103816667,
+      "skill": 0.31088159346997357,
+      "cov90": 0.9194444444444444,
+      "pct": 10.777586572587987
+     },
+     "seasonal_naive": {
+      "pinball": 7.635888097464992,
+      "skill": 0.0,
+      "cov90": 0.9288194444444444,
+      "pct": 15.639673052497958
+     },
+     "lightgbm_quantile": {
+      "pinball": 3.451300278814833,
+      "skill": 0.5480158647216666,
+      "cov90": 0.9184353298611111,
+      "pct": 7.068884100669142
+     }
+    }
    }
   ],
-  "office": [],
-  "demographic": [],
+  "office": [
+   {
+    "id": "Fox_office_Gaylord",
+    "site": "Fox",
+    "usage": "Office",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.8725854983689779,
+    "tMean": 24.331113819899436,
+    "hvacShare": 0.24050128845023003,
+    "corrTemp": null,
+    "medianLoad": 97.21,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 20.30702730137662,
+      "skill": -2.268541183047166,
+      "cov90": 0.8520833333333333,
+      "pct": 20.88985423451972
+     },
+     "persistence": {
+      "pinball": 27.581687645844585,
+      "skill": -3.4394425944497957,
+      "cov90": 0.8204861111111111,
+      "pct": 28.373302793791368
+     },
+     "climatology": {
+      "pinball": 7.313924201632956,
+      "skill": -0.177221171170735,
+      "cov90": 0.8631944444444445,
+      "pct": 7.5238393186225245
+     },
+     "seasonal_naive": {
+      "pinball": 6.212871787176006,
+      "skill": 0.0,
+      "cov90": 0.8840277777777777,
+      "pct": 6.391185873033645
+     },
+     "lightgbm_quantile": {
+      "pinball": 2.4191162326298095,
+      "skill": 0.6106283349315031,
+      "cov90": 0.8880696614583333,
+      "pct": 2.4885466851453653
+     }
+    }
+   },
+   {
+    "id": "Rat_office_Jill",
+    "site": "Rat",
+    "usage": "Office",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.04521366220494343,
+    "corrTemp": null,
+    "medianLoad": 404.5429951011977,
+    "uaFlagged": true,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 84.56065914120656,
+      "skill": -0.7040076724055775,
+      "cov90": 0.7892361111111111,
+      "pct": 20.90276192276014
+     },
+     "persistence": {
+      "pinball": 99.52183466167392,
+      "skill": -1.0054948903861152,
+      "cov90": 0.9210557725694445,
+      "pct": 24.60105251279366
+     },
+     "climatology": {
+      "pinball": 43.03658176145387,
+      "skill": 0.13275669489322584,
+      "cov90": 0.7927083333333333,
+      "pct": 10.638320841691531
+     },
+     "seasonal_naive": {
+      "pinball": 49.62457652660143,
+      "skill": 0.0,
+      "cov90": 0.8288194444444444,
+      "pct": 12.26682383023038
+     },
+     "lightgbm_quantile": {
+      "pinball": 34.038479011944005,
+      "skill": 0.3140802119752587,
+      "cov90": 0.8239040798611111,
+      "pct": 8.414057201368466
+     }
+    }
+   },
+   {
+    "id": "Hog_office_Mari",
+    "site": "Hog",
+    "usage": "Office",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.10872364499195994,
+    "tMean": 8.919769922291634,
+    "hvacShare": 0.23942631612842266,
+    "corrTemp": null,
+    "medianLoad": 37.173,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 5.42744327407042,
+      "skill": -0.13454990021579594,
+      "cov90": 0.8833333333333333,
+      "pct": 14.600498410325827
+     },
+     "persistence": {
+      "pinball": 7.347031802106054,
+      "skill": -0.5358196810245559,
+      "cov90": 0.8722764756944444,
+      "pct": 19.764430640803955
+     },
+     "climatology": {
+      "pinball": 3.4925640610397695,
+      "skill": 0.2699162373781572,
+      "cov90": 0.9100694444444445,
+      "pct": 9.395432332713984
+     },
+     "seasonal_naive": {
+      "pinball": 4.783785422781403,
+      "skill": 0.0,
+      "cov90": 0.8902777777777777,
+      "pct": 12.868978620992126
+     },
+     "lightgbm_quantile": {
+      "pinball": 3.009111503480399,
+      "skill": 0.37097690687580376,
+      "cov90": 0.91396484375,
+      "pct": 8.09488473752562
+     }
+    }
+   },
+   {
+    "id": "Robin_office_Wai",
+    "site": "Robin",
+    "usage": "Office",
+    "country": "GB",
+    "tier": 1,
+    "cddShare": 0.04550438073621397,
+    "tMean": 11.434981684981684,
+    "hvacShare": 0.007872911618107614,
+    "corrTemp": null,
+    "medianLoad": 148.74990524716432,
+    "uaFlagged": true,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 10.005705517246962,
+      "skill": 0.2798107505477977,
+      "cov90": 0.9590277777777778,
+      "pct": 6.726529002234578
+     },
+     "persistence": {
+      "pinball": 8.952970625328954,
+      "skill": 0.3555843529565146,
+      "cov90": 0.9262966579861112,
+      "pct": 6.018807615677206
+     },
+     "climatology": {
+      "pinball": 22.438745993070818,
+      "skill": -0.6150928695175806,
+      "cov90": 0.9260416666666667,
+      "pct": 15.084880864822315
+     },
+     "seasonal_naive": {
+      "pinball": 13.893161450073858,
+      "skill": 0.0,
+      "cov90": 0.8572916666666667,
+      "pct": 9.339946420126347
+     },
+     "lightgbm_quantile": {
+      "pinball": 20.321878812529725,
+      "skill": -0.4627253045002,
+      "cov90": 0.9304090711805556,
+      "pct": 13.661775971394865
+     }
+    }
+   },
+   {
+    "id": "Wolf_office_Nadia",
+    "site": "Wolf",
+    "usage": "Office",
+    "country": "IE",
+    "tier": 1,
+    "cddShare": 0.003314352887088835,
+    "tMean": 9.627964872088583,
+    "hvacShare": 0.03130637948857274,
+    "corrTemp": null,
+    "medianLoad": 62.14601851851852,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 4.5397335620953765,
+      "skill": -0.09392148105833908,
+      "cov90": 0.9010416666666666,
+      "pct": 7.304946753334823
+     },
+     "persistence": {
+      "pinball": 6.200866832600215,
+      "skill": -0.49419813664849777,
+      "cov90": 0.899755859375,
+      "pct": 9.977898794518037
+     },
+     "climatology": {
+      "pinball": 2.8410475809404137,
+      "skill": 0.3154041013664549,
+      "cov90": 0.9059027777777777,
+      "pct": 4.571568136893318
+     },
+     "seasonal_naive": {
+      "pinball": 4.149962900173885,
+      "skill": 0.0,
+      "cov90": 0.9263888888888889,
+      "pct": 6.677761502834269
+     },
+     "lightgbm_quantile": {
+      "pinball": 2.0196691287064223,
+      "skill": 0.5133283893642043,
+      "cov90": 0.9124403211805555,
+      "pct": 3.249876946026065
+     }
+    }
+   }
+  ],
+  "demographic": [
+   {
+    "id": "Rat_education_Lonnie",
+    "site": "Rat",
+    "usage": "Education",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.2300677969747651,
+    "corrTemp": null,
+    "medianLoad": 38.445087370986826,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 6.413576924309517,
+      "skill": -0.3650572321218024,
+      "cov90": 0.909375,
+      "pct": 16.682435553910643
+     },
+     "persistence": {
+      "pinball": 7.959678330807739,
+      "skill": -0.6941274111251214,
+      "cov90": 0.90087890625,
+      "pct": 20.704019356227636
+     },
+     "climatology": {
+      "pinball": 3.794265633209136,
+      "skill": 0.19243351965238142,
+      "cov90": 0.909375,
+      "pct": 9.86931203093724
+     },
+     "seasonal_naive": {
+      "pinball": 4.698394157687039,
+      "skill": 0.0,
+      "cov90": 0.8854166666666666,
+      "pct": 12.221052100489578
+     },
+     "lightgbm_quantile": {
+      "pinball": 2.9639234291394607,
+      "skill": 0.369162456434144,
+      "cov90": 0.9002821180555556,
+      "pct": 7.709498486863191
+     }
+    }
+   },
+   {
+    "id": "Rat_assembly_Viola",
+    "site": "Rat",
+    "usage": "Entertainment/public assembly",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.3062002872981671,
+    "corrTemp": null,
+    "medianLoad": 38.1,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 2.4710767789556694,
+      "skill": 0.41061836293362675,
+      "cov90": 0.9409722222222222,
+      "pct": 6.4857658240306275
+     },
+     "persistence": {
+      "pinball": 3.088148413764112,
+      "skill": 0.26343933012982734,
+      "cov90": 0.9101182725694444,
+      "pct": 8.105376414079034
+     },
+     "climatology": {
+      "pinball": 2.436675549617112,
+      "skill": 0.4188234713452008,
+      "cov90": 0.9409722222222222,
+      "pct": 6.39547388350948
+     },
+     "seasonal_naive": {
+      "pinball": 4.19265993975545,
+      "skill": 0.0,
+      "cov90": 0.9524305555555556,
+      "pct": 11.0043567972584
+     },
+     "lightgbm_quantile": {
+      "pinball": 2.0376858525396666,
+      "skill": 0.5139873298051163,
+      "cov90": 0.9188042534722223,
+      "pct": 5.3482568308127725
+     }
+    }
+   },
+   {
+    "id": "Rat_health_Tanya",
+    "site": "Rat",
+    "usage": "Healthcare",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.20682967822642973,
+    "corrTemp": null,
+    "medianLoad": 44.55941750743388,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 2.0415006961512265,
+      "skill": 0.2978414267923537,
+      "cov90": 0.8958333333333334,
+      "pct": 4.5815246480963125
+     },
+     "persistence": {
+      "pinball": 2.4461202918321723,
+      "skill": 0.1586756069957671,
+      "cov90": 0.8994411892361112,
+      "pct": 5.4895697220999
+     },
+     "climatology": {
+      "pinball": 1.9678858418744014,
+      "skill": 0.3231606937136692,
+      "cov90": 0.8958333333333334,
+      "pct": 4.416318596503416
+     },
+     "seasonal_naive": {
+      "pinball": 2.907463889282318,
+      "skill": 0.0,
+      "cov90": 0.8708333333333333,
+      "pct": 6.524914489282235
+     },
+     "lightgbm_quantile": {
+      "pinball": 1.7016400529624245,
+      "skill": 0.414733899452674,
+      "cov90": 0.9021158854166667,
+      "pct": 3.81881125954696
+     }
+    }
+   },
+   {
+    "id": "Rat_lodging_Christine",
+    "site": "Rat",
+    "usage": "Lodging/residential",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.2779885163182236,
+    "corrTemp": null,
+    "medianLoad": 45.453154749550684,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 2.1458976784040877,
+      "skill": 0.21272634211553643,
+      "cov90": 0.9152777777777777,
+      "pct": 4.721119337542353
+     },
+     "persistence": {
+      "pinball": 2.924339051886947,
+      "skill": -0.0728634107035413,
+      "cov90": 0.9064778645833333,
+      "pct": 6.4337427577914275
+     },
+     "climatology": {
+      "pinball": 1.984110188594314,
+      "skill": 0.2720819349680401,
+      "cov90": 0.915625,
+      "pct": 4.365175969692022
+     },
+     "seasonal_naive": {
+      "pinball": 2.725732859105784,
+      "skill": 0.0,
+      "cov90": 0.9135416666666667,
+      "pct": 5.996795765056833
+     },
+     "lightgbm_quantile": {
+      "pinball": 2.1018282029442115,
+      "skill": 0.22889427849736288,
+      "cov90": 0.9005479600694445,
+      "pct": 4.6241635251181075
+     }
+    }
+   },
+   {
+    "id": "Rat_office_Jill",
+    "site": "Rat",
+    "usage": "Office",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.04521366220494343,
+    "corrTemp": null,
+    "medianLoad": 404.5429951011977,
+    "uaFlagged": true,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 84.56065914120656,
+      "skill": -0.7040076724055775,
+      "cov90": 0.7892361111111111,
+      "pct": 20.90276192276014
+     },
+     "persistence": {
+      "pinball": 99.52183466167392,
+      "skill": -1.0054948903861152,
+      "cov90": 0.9210557725694445,
+      "pct": 24.60105251279366
+     },
+     "climatology": {
+      "pinball": 43.03658176145387,
+      "skill": 0.13275669489322584,
+      "cov90": 0.7927083333333333,
+      "pct": 10.638320841691531
+     },
+     "seasonal_naive": {
+      "pinball": 49.62457652660143,
+      "skill": 0.0,
+      "cov90": 0.8288194444444444,
+      "pct": 12.26682383023038
+     },
+     "lightgbm_quantile": {
+      "pinball": 34.038479011944005,
+      "skill": 0.3140802119752587,
+      "cov90": 0.8239040798611111,
+      "pct": 8.414057201368466
+     }
+    }
+   },
+   {
+    "id": "Rat_public_Michelle",
+    "site": "Rat",
+    "usage": "Public services",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.03188258913166361,
+    "corrTemp": null,
+    "medianLoad": 46.39032202842719,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 8.239430886599488,
+      "skill": -1.1222493865720846,
+      "cov90": 0.8854166666666666,
+      "pct": 17.761098708369616
+     },
+     "persistence": {
+      "pinball": 11.949568210140722,
+      "skill": -2.0778780904658807,
+      "cov90": 0.8803765190972223,
+      "pct": 25.758752445861944
+     },
+     "climatology": {
+      "pinball": 4.039974622957741,
+      "skill": -0.040585664634099405,
+      "cov90": 0.8857638888888889,
+      "pct": 8.708658285411587
+     },
+     "seasonal_naive": {
+      "pinball": 3.8824046498644735,
+      "skill": 0.0,
+      "cov90": 0.8840277777777777,
+      "pct": 8.368996980631872
+     },
+     "lightgbm_quantile": {
+      "pinball": 3.680420541424831,
+      "skill": 0.05202551682671541,
+      "cov90": 0.88740234375,
+      "pct": 7.933595587393277
+     }
+    }
+   },
+   {
+    "id": "Rat_retail_Jeffrey",
+    "site": "Rat",
+    "usage": "Retail",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.24595849726294466,
+    "corrTemp": null,
+    "medianLoad": 57.06,
+    "uaFlagged": true,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 6.300934369657809,
+      "skill": 0.17967301977055794,
+      "cov90": 0.9118055555555555,
+      "pct": 11.042646985029458
+     },
+     "persistence": {
+      "pinball": 7.18462647237272,
+      "skill": 0.06462397600276859,
+      "cov90": 0.8848904079861111,
+      "pct": 12.591353789647249
+     },
+     "climatology": {
+      "pinball": 5.455079590650676,
+      "skill": 0.28979597231501464,
+      "cov90": 0.8958333333333334,
+      "pct": 9.56025164852905
+     },
+     "seasonal_naive": {
+      "pinball": 7.681003455348334,
+      "skill": 0.0,
+      "cov90": 0.8545138888888889,
+      "pct": 13.461274895457999
+     },
+     "lightgbm_quantile": {
+      "pinball": 4.733883772884856,
+      "skill": 0.3836894098011867,
+      "cov90": 0.8974555121527777,
+      "pct": 8.296326275648187
+     }
+    }
+   },
+   {
+    "id": "Rat_warehouse_Eloisa",
+    "site": "Rat",
+    "usage": "Warehouse/storage",
+    "country": "US",
+    "tier": 1,
+    "cddShare": 0.31493732379996525,
+    "tMean": 14.971987194145893,
+    "hvacShare": 0.06234466758696185,
+    "corrTemp": null,
+    "medianLoad": 55.8568119266055,
+    "uaFlagged": false,
+    "note": null,
+    "nativeMin": null,
+    "models": {
+     "static_margin": {
+      "pinball": 1.1989054782488169,
+      "skill": 0.26675999605017253,
+      "cov90": 0.9083333333333333,
+      "pct": 2.1463908105320253
+     },
+     "persistence": {
+      "pinball": 1.7078998143055926,
+      "skill": -0.04453644537225476,
+      "cov90": 0.8924370659722223,
+      "pct": 3.0576392661824876
+     },
+     "climatology": {
+      "pinball": 4.075949269034053,
+      "skill": -1.4928145815892009,
+      "cov90": 0.9378472222222223,
+      "pct": 7.297139110606155
+     },
+     "seasonal_naive": {
+      "pinball": 1.6350791988851348,
+      "skill": 0.0,
+      "cov90": 0.9020833333333333,
+      "pct": 2.9272691055722784
+     },
+     "lightgbm_quantile": {
+      "pinball": 1.1888698672592664,
+      "skill": 0.27289768711516393,
+      "cov90": 0.9424913194444444,
+      "pct": 2.1284241370979293
+     }
+    }
+   }
+  ],
   "national": [
    {
     "id": "IN_Delhi",
@@ -413,21 +1214,209 @@
       "pct": 0.9846065043152474
      }
     }
+   },
+   {
+    "id": "IE",
+    "site": "IE",
+    "usage": "system demand",
+    "country": "IE",
+    "tier": 2,
+    "cddShare": 0.0028164221315117003,
+    "tMean": 10.138373043907839,
+    "hvacShare": null,
+    "corrTemp": -0.07234384758932588,
+    "medianLoad": 3190.0,
+    "uaFlagged": false,
+    "note": "Ireland national, hourly, capital-temperature proxy",
+    "nativeMin": 60,
+    "models": {
+     "static_margin": {
+      "pinball": 128.54621471939237,
+      "skill": -3.3118448672974425,
+      "cov90": 0.9033715676051443,
+      "pct": 4.029661903429228
+     },
+     "persistence": {
+      "pinball": 174.39991092843854,
+      "skill": -4.849922243416127,
+      "cov90": 0.8760373218630518,
+      "pct": 5.467081847286475
+     },
+     "climatology": {
+      "pinball": 43.62067560459978,
+      "skill": -0.4631748326803584,
+      "cov90": 0.9210983663538408,
+      "pct": 1.3674192979498365
+     },
+     "seasonal_naive": {
+      "pinball": 29.812346843536126,
+      "skill": 0.0,
+      "cov90": 0.8988529718456726,
+      "pct": 0.9345563273835775
+     },
+     "lightgbm_quantile": {
+      "pinball": 16.62390163489045,
+      "skill": 0.4423819861570266,
+      "cov90": 0.9106979927007299,
+      "pct": 0.5211254431000142
+     }
+    }
+   },
+   {
+    "id": "DE",
+    "site": "DE",
+    "usage": "system demand",
+    "country": "DE",
+    "tier": 2,
+    "cddShare": 0.060753624430257135,
+    "tMean": 10.011388777573039,
+    "hvacShare": null,
+    "corrTemp": -0.09915201304551095,
+    "medianLoad": 55514.68104931193,
+    "uaFlagged": false,
+    "note": "Germany national, hourly, capital-temperature proxy is rough",
+    "nativeMin": 60,
+    "models": {
+     "static_margin": {
+      "pinball": 2401.1514515581484,
+      "skill": -0.7856432922210745,
+      "cov90": 0.9058046576294752,
+      "pct": 4.325254880641901
+     },
+     "persistence": {
+      "pinball": 2764.731444247399,
+      "skill": -1.0560236444100441,
+      "cov90": 0.8853080465762948,
+      "pct": 4.980180723350595
+     },
+     "climatology": {
+      "pinball": 791.5405644597323,
+      "skill": 0.4113619536446905,
+      "cov90": 0.9210983663538408,
+      "pct": 1.4258220519300686
+     },
+     "seasonal_naive": {
+      "pinball": 1344.6982731760907,
+      "skill": 0.0,
+      "cov90": 0.8321167883211679,
+      "pct": 2.4222390325572403
+     },
+     "lightgbm_quantile": {
+      "pinball": 386.4652951358636,
+      "skill": 0.7126007351648802,
+      "cov90": 0.8372273635731665,
+      "pct": 0.6961497172118826
+     }
+    }
+   },
+   {
+    "id": "FR",
+    "site": "FR",
+    "usage": "system demand",
+    "country": "FR",
+    "tier": 2,
+    "cddShare": 0.07631794846766735,
+    "tMean": 11.371662298612291,
+    "hvacShare": null,
+    "corrTemp": -0.6399918505349292,
+    "medianLoad": 53531.71825541687,
+    "uaFlagged": false,
+    "note": "France national, hourly. Electric-heating dominated.",
+    "nativeMin": 60,
+    "models": {
+     "static_margin": {
+      "pinball": 1698.2126808178466,
+      "skill": -0.8016809860100116,
+      "cov90": 0.883559263121307,
+      "pct": 3.1723485368340567
+     },
+     "persistence": {
+      "pinball": 1857.6429908469022,
+      "skill": -0.9708250286953464,
+      "cov90": 0.7889131473757386,
+      "pct": 3.4701725470187528
+     },
+     "climatology": {
+      "pinball": 926.0542293996004,
+      "skill": 0.017523355013520203,
+      "cov90": 0.9266597149808828,
+      "pct": 1.7299168784030077
+     },
+     "seasonal_naive": {
+      "pinball": 942.5712398612226,
+      "skill": 0.0,
+      "cov90": 0.9064998262078554,
+      "pct": 1.7607715025397002
+     },
+     "lightgbm_quantile": {
+      "pinball": 342.80906775828333,
+      "skill": 0.6363043415065835,
+      "cov90": 0.8291514598540146,
+      "pct": 0.6403849510726186
+     }
+    }
+   },
+   {
+    "id": "ES",
+    "site": "ES",
+    "usage": "system demand",
+    "country": "ES",
+    "tier": 2,
+    "cddShare": 0.2827640331845868,
+    "tMean": 14.595356305387867,
+    "hvacShare": null,
+    "corrTemp": 0.17068289943228426,
+    "medianLoad": 28843.19067035504,
+    "uaFlagged": false,
+    "note": "Spain national, hourly, capital-temperature proxy is rough",
+    "nativeMin": 60,
+    "models": {
+     "static_margin": {
+      "pinball": 1504.8966349439656,
+      "skill": -1.5321311878357653,
+      "cov90": 0.6426833507125478,
+      "pct": 5.217510961749093
+     },
+     "persistence": {
+      "pinball": 1337.6768430919512,
+      "skill": -1.250768042793145,
+      "cov90": 0.7820483576642335,
+      "pct": 4.637756128925126
+     },
+     "climatology": {
+      "pinball": 1036.1283935361485,
+      "skill": -0.7433842025786312,
+      "cov90": 0.49982620785540494,
+      "pct": 3.592280775653155
+     },
+     "seasonal_naive": {
+      "pinball": 594.3201687864419,
+      "skill": 0.0,
+      "cov90": 0.8175182481751825,
+      "pct": 2.0605215822994323
+     },
+     "lightgbm_quantile": {
+      "pinball": 226.5436403945476,
+      "skill": 0.6188188584325969,
+      "cov90": 0.8132005995828988,
+      "pct": 0.7854319689651692
+     }
+    }
    }
   ]
  },
  "correlations": {
   "cdd_vs_hvac": {
-   "r": 0.30474703627253,
-   "n": 3
+   "r": 0.469810473531254,
+   "n": 20
   },
   "cdd_vs_skill": {
-   "r": -0.9556852645261845,
-   "n": 3
+   "r": 0.013905455990586285,
+   "n": 12
   },
   "hvac_vs_skill": {
-   "r": -0.01085507611621159,
-   "n": 3
+   "r": 0.28221388223707206,
+   "n": 20
   }
  },
  "counts": {
