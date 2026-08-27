@@ -1,0 +1,27 @@
+{
+  "_": "The estate itself. Scaling to 120 or 240 flats is `flats` plus `cols`; the towers, the grid, the scene and the fairness ledger all follow from it.",
+
+  "name": "Anna Nagar Residency",
+  "flats": 60,
+  "cols": 6,
+  "tower_split_col": 3,
+  "tower_names": ["A", "B"],
+
+  "archetypes": [
+    { "name": "Working couple, no AC",     "share": 0.18, "ac": 0, "ev": 0.10 },
+    { "name": "Family of four, two ACs",   "share": 0.26, "ac": 2, "ev": 0.25 },
+    { "name": "Retired couple",            "share": 0.14, "ac": 1, "ev": 0.05 },
+    { "name": "Family with EV",            "share": 0.16, "ac": 1, "ev": 1.00 },
+    { "name": "Single occupant",           "share": 0.12, "ac": 1, "ev": 0.08 },
+    { "name": "Joint family, three ACs",   "share": 0.14, "ac": 3, "ev": 0.20 }
+  ],
+
+  "_opted_out": "Flats that have declined the scheme. The interface never hides them and the constraint registry's opt_out_respected entry keeps the optimiser off them.",
+  "opted_out": [4, 11, 19, 26, 33, 47, 55],
+
+  "_offline_meters": "Candidate submeters that stop reporting; a scenario's `offline_meters` count takes the first N.",
+  "offline_meter_candidates": [8, 41, 3, 14, 22, 30, 37, 52, 58],
+
+  "pv_share": 0.65,
+  "seed": 40503
+}

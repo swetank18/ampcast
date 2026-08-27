@@ -1,0 +1,80 @@
+{
+  "_": "Lane A P1. Every module that is built and held in reserve, behind a flag, defaulting off. Turning one on in Round 2 is flipping `on` to true here. `play_when` is the ask that should make you reach for it.",
+
+  "_how": "Flags are read at module load. Flip `on` here and the page picks it up on the next reload — that is the whole ceremony. The Evidence tab lists what is held and what it costs to turn on, so the reserve is visible to the jury without being live.",
+
+  "features": {
+    "battery_solar": {
+      "on": false,
+      "key": "B",
+      "label": "Battery and rooftop solar",
+      "play_when": "renewables, storage, self-consumption, 'what about solar'",
+      "status": "built, tested, held",
+      "cost_minutes": 15
+    },
+    "fairness_ledger": {
+      "on": true,
+      "key": "F",
+      "label": "Fairness ledger and Jain index",
+      "play_when": "equity, who gets curtailed, resident pushback",
+      "status": "shown — it is on the Evidence tab",
+      "cost_minutes": 0
+    },
+    "ev_sessions": {
+      "on": false,
+      "key": "V",
+      "label": "EV session model",
+      "play_when": "electric vehicles, future load growth, charger rollout",
+      "status": "built, tested, held",
+      "cost_minutes": 15
+    },
+    "tariff_engine": {
+      "on": true,
+      "key": "T",
+      "label": "Tariff engine and rupee bill",
+      "play_when": "cost, savings, ROI, the business case",
+      "status": "shown — the bill is the spine of the interface",
+      "cost_minutes": 0
+    },
+    "multi_transformer": {
+      "on": false,
+      "key": "M",
+      "label": "Multi-transformer scale",
+      "play_when": "scalability, a whole campus, a feeder, 'does this work at scale'",
+      "status": "built, tested, held",
+      "cost_minutes": 10
+    },
+    "resident_view": {
+      "on": true,
+      "key": "P",
+      "label": "Resident-facing view",
+      "play_when": "end-user experience, adoption, consent",
+      "status": "shown — click any flat",
+      "cost_minutes": 0
+    },
+    "decision_log": {
+      "on": true,
+      "key": "L",
+      "label": "Decision log",
+      "play_when": "'why did it defer that flat', explainability, audit",
+      "status": "shown — the LOG tab",
+      "cost_minutes": 0
+    },
+    "forecaster_switch": {
+      "on": true,
+      "key": "S",
+      "label": "Live forecaster switch",
+      "play_when": "'is the model load bearing', 'what if the forecast is wrong'",
+      "status": "shown — the ablation runs live in the society view",
+      "cost_minutes": 0
+    },
+    "carbon_objective": {
+      "on": false,
+      "key": "C",
+      "label": "Carbon and emissions objective",
+      "play_when": "carbon, emissions, sustainability, green credentials",
+      "status": "not built — grid intensity curve exists, the objective term does not",
+      "cost_minutes": 25
+    }
+  }
+}

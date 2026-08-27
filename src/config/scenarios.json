@@ -1,0 +1,106 @@
+{
+  "_": "Seam 4. New weather, new day, new penetration level, new stress event — all data, no code. Add an entry, give it the next number key, and it appears in the bottom bar and on the keyboard.",
+
+  "_scaling": "Peaks are written in kVA at `reference_ceiling_kva`. Default false: the literal reading of 'the transformer is 180 kVA' is the same society under a new limit, so the peaks stay put and the interface honestly shows the headroom that opens up (or, at 60 kVA, the breaches that appear). Set true for the other reading — scale the society with the transformer — and every peak is multiplied by the ratio.",
+
+  "reference_ceiling_kva": 92,
+  "scale_with_ceiling": false,
+
+  "scenarios": [
+    {
+      "key": "normal",
+      "n": 1,
+      "label": "Normal day",
+      "note": "A weekday in the shoulder season. Nothing unusual is happening.",
+      "ghost_peak_kva": 95.8,
+      "plan_peak_kva": 84.4,
+      "fc_peak_kva": 87.0,
+      "band_scale": 1,
+      "status": "safe",
+      "outage_at": null,
+      "offline_meters": 2,
+      "shape_terms": []
+    },
+    {
+      "key": "heatwave",
+      "n": 2,
+      "label": "Heatwave",
+      "note": "38 °C at four in the afternoon. Every air conditioner in the society is running and none of them will stop.",
+      "ghost_peak_kva": 104.5,
+      "plan_peak_kva": 89.6,
+      "fc_peak_kva": 94.6,
+      "band_scale": 1.25,
+      "status": "watch",
+      "outage_at": null,
+      "offline_meters": 2,
+      "shape_terms": [
+        { "amp": 13, "hour": 15.6, "width": 3.1, "why": "afternoon cooling load that does not switch off" },
+        { "amp": 6, "hour": 2.5, "width": 2.4, "why": "ACs still running through the night" }
+      ]
+    },
+    {
+      "key": "sensor_drop",
+      "n": 3,
+      "label": "Sensor drop",
+      "note": "Nine submeters stopped reporting at 16:00. The forecast is running on a stale estimate and knows it.",
+      "ghost_peak_kva": 95.8,
+      "plan_peak_kva": 82.9,
+      "fc_peak_kva": 89.4,
+      "band_scale": 2.6,
+      "status": "safe",
+      "outage_at": null,
+      "offline_meters": 9,
+      "shape_terms": []
+    },
+    {
+      "key": "grid_outage",
+      "n": 4,
+      "label": "Grid outage",
+      "note": "Feeder trip at 19:30. The estate goes dark and critical services move to backup.",
+      "ghost_peak_kva": 95.8,
+      "plan_peak_kva": 84.4,
+      "fc_peak_kva": 87.0,
+      "band_scale": 1,
+      "status": "danger",
+      "outage_at": 78,
+      "offline_meters": 2,
+      "shape_terms": []
+    },
+    {
+      "key": "festival",
+      "n": 5,
+      "label": "Festival",
+      "note": "Deepavali eve. Lights on every balcony, guests in every flat, and every geyser in the block.",
+      "ghost_peak_kva": 101.2,
+      "plan_peak_kva": 88.1,
+      "fc_peak_kva": 92.8,
+      "band_scale": 1.15,
+      "status": "watch",
+      "outage_at": null,
+      "offline_meters": 2,
+      "shape_terms": [
+        { "amp": 10, "hour": 21.1, "width": 1.7, "why": "balcony lighting and late guests" },
+        { "amp": 4, "hour": 11.5, "width": 2.0, "why": "midday cooking for the day's meal" }
+      ]
+    }
+  ],
+
+  "_base_shape": "The society's own load shape, before any scenario term is added. Amplitudes in kVA, hour is the centre of a wrapped Gaussian, width its standard deviation in hours.",
+  "base_shape": {
+    "floor": 26,
+    "terms": [
+      { "amp": 30, "hour": 7.6,  "width": 1.25, "why": "geysers and the school run" },
+      { "amp": 14, "hour": 12.6, "width": 2.4,  "why": "midday, largely offset by the roof" },
+      { "amp": 69, "hour": 19.4, "width": 1.35, "why": "the wall — the thing the product exists to flatten" },
+      { "amp": 12, "hour": 21.9, "width": 0.9,  "why": "late kitchens" }
+    ],
+    "rooftop_pv": { "peak_kva": 9.4, "sunrise_hour": 6.1, "day_length_hours": 11.8 }
+  },
+
+  "backup": {
+    "_": "What the estate falls back to when the feeder trips. Lifts, fire panel and water pumps only.",
+    "steady_kva": 17.5,
+    "initial_surge_kva": 4,
+    "decay_intervals": 26
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "_": "Seam 2. Every hard rule the controller runs under, in one list. Adding a rule is appending one entry; suspending one is flipping `active`. The `effect` field names the mechanism in model.ts that reads it, so there is never a search for where a rule bites.",
+
+  "constraints": [
+    {
+      "name": "transformer_limit",
+      "type": "upper",
+      "value": 92,
+      "unit": "kVA",
+      "applies_to": "society",
+      "active": true,
+      "effect": "ceiling",
+      "why": "The distribution transformer's rating. Crossing it is what the whole system exists to prevent, and it is also the number the demand charge is written against."
+    },
+    {
+      "name": "never_curtail",
+      "type": "exclude",
+      "value": null,
+      "applies_to": "tagged",
+      "tags": ["lift", "water_pump", "fire_panel", "medical", "corridor_light"],
+      "active": true,
+      "effect": "curtailable_pool",
+      "why": "Lifts, water, fire and medical devices are never shed. Any device carrying one of these tags has its `curtailable` flag forced false in the derived registry, whatever the device entry says, so the guarantee is structural rather than a promise. Note this governs SHEDDING, not moving: a pump run at 08:00 instead of 14:00 is deferred, not curtailed, which is why the pumps stay in the deferrable pool."
+    },
+    {
+      "name": "critical_load_floor",
+      "type": "lower",
+      "value": 0,
+      "unit": "kW",
+      "applies_to": "tagged",
+      "tags": ["water_pump"],
+      "active": false,
+      "effect": "floor",
+      "why": "A minimum draw that must be met regardless of the ceiling. Off by default. Turn it on and set a value when a load must keep running rather than merely not be shed — 'the water pump must run twice daily' is this entry."
+    },
+    {
+      "name": "deferral_cap_per_flat",
+      "type": "upper",
+      "value": 8,
+      "unit": "asks/month",
+      "applies_to": "household",
+      "active": true,
+      "effect": "fairness_cap",
+      "why": "No flat may be asked to wait more than eight times in a month. A system that saves eighteen percent by always deferring the same six flats gets voted out at the next general body meeting."
+    },
+    {
+      "name": "deadline_honoured",
+      "type": "deadline",
+      "value": null,
+      "applies_to": "device",
+      "active": true,
+      "effect": "device_deadline",
+      "why": "Every deferred device finishes before its own deadline, read from the device registry. A geyser held at 18:30 with a 06:00 deadline is a scheduling decision; one held past 06:00 is a failure."
+    },
+    {
+      "name": "opt_out_respected",
+      "type": "exclude",
+      "value": null,
+      "applies_to": "household",
+      "active": true,
+      "effect": "opt_out",
+      "why": "A flat that has opted out is never deferred, and the interface never hides it. Consent is a constraint, not a setting."
+    }
+  ]
+}

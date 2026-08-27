@@ -1,0 +1,32 @@
+{
+  "_": "Seam 1. Every rate, multiplier and limit the society is billed against. Nothing here is duplicated in code: model.ts reads this file and derives the rest. A pricing or limit change is an edit to this file and nothing else.",
+
+  "name": "TN HT-I-A",
+  "authority": "TNERC tariff order, ToD windows per the 2023 amendment rules",
+
+  "energy_rate": 6.35,
+  "demand_charge_per_kva": 608,
+  "transformer_limit_kva": 92,
+  "contract_kva": 92,
+  "billing_demand_floor": 0.9,
+  "electricity_duty": 0.05,
+  "power_factor": 0.98,
+
+  "tod_windows": [
+    { "name": "Night",  "start": "00:00", "end": "05:00", "multiplier": 0.9,
+      "why": "Where the deferred geysers and every EV end up." },
+    { "name": "Solar",  "start": "05:00", "end": "10:00", "multiplier": 0.8,
+      "why": "Rooftop and grid solar are both long. Run the pumps here." },
+    { "name": "Normal", "start": "10:00", "end": "18:00", "multiplier": 1.0,
+      "why": "The reference rate. Everything else is quoted against it." },
+    { "name": "Peak",   "start": "18:00", "end": "22:00", "multiplier": 1.25,
+      "why": "Statutory minimum 1.2x. This is the window we defend." },
+    { "name": "Night",  "start": "22:00", "end": "24:00", "multiplier": 0.9,
+      "why": "Where the deferred geysers and every EV end up." }
+  ],
+
+  "billing": {
+    "day_of_month": 21,
+    "days_in_month": 30
+  }
+}

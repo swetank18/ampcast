@@ -15,20 +15,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
-  CEILING, CONTRACT_KVA, DAYS_IN_MONTH, DAY_OF_MONTH, DEMAND_RATE, ENERGY_RATE, FLATS, N, SCENARIOS,
-  SPEC, TOD_ROWS, type Day, type Home, type ScenarioKey, type Status,
-  achievableSaving, billingDemand, buildCarpet, buildDay, buildHomes, controllerTable, fairness, hhmm,
-  inr, monthBill, phaseOf, scenarioOf, skyOf, span,
+  CEILING, CONSTRAINTS, CONTRACT_KVA, DAYS_IN_MONTH, DAY_OF_MONTH, DEFAULT_FORECASTER, DEMAND_RATE,
+  ENERGY_RATE, FLATS, FORECASTERS, HELD_FEATURES, N, SCENARIOS, SPEC, TOD_ROWS, UNTOUCHED_DEVICES,
+  type Day, type Home, type ScenarioKey, type Status,
+  achievableSaving, billingDemand, buildCarpet, buildDay, buildHomes, controllerTable, deviceOf,
+  fairness, forecasterOf, hhmm, inr, monthBill, phaseOf, scenarioOf, skyOf, span, usableHeadroom,
 } from "./model";
+import {
+  ACTION_LABEL, buildDecisionLog, decisionsFor, summarise, type Decision,
+} from "./decisionLog";
 import { IsoScene, TileScene, SceneLegend } from "./scene";
 import {
   AchievableSaving, CalibrationPlot, CautionDial, CompareChart, ControllerTable, FairnessBars,
   MonthCarpet, TimelineChart,
 } from "./charts";
 
-type Tab = "NOW" | "TIMELINE" | "COMPARE" | "EVIDENCE";
+type Tab = "NOW" | "TIMELINE" | "COMPARE" | "EVIDENCE" | "LOG";
 const TABS: { key: Tab; hint: string }[] = [
-  { key: "NOW", hint: "Q" }, { key: "TIMELINE", hint: "W" }, { key: "COMPARE", hint: "E" }, { key: "EVIDENCE", hint: "R" },
+  { key: "NOW", hint: "Q" }, { key: "TIMELINE", hint: "W" }, { key: "COMPARE", hint: "E" },
+  { key: "EVIDENCE", hint: "R" }, { key: "LOG", hint: "T" },
 ];
 
 interface Toast { id: number; tone: "neutral" | "confirm" | "warn"; text: string }
@@ -67,13 +72,17 @@ export default function Samanvay() {
   const [calStep, setCalStep] = useState(-1);
   const [calDone, setCalDone] = useState(false);
   const [why, setWhy] = useState(false);
+  const [fcKey, setFcKey] = useState<string>(params.get("forecaster") ?? DEFAULT_FORECASTER);
   const toastId = useRef(0);
 
-  const day = useMemo(() => buildDay(scenario), [scenario]);
+  /* Seam 5. Everything below is pinned; only the forecaster feeding the
+   * capacity constraint moves. That is the ablation, and it runs live. */
+  const day = useMemo(() => buildDay(scenario, fcKey), [scenario, fcKey]);
   const homes = useMemo(() => buildHomes(scenarioOf(scenario)), [scenario]);
-  const carpet = useMemo(() => buildCarpet(scenario), [scenario]);
+  const carpet = useMemo(() => buildCarpet(scenario, fcKey), [scenario, fcKey]);
   const rows = useMemo(() => controllerTable(day), [day]);
   const fair = useMemo(() => fairness(homes), [homes]);
+  const log = useMemo(() => buildDecisionLog(day, homes), [day, homes]);
 
   const push = useCallback((tone: Toast["tone"], text: string) => {
     const id = ++toastId.current;
@@ -107,6 +116,7 @@ export default function Samanvay() {
       else if (k === "w") setTab("TIMELINE");
       else if (k === "e") setTab("COMPARE");
       else if (k === "r") setTab("EVIDENCE");
+      else if (k === "t") setTab("LOG");
       else if (k === "g") { setView((v) => (v === "3d" ? "2d" : "3d")); }
       else if (k === " ") { e.preventDefault(); setPlaying((p) => !p); }
       else if (k === "escape") { setPhone(null); setTariff(false); }
@@ -153,13 +163,22 @@ export default function Samanvay() {
   const perFlat = monthSaving / FLATS;
   const billToDate = day.dayRupees * (DAY_OF_MONTH - 1) + day.cumRupees[t] + bills.plan.demandCharge;
 
-  const status: Status = override ? "override" : forcedAlert && forcedAlert !== "override" ? forcedAlert : sc.status;
+  // The ablation speaks through the status strip: if the loaded forecaster's
+  // plan crosses the transformer, the estate is in danger and says so.
+  const tripped = day.planCrossings.length > 0;
+  const status: Status = override
+    ? "override"
+    : tripped
+      ? "danger"
+      : forcedAlert && forcedAlert !== "override" ? forcedAlert : sc.status;
   const statusLine: Record<Status, string> = {
     safe: `Inside the ceiling. ${headroom.toFixed(1)} kVA of headroom and the forecast keeps it there for the next eight hours.`,
     watch: `Watch. The q95 forecast comes within ${Math.max(1.2, headroom - 3.4).toFixed(1)} kVA of the ceiling this evening; deferrals have already been issued.`,
     danger: dark
       ? "Feeder down since 19:30. Lifts, fire panel and water pumps are on backup. Nothing is being shed."
-      : "Danger. The plan crosses the ceiling on the current forecast. Manual intervention is available in the bar below.",
+      : tripped
+        ? `The transformer is over. ${forecasterOf(fcKey).name} put the plan ${(day.peakPlan - CEILING).toFixed(1)} kVA above ${CEILING} kVA across ${day.planCrossings.length} interval${day.planCrossings.length === 1 ? "" : "s"} — nothing else about the society changed.`
+        : "Danger. The plan crosses the ceiling on the current forecast. Manual intervention is available in the bar below.",
     override: "Operator override engaged. Control is released and the society is running its old schedule.",
   };
 
@@ -245,10 +264,11 @@ export default function Samanvay() {
 
           {/* ------------------------------------------------------ the tabs */}
           <div className="sv-body">
-            {tab === "NOW" && <NowTab {...{ day, homes, t, override, view, dark, stale, openPhone, calibrate, calStep, calDone, setTab }} />}
+            {tab === "NOW" && <NowTab {...{ day, homes, t, override, view, dark, stale, openPhone, calibrate, calStep, calDone, setTab, fcKey, setFcKey, push }} />}
             {tab === "TIMELINE" && <TimelineTab {...{ day, t, stale, override }} />}
             {tab === "COMPARE" && <CompareTab {...{ day, rows, split, setSplit }} />}
             {tab === "EVIDENCE" && <EvidenceTab {...{ day, carpet, fair, bills, monthSaving }} />}
+            {tab === "LOG" && <LogTab {...{ day, homes, log, t, openPhone }} />}
           </div>
 
           {/* --------------------------------------------------- bottom bar */}
@@ -293,7 +313,7 @@ export default function Samanvay() {
 
           {/* ---------------------------------------------------- overlays */}
           {(phone || tariff) && <div className="sv-scrim" onClick={() => { setPhone(null); setTariff(false); }} />}
-          {phone && <ResidentPanel home={phone} day={day} why={why} setWhy={setWhy} onClose={() => setPhone(null)} push={push} />}
+          {phone && <ResidentPanel home={phone} day={day} log={log} why={why} setWhy={setWhy} onClose={() => setPhone(null)} push={push} />}
           {tariff && <TariffPanel day={day} bills={bills} onClose={() => setTariff(false)} />}
 
           <div className="sv-toasts">
@@ -340,12 +360,15 @@ function Scrubber({ day, t, onSeek }: { day: Day; t: number; onSeek: (v: number)
 /* ==================================================================== tab 1 */
 
 function NowTab({
-  day, homes, t, override, view, dark, stale, openPhone, calibrate, calStep, calDone, setTab,
+  day, homes, t, override, view, dark, stale, openPhone, calibrate, calStep, calDone, setTab, fcKey, setFcKey, push,
 }: {
   day: Day; homes: Home[]; t: number; override: boolean; view: "3d" | "2d"; dark: boolean; stale: boolean;
   openPhone: (h: Home) => void; calibrate: () => void; calStep: number; calDone: boolean; setTab: (t: Tab) => void;
+  fcKey: string; setFcKey: (k: string) => void;
+  push: (tone: "neutral" | "confirm" | "warn", text: string) => void;
 }) {
   const sky = skyOf(t, dark);
+  const fc = forecasterOf(fcKey);
   const held = homes.filter((h) => !h.optedOut && t >= h.shiftFrom && t < h.shiftFrom + h.shiftLen).length;
   const releaseAt = hhmm(88 + 2);
   const headroom = CEILING - (dark ? 17.5 : (override ? day.ghost : day.plan)[t]);
@@ -372,14 +395,17 @@ function NowTab({
 
       <aside className="sv-rail">
         <div className="sv-card">
-          <header><h3>Forecast health</h3><span className="sv-eyebrow">M1 · q95</span></header>
-          <div className="sv-big" style={{ color: calDone ? "#1E7A4B" : undefined }}>
-            {calDone ? "96.4" : "92"}<em>% coverage</em>
+          <header><h3>Forecast health</h3><span className="sv-eyebrow">Seam 5</span></header>
+          <div className="sv-big" style={{ color: fc.key !== "q95" ? "#C4392B" : calDone ? "#1E7A4B" : undefined }}>
+            {fc.key === "q95" && calDone ? "96.4" : (fc.coverage * 100).toFixed(0)}<em>% coverage</em>
           </div>
           <p className="sv-note" style={{ marginTop: 6 }}>
-            Against a <b>90%</b> target. Worst horizon <b>88.8%</b> at eight hours. Median error <b>2.4 kVA</b>,
-            mean band width <b>{(9.6 * day.sc.bandScale).toFixed(1)} kVA</b>.
+            Against a <b>90%</b> target. {fc.key === "q95"
+              ? <>Worst horizon <b>88.8%</b> at eight hours. Median error <b>2.4 kVA</b>, mean band width <b>{(9.6 * day.sc.bandScale * fc.bandWidth).toFixed(1)} kVA</b>.</>
+              : <>Band width <b>{(9.6 * day.sc.bandScale * fc.bandWidth).toFixed(1)} kVA</b> against ours at <b>{(9.6 * day.sc.bandScale).toFixed(1)}</b>. {fc.note}</>}
           </p>
+
+          <ForecasterSwitch day={day} fcKey={fcKey} setFcKey={setFcKey} push={push} />
           {stale && (
             <p className="sv-note" style={{ marginTop: 7, color: "#B07000" }}>
               Nine submeters stopped reporting at 16:00. The forward plan is drawn on a stale estimate and is greyed.
@@ -647,6 +673,28 @@ function EvidenceTab({
           </p>
         </div>
         <div className="sv-card">
+          <header><h3>Held in reserve</h3><span className="sv-eyebrow">features.json</span></header>
+          <p className="sv-note" style={{ marginBottom: 8 }}>
+            Built, tested, and behind a flag that is off. We did not build everything, because the modules we held back
+            are the ones we would rather build against your constraints than our own guesses.
+          </p>
+          <div className="sv-rows">
+            {HELD_FEATURES.map((f) => (
+              <div className="sv-row" key={f.name}>
+                <span>{f.label}</span>
+                <span style={{ color: f.status.startsWith("not built") ? "#B07000" : "#6B6B66" }}>
+                  {f.cost_minutes} min
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="sv-note" style={{ marginTop: 9 }}>
+            {HELD_FEATURES.map((f) => f.play_when.split(",")[0]).join(" · ")}. Name one and it is a flag, not a
+            rewrite.
+          </p>
+        </div>
+
+        <div className="sv-card">
           <header><h3>Two figures disagree</h3><span className="sv-eyebrow">open</span></header>
           <p className="sv-note">
             The spec says <b>₹{inr(SPEC.monthSaving)}</b> across sixty flats, which is <b>₹204</b> a flat, and it also
@@ -662,15 +710,200 @@ function EvidenceTab({
   );
 }
 
+/* ============================================== Seam 5, on the demo surface */
+
+/**
+ * The ablation, live.
+ *
+ * The optimiser, the simulator, the tariff, the physics, the estate and the
+ * seed are all pinned. Only the file the quantiles come from changes. Switch to
+ * persistence and the transformer goes over — say nothing while it happens.
+ */
+function ForecasterSwitch({
+  day, fcKey, setFcKey, push,
+}: {
+  day: Day; fcKey: string; setFcKey: (k: string) => void;
+  push: (tone: "neutral" | "confirm" | "warn", text: string) => void;
+}) {
+  const tripped = day.planCrossings.length > 0;
+  return (
+    <div style={{ marginTop: 11 }}>
+      <div className="sv-eyebrow" style={{ marginBottom: 5 }}>
+        Forecaster feeding the constraint
+      </div>
+      <div className="sv-fcswitch" role="radiogroup" aria-label="Forecaster feeding the capacity constraint">
+        {FORECASTERS.map((f) => {
+          const head = usableHeadroom(f, day.sc);
+          return (
+            <button
+              key={f.key}
+              role="radio"
+              aria-checked={f.key === fcKey}
+              data-trips={head < 0 ? "true" : undefined}
+              onClick={() => {
+                setFcKey(f.key);
+                push(head < 0 ? "warn" : "neutral",
+                  head < 0
+                    ? `${f.name} — the plan goes ${(-head).toFixed(1)} kVA over the transformer. Nothing else moved.`
+                    : `${f.name} — peak ${(CEILING - head).toFixed(1)} kVA, ${head.toFixed(1)} kVA of headroom.`);
+              }}>
+              <span className="n">{f.name}</span>
+              <span className="h">{head < 0 ? `+${(-head).toFixed(1)} over` : `${head.toFixed(1)} kVA free`}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="sv-note" style={{ marginTop: 7, color: tripped ? "#C4392B" : undefined }}>
+        {tripped
+          ? <>Everything else is pinned. The only thing that changed is where the quantiles came from, and the society is now over its transformer on {day.planCrossings.length} interval{day.planCrossings.length === 1 ? "" : "s"}.</>
+          : <>Study pinball loss <b>{forecasterOf(fcKey).study?.pinball.toFixed(3) ?? "—"}</b>{forecasterOf(fcKey).study ? <> · {forecasterOf(fcKey).study!.note}</> : null}. Measured on the commercial building in the evidence repo, not on this society.</>}
+      </p>
+    </div>
+  );
+}
+
+/* ==================================================================== tab 5 */
+
+/**
+ * The decision log.
+ *
+ * "Why did it defer that flat" is a query, not a guess. Every row carries the
+ * entry in the constraint registry that caused it, so the ledger is auditable
+ * by someone who does not trust us.
+ */
+function LogTab({
+  day, homes, log, t, openPhone,
+}: { day: Day; homes: Home[]; log: Decision[]; t: number; openPhone: (h: Home) => void }) {
+  const [q, setQ] = useState("");
+  const [only, setOnly] = useState<"all" | "window" | "exempt">("all");
+
+  const rows = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return log.filter((d) => {
+      if (only === "window" && Math.abs(d.t - t) > 4) return false;
+      if (only === "exempt" && !d.action.startsWith("exempt")) return false;
+      if (!needle) return true;
+      return [d.flat, d.device, d.action, d.constraint ?? "", d.reason, d.ts]
+        .join(" ").toLowerCase().includes(needle);
+    });
+  }, [log, q, only, t]);
+
+  const s = summarise(log);
+
+  return (
+    <>
+      <main className="sv-main" style={{ alignContent: "start" }}>
+        <div className="sv-card">
+          <header>
+            <h3>Decision log</h3>
+            <span className="sv-eyebrow">{rows.length} of {log.length} rows</span>
+          </header>
+
+          <div className="sv-logbar">
+            <input
+              className="sv-input"
+              placeholder="Filter by flat, device, constraint or reason — try A-401, geyser, never_curtail"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              aria-label="Filter the decision log" />
+            <div className="sv-seg" role="group" aria-label="Scope">
+              {(["all", "window", "exempt"] as const).map((k) => (
+                <button key={k} aria-pressed={only === k} onClick={() => setOnly(k)}>
+                  {k === "all" ? "Everything" : k === "window" ? `Around ${hhmm(t)}` : "Not asked"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="sv-logscroll">
+            <table className="sv-table sv-log">
+              <thead>
+                <tr><th>Time</th><th>Flat</th><th>Device</th><th>Quota</th><th>Decision</th><th>Because</th></tr>
+              </thead>
+              <tbody>
+                {rows.map((d, i) => (
+                  <tr key={`${d.t}-${d.flat}-${d.action}-${i}`} data-exempt={d.action.startsWith("exempt") || undefined}>
+                    <td className="num">{d.ts}</td>
+                    <td>
+                      {d.homeIndex >= 0
+                        ? <button className="sv-link" onClick={() => openPhone(homes[d.homeIndex])}>{d.flat}</button>
+                        : d.flat}
+                    </td>
+                    <td>{d.device.replace(/_/g, " ")}</td>
+                    <td className="num" data-sign={d.quotaKva < 0 ? "neg" : "pos"}>
+                      {d.quotaKva > 0 ? "+" : ""}{d.quotaKva.toFixed(2)}
+                    </td>
+                    <td>
+                      {ACTION_LABEL[d.action]}
+                      {d.deadline && <div className="sv-note" style={{ fontWeight: 400 }}>deadline {d.deadline}</div>}
+                    </td>
+                    <td>
+                      {d.constraint && <code className="sv-code">{d.constraint}</code>}
+                      <div className="sv-note" style={{ fontWeight: 400 }}>{d.reason}</div>
+                    </td>
+                  </tr>
+                ))}
+                {rows.length === 0 && (
+                  <tr><td colSpan={6} className="sv-note">Nothing matches. The log holds {log.length} rows for this day.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <aside className="sv-rail">
+        <div className="sv-card">
+          <header><h3>The day in decisions</h3><span className="sv-eyebrow">{day.sc.label}</span></header>
+          <div className="sv-rows">
+            <div className="sv-row"><span>Deferred</span><span>{s.deferred}</span></div>
+            <div className="sv-row"><span>Reduced to trickle</span><span>{s.trickled}</span></div>
+            <div className="sv-row"><span>Released to night</span><span>{s.released}</span></div>
+            <div className="sv-row"><span>Moved into solar</span><span>{s.shifted}</span></div>
+            <div className="sv-row"><span>Not asked</span><span>{s.exempt}</span></div>
+            <div className="sv-row"><span>kVA withheld</span><span>{s.kvaWithheld.toFixed(1)}</span></div>
+          </div>
+          <p className="sv-note" style={{ marginTop: 9 }}>
+            Nothing here is written after the fact. Each row names the entry in the constraint registry that produced
+            it, which is what makes &ldquo;why was I asked&rdquo; answerable to a resident and not only to us.
+          </p>
+        </div>
+
+        <div className="sv-card">
+          <header><h3>The rules it ran under</h3><span className="sv-eyebrow">constraints.json</span></header>
+          <div className="sv-rows">
+            {CONSTRAINTS.map((c) => (
+              <div className="sv-row" key={c.name}>
+                <span><code className="sv-code">{c.name}</code></span>
+                <span style={{ color: c.active ? "#1E7A4B" : "#9A9A94" }}>
+                  {c.active ? (c.value === null ? "on" : `${c.value}${c.unit ? ` ${c.unit}` : ""}`) : "off"}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="sv-note" style={{ marginTop: 9 }}>
+            One list, one file. Adding a rule is appending an entry; suspending one is flipping a flag. Nothing in the
+            optimiser is written twice.
+          </p>
+        </div>
+      </aside>
+    </>
+  );
+}
+
 /* ================================================================= overlays */
 
 function ResidentPanel({
-  home, day, why, setWhy, onClose, push,
+  home, day, log, why, setWhy, onClose, push,
 }: {
-  home: Home; day: Day; why: boolean; setWhy: (v: boolean) => void; onClose: () => void;
+  home: Home; day: Day; log: Decision[]; why: boolean; setWhy: (v: boolean) => void; onClose: () => void;
   push: (tone: "neutral" | "confirm" | "warn", text: string) => void;
 }) {
   const [optIn, setOptIn] = useState(!home.optedOut);
+  // The resident view is a rendering of the decision log, not a second story
+  // about the same events. If the ledger says nothing happened, so does this.
+  const mine = decisionsFor(log, home.i);
+  const dev = deviceOf(home.device);
   return (
     <div className="sv-panel sv-phone" role="dialog" aria-label={`Resident view, flat ${home.flat}`}>
       <header>
@@ -684,30 +917,45 @@ function ResidentPanel({
         <div>
           <div className="sv-eyebrow" style={{ marginBottom: 5 }}>What changed today</div>
           <p>
-            Your {home.device} ran at <b>{hhmm(home.shiftTo)}</b> instead of <b>{hhmm(home.shiftFrom)}</b>. Nothing else
-            was touched.
+            Your {home.device.replace(/_/g, " ")} ran at <b>{hhmm(home.shiftTo)}</b> instead of{" "}
+            <b>{hhmm(home.shiftFrom)}</b>{dev?.deadline_hours ? <>, against a <b>{dev.deadline_hours} h</b> deadline</> : null}.
+            Nothing else was touched.
           </p>
           <button className="sv-btn" style={{ marginTop: 8 }} onClick={() => setWhy(!why)} aria-expanded={why}>
             Why? {why ? "▴" : "▾"}
           </button>
           {why && (
-            <p className="sv-note" style={{ marginTop: 8 }}>
-              Between {hhmm(72)} and {hhmm(88)} the society was within{" "}
-              <b>{(CEILING - day.peakPlan).toFixed(1)} kVA</b> of the limit its transformer is rated for. Fourteen flats
-              were asked to wait; you were one of them because you have been asked <b>{home.asks}</b> times this month
-              against a society average of <b>4.2</b>. Your {home.device} had until <b>06:00</b>, so it still finished
-              in time and it ran at the cheaper night rate.
-            </p>
+            <div style={{ marginTop: 8 }}>
+              {mine.length === 0 && (
+                <p className="sv-note">Nothing was asked of this flat today. The log has no row for it.</p>
+              )}
+              {mine.map((d, i) => (
+                <p className="sv-note" key={i} style={{ marginBottom: 6 }}>
+                  <b>{d.ts}</b> · {ACTION_LABEL[d.action]}
+                  {d.deadline ? <> · deadline <b>{d.deadline}</b></> : null}
+                  <br />{d.reason}
+                  {d.constraint && <> <code className="sv-code">{d.constraint}</code></>}
+                </p>
+              ))}
+              <p className="sv-note" style={{ marginTop: 8, color: "#6B6B66" }}>
+                Straight out of the decision log — press <span className="sv-kbd">T</span> to read the whole ledger,
+                including every flat that was not asked and why.
+              </p>
+            </div>
           )}
         </div>
 
         <div>
           <div className="sv-eyebrow" style={{ marginBottom: 5 }}>Never touched</div>
           <div className="sv-legend" style={{ gap: "4px 12px" }}>
-            {["Lights", "Fans", "Cooking", "Refrigerator", "Medical devices"].map((x) => (
-              <span key={x}><i style={{ background: "#1E7A4B" }} />{x}</span>
+            {UNTOUCHED_DEVICES.map((d) => (
+              <span key={d.type}><i style={{ background: "#1E7A4B" }} />{d.type.replace(/_/g, " ")}</span>
             ))}
           </div>
+          <p className="sv-note" style={{ marginTop: 6, fontWeight: 400 }}>
+            Read from the device registry, not from a list written next to it. A load is untouchable because its entry
+            says so and the never_curtail rule enforces it.
+          </p>
         </div>
 
         <div className="sv-card" style={{ background: "#F2F8F4", borderColor: "rgba(30,122,75,.35)" }}>

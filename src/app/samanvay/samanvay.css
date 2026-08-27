@@ -381,6 +381,71 @@ button.sv-chip[aria-expanded="true"] { background: var(--ink); border-color: var
   padding: 0 4px; font-size: 10.5px; background: var(--paper); color: var(--ink-2); min-width: 16px; text-align: center;
 }
 
+/* ------------------------------------------------- seam 5, the ablation live */
+
+.sv-fcswitch { display: grid; gap: 3px; }
+.sv-fcswitch button {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  width: 100%; padding: 5px 8px; text-align: left;
+  border: 1px solid var(--rule); border-radius: 2px; background: var(--paper);
+  color: var(--ink-2); font: 400 11.5px/1.35 var(--sans); cursor: pointer;
+}
+.sv-fcswitch button:hover { border-color: var(--ink-3); background: var(--card); }
+.sv-fcswitch button[aria-checked="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); font-weight: 600; }
+.sv-fcswitch button[data-trips] .h { color: var(--ceiling); font-weight: 600; }
+.sv-fcswitch button[aria-checked="true"][data-trips] { background: var(--ceiling); border-color: var(--ceiling); color: #FFFFFF; }
+.sv-fcswitch button[aria-checked="true"][data-trips] .h { color: #FFFFFF; }
+.sv-fcswitch .n { flex: 1; min-width: 0; }
+.sv-fcswitch .h { font-variant-numeric: tabular-nums; font-size: 10.5px; color: var(--ink-3); white-space: nowrap; }
+.sv-fcswitch button[aria-checked="true"] .h { color: var(--paper-2); }
+
+/* ------------------------------------------------------------ decision log */
+
+.sv-logbar { display: flex; align-items: center; gap: 10px; margin: 2px 0 10px; flex-wrap: wrap; }
+.sv-input {
+  flex: 1; min-width: 220px; padding: 6px 9px;
+  border: 1px solid var(--rule); border-radius: 2px; background: var(--paper);
+  color: var(--ink); font: 400 12.5px/1.4 var(--sans);
+}
+.sv-input:focus { outline: none; border-color: var(--ink); background: var(--card); }
+.sv-input::placeholder { color: var(--ink-4); }
+
+.sv-seg { display: flex; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; flex: none; }
+.sv-seg button {
+  padding: 6px 10px; border: none; border-right: 1px solid var(--rule);
+  background: var(--paper); color: var(--ink-3);
+  font: 500 10.5px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+}
+.sv-seg button:last-child { border-right: none; }
+.sv-seg button:hover { background: var(--card); color: var(--ink); }
+.sv-seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.sv-logscroll { max-height: 470px; overflow: auto; border-top: 1px solid var(--rule); }
+.sv-log td { white-space: normal; vertical-align: top; }
+.sv-log td.num { white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+.sv-log td[data-sign="neg"] { color: var(--ceiling); }
+.sv-log td[data-sign="pos"] { color: var(--saved); }
+.sv-log th:nth-child(2), .sv-log td:nth-child(2),
+.sv-log th:nth-child(3), .sv-log td:nth-child(3),
+.sv-log th:nth-child(5), .sv-log td:nth-child(5),
+.sv-log th:last-child,   .sv-log td:last-child { text-align: left; }
+.sv-log td:last-child { min-width: 300px; }
+.sv-log tr[data-exempt] td { background: var(--paper); color: var(--ink-3); }
+.sv-log thead th { position: sticky; top: 0; z-index: 1; background: var(--card); }
+
+.sv-link {
+  border: none; background: none; padding: 0; cursor: pointer;
+  color: var(--ink); font: inherit; font-weight: 600; text-decoration: underline;
+  text-decoration-color: var(--rule); text-underline-offset: 2px;
+}
+.sv-link:hover { text-decoration-color: var(--ink); }
+
+.sv-code {
+  font: 500 10.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--paper-2); border: 1px solid var(--rule-2); border-radius: 2px;
+  padding: 0 4px; color: var(--ink-2); white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sv *, .sv *::before, .sv *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
