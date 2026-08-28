@@ -412,3 +412,51 @@ export const BOOST_DAYS = { used: 2, total: 6 };
 export const NEVER_TOUCHED = ["Lights", "Fans", "TV", "Cooking", "Fridge"];
 export const ONLY_MOVED = ["water heater", "air conditioning", "car charger"];
 export const MAX_SHIFT_MINUTES = 40;
+
+/* ------------------------------------------------- the day, as it is billed */
+
+/* The society is billed on the single highest fifteen minutes of the month, so
+ * a day is not 24 hours here. It is 96 intervals, and the whole product is the
+ * business of moving one of them. */
+export const INTERVALS = 96;
+
+/** Interval index for a wall-clock hour. */
+export const atHour = (h: number) => Math.round(h * 4);
+
+/** 6 pm to 10 pm, where a unit costs 26 percent more. */
+export const EXPENSIVE: [number, number] = [atHour(18), atHour(22)];
+
+/** The geyser used to start here, and now starts 20 minutes later. */
+export const MOVED_FROM = atHour(6);
+export const MOVED_TO = MOVED_FROM + 1;
+
+export const MOVED_BY_MINUTES = 20;
+export const MOVED_SAVED = 4;
+
+/**
+ * This flat's own day, in kilowatts, one value per interval.
+ *
+ * Deterministic — no Math.random anywhere — because the server and the browser
+ * have to draw the identical figure or hydration breaks. The shape is a base
+ * load, a morning water-heating spike, and the long 6–10 pm peak that is the
+ * reason any of this exists.
+ */
+export function flatDay(): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < INTERVALS; i++) {
+    const h = i / 4;
+
+    let kw = 0.32;
+    /* fridge and fans breathing, not noise for its own sake */
+    kw += 0.05 * Math.sin(i / 3.1) + 0.03 * Math.sin(i / 7.7);
+    /* the geyser, and the kitchen behind it */
+    kw += 1.15 * Math.exp(-((h - 6.4) ** 2) / 0.5);
+    kw += 0.45 * Math.exp(-((h - 8.2) ** 2) / 2.2);
+    /* the long evening: everyone home, lights on, air conditioning */
+    kw += 1.65 * Math.exp(-((h - 20.1) ** 2) / 6.5);
+    kw += 0.5 * Math.exp(-((h - 13) ** 2) / 5);
+
+    out.push(Math.max(0.18, kw));
+  }
+  return out;
+}

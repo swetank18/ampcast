@@ -22,7 +22,8 @@ import {
   SOLAR_SHARE, SUGGESTIONS, TIERS, TOWER, UNCLAIMED, UNCLAIMED_COMBINED,
   type Accepted, type Band, type Declined, type Magnitude, type RequestKind,
   type ResidentRequest, type SliceId, type Suggestion, type SuggestionId, type TierId,
-  dayProfile, inr,
+  EXPENSIVE, INTERVALS, MOVED_BY_MINUTES, MOVED_FROM, MOVED_SAVED, MOVED_TO,
+  dayProfile, flatDay, inr,
 } from "./data";
 
 type Tab = "MY FLAT" | "SUGGESTIONS" | "SAVINGS" | "SOLAR" | "REQUESTS";
@@ -461,6 +462,8 @@ function MyFlat({
 }) {
   return (
     <>
+      <DayIntervals moved={!undone} whyOpen={whyOpen} setWhyOpen={setWhyOpen} onUndo={() => setUndone(true)} />
+
       <section className="rs-notice">
         <div className="rs-kicker">From management · {notice.on}</div>
         <p>{notice.body}</p>
@@ -540,30 +543,6 @@ function MyFlat({
         </div>
       </section>
 
-      <section className="rs-today">
-        <h3 className="rs-kicker">Today</h3>
-        {undone ? (
-          <p className="rs-none">Nothing was changed today.</p>
-        ) : (
-          <>
-            <p className="rs-line">
-              <b>11:20 pm</b> Your geyser started 20 minutes later than usual. Hot water was
-              ready before 7 am. Saved you about {inr(4)}.
-            </p>
-            <div className="rs-sub">
-              <button className="rs-link" onClick={() => setWhyOpen(!whyOpen)}>Why?</button>
-              <button className="rs-link" onClick={() => setUndone(true)}>UNDO</button>
-            </div>
-            {whyOpen && (
-              <p className="rs-why">
-                Because between 6 pm and 10 pm electricity costs 26 percent more, and the society
-                was close to its limit.
-              </p>
-            )}
-          </>
-        )}
-      </section>
-
       <section className="rs-never">
         <h3 className="rs-kicker">We never touch these</h3>
         <ul>
@@ -580,6 +559,102 @@ function MyFlat({
         </p>
       </section>
     </>
+  );
+}
+
+/* -------------------------------------------------------------- the hero */
+
+/* The society is billed on its single highest fifteen minutes of the month, so
+ * a day here is ninety-six intervals rather than twenty-four hours. Drawing the
+ * flat's real day at that resolution is the whole argument of the product in
+ * one figure: ninety-six intervals, one of them moved, by twenty minutes. */
+function DayIntervals({
+  moved, whyOpen, setWhyOpen, onUndo,
+}: { moved: boolean; whyOpen: boolean; setWhyOpen: (b: boolean) => void; onUndo: () => void }) {
+  const load = useMemo(() => flatDay(), []);
+  const max = Math.max(...load);
+  const pct = (i: number) => (i / INTERVALS) * 100;
+
+  return (
+    <figure className="rs-day">
+      <figcaption className="rs-day-head">
+        <div>
+          <span className="rs-kicker">Today · {MONTH}</span>
+          <h2>Your day, in 96 intervals</h2>
+        </div>
+        <p>
+          The society is billed on its single highest fifteen minutes of the month. So a day
+          here is ninety-six of them, and the work is moving one.
+        </p>
+      </figcaption>
+
+      <div className="rs-day-plot">
+        <span
+          className="rs-day-band"
+          style={{ left: `${pct(EXPENSIVE[0])}%`, width: `${pct(EXPENSIVE[1]) - pct(EXPENSIVE[0])}%` }}
+        >
+          <em>6 pm — 10 pm · a unit costs 26% more</em>
+        </span>
+
+        {moved && (
+          <span className="rs-day-mark" style={{ left: `${pct(MOVED_FROM)}%` }}>
+            <b>6:00 am</b>
+            <span>geyser moved {MOVED_BY_MINUTES} min later</span>
+          </span>
+        )}
+
+        <div className="rs-day-ticks" role="img"
+          aria-label={`This flat's load across 96 fifteen-minute intervals. ${moved ? "One interval was moved twenty minutes later." : "Nothing was moved today."}`}>
+          {load.map((kw, i) => (
+            <i
+              key={i}
+              className={
+                moved && i === MOVED_FROM ? "ghost"
+                  : moved && i === MOVED_TO ? "moved"
+                    : i >= EXPENSIVE[0] && i < EXPENSIVE[1] ? "peak" : undefined
+              }
+              style={{
+                height: `${Math.max(3, (kw / max) * 100)}%`,
+                /* the day draws itself left to right, once */
+                animationDelay: `${i * 4}ms`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="rs-day-axis">
+        <span>12 am</span><span>6 am</span><span>12 pm</span><span>6 pm</span><span>12 am</span>
+      </div>
+
+      <div className="rs-day-foot">
+        {moved ? (
+          <>
+            <p className="rs-day-fact">
+              One of your ninety-six intervals was moved today. Hot water was still ready before
+              7 am, and it saved you <b className="green">{inr(MOVED_SAVED)}</b>.
+            </p>
+            <div className="rs-day-acts">
+              <button className="rs-link" onClick={() => setWhyOpen(!whyOpen)}>
+                {whyOpen ? "Hide why" : "Why?"}
+              </button>
+              <button className="rs-link" onClick={onUndo}>Undo it</button>
+            </div>
+          </>
+        ) : (
+          <p className="rs-day-fact">
+            Nothing was moved today. Your home ran exactly as it always does.
+          </p>
+        )}
+      </div>
+
+      {moved && whyOpen && (
+        <p className="rs-why">
+          Because between 6 pm and 10 pm electricity costs 26 percent more, and the society was
+          close to its limit.
+        </p>
+      )}
+    </figure>
   );
 }
 
