@@ -24,16 +24,18 @@ import {
 import {
   ACTION_LABEL, buildDecisionLog, decisionsFor, summarise, type Decision,
 } from "./decisionLog";
+import RequestsTab from "./RequestsTab";
+import { QUEUE } from "./requests";
 import { IsoScene, TileScene, SceneLegend } from "./scene";
 import {
   AchievableSaving, CalibrationPlot, CautionDial, CompareChart, ControllerTable, FairnessBars,
   MonthCarpet, TimelineChart,
 } from "./charts";
 
-type Tab = "NOW" | "TIMELINE" | "COMPARE" | "EVIDENCE" | "LOG";
+type Tab = "NOW" | "TIMELINE" | "COMPARE" | "EVIDENCE" | "REQUESTS" | "LOG";
 const TABS: { key: Tab; hint: string }[] = [
   { key: "NOW", hint: "Q" }, { key: "TIMELINE", hint: "W" }, { key: "COMPARE", hint: "E" },
-  { key: "EVIDENCE", hint: "R" }, { key: "LOG", hint: "T" },
+  { key: "EVIDENCE", hint: "R" }, { key: "REQUESTS", hint: "T" }, { key: "LOG", hint: "Y" },
 ];
 
 interface Toast { id: number; tone: "neutral" | "confirm" | "warn"; text: string }
@@ -56,6 +58,7 @@ export default function Samanvay() {
   const startView = params.get("view") === "2d" ? "2d" : "3d";
 
   const [tab, setTab] = useState<Tab>(TABS.some((t) => t.key === startMode) ? startMode : "NOW");
+  const [reqPending, setReqPending] = useState(QUEUE.length);
   const [scenario, setScenario] = useState<ScenarioKey>(
     SCENARIOS.some((s) => s.key === startScenario) ? startScenario : "normal",
   );
@@ -116,7 +119,8 @@ export default function Samanvay() {
       else if (k === "w") setTab("TIMELINE");
       else if (k === "e") setTab("COMPARE");
       else if (k === "r") setTab("EVIDENCE");
-      else if (k === "t") setTab("LOG");
+      else if (k === "t") setTab("REQUESTS");
+      else if (k === "y") setTab("LOG");
       else if (k === "g") { setView((v) => (v === "3d" ? "2d" : "3d")); }
       else if (k === " ") { e.preventDefault(); setPlaying((p) => !p); }
       else if (k === "escape") { setPhone(null); setTariff(false); }
@@ -212,6 +216,7 @@ export default function Samanvay() {
               {TABS.map((x) => (
                 <button key={x.key} role="tab" aria-selected={tab === x.key} onClick={() => setTab(x.key)}>
                   {x.key}<kbd>{x.hint}</kbd>
+                  {x.key === "REQUESTS" && reqPending > 0 && <i className="sv-tabbadge">{reqPending}</i>}
                 </button>
               ))}
             </div>
@@ -268,6 +273,7 @@ export default function Samanvay() {
             {tab === "TIMELINE" && <TimelineTab {...{ day, t, stale, override }} />}
             {tab === "COMPARE" && <CompareTab {...{ day, rows, split, setSplit }} />}
             {tab === "EVIDENCE" && <EvidenceTab {...{ day, carpet, fair, bills, monthSaving }} />}
+            {tab === "REQUESTS" && <RequestsTab push={push} onPending={setReqPending} />}
             {tab === "LOG" && <LogTab {...{ day, homes, log, t, openPhone }} />}
           </div>
 
