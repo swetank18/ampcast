@@ -1,0 +1,170 @@
+SAMANVAY — PITCH 3 OF 3
+The simulation: what happens when the day goes wrong
+======================================================================
+
+
+THE ONE SENTENCE
+----------------------------------------------------------------------
+
+A controller that works on a normal Tuesday is not a product. The
+simulator exists to run the days that break it — a heatwave, half a
+feeder going blind, the intake tripping at half past seven — and to
+show what the controller does when it can no longer trust its own
+inputs.
+
+
+TWO SIMULATORS, DIFFERENT JOBS
+----------------------------------------------------------------------
+
+1. THE BUILDING SIMULATOR — evidence
+
+   Real metered data, real thermal physics, real tariff. Six
+   controllers run against four scenarios: 24 complete month-long
+   runs at fifteen minute resolution.
+
+   This is where the numbers in Pitch 1 come from.
+
+2. THE SOCIETY SIMULATOR — the demo
+
+   Sixty flats, one shared connection, an estate you can watch hour by
+   hour. Five stress scenarios on the keys 1 to 5. This is the thing a
+   judge actually looks at.
+
+They share the tariff, the constraint registry and the forecaster
+interface. They are not the same simulation and we do not present them
+as one.
+
+
+THE SIX CONTROLLERS
+----------------------------------------------------------------------
+
+  no_control           A deadband thermostat at a fixed 24 °C, water
+                       heater always hot, EVs charging flat out on
+                       arrival. Price-blind and peak-blind — what an
+                       uninstrumented building does.
+
+  rule_based           Time-of-day rules. What a competent facility
+                       manager already does by hand.
+
+  mpc_mean             Our controller with the mean substituted for
+                       the q95. Same optimiser, same physics, same
+                       seed. The ONLY difference is the quantile.
+
+  ours                 Chance-constrained on the calibrated q95.
+
+  mpc_oracle_rolling   Perfect forecast, rolling horizon.
+
+  oracle               Knows the whole month in advance. Not a
+                       controller you can build — the ceiling on what
+                       any controller could do.
+
+mpc_mean is the important one. It isolates the single claim of this
+project: not "MPC is good", but "the quantile you put in the capacity
+constraint is what decides whether you breach". Everything else is
+held identical so that difference cannot be attributed to anything
+else.
+
+
+THE FOUR BUILDING SCENARIOS
+----------------------------------------------------------------------
+
+  none             A normal month. The baseline.
+  heatwave         Cooling load that does not switch off.
+  sensor_dropout   The meters stop reporting mid-run.
+  outage           Supply is lost and critical load moves to backup.
+
+sensor_dropout is the one worth demonstrating. A forecaster running on
+a stale estimate should not keep claiming the same confidence. Ours
+widens its band when its inputs degrade, so the controller
+automatically becomes more conservative without anybody intervening.
+A model that keeps quoting a narrow interval after its data has gone
+is not being brave, it is being wrong.
+
+
+THE FIVE SOCIETY SCENARIOS
+----------------------------------------------------------------------
+
+  1  Normal day      A weekday in the shoulder season.
+
+  2  Heatwave        38 °C at four in the afternoon. Every AC in the
+                     society running and none of them stopping.
+                     Forecast band widens 1.25x.
+
+  3  Sensor drop     Submeters stop reporting at 16:00 — most of an
+                     entire feeder. The forecast is running on a stale
+                     estimate AND KNOWS IT: the band widens 2.6x and
+                     the controller gives back headroom rather than
+                     pretending.
+
+  4  Grid outage     Intake trips at 19:30. The estate goes dark and
+                     critical services move to backup — lifts, fire
+                     panel, pump house, emergency lighting. Lifts,
+                     water and fire are never shed. That is a hard
+                     constraint, not a preference.
+
+  5  Festival        Deepavali eve. Lights on every balcony, guests in
+                     every flat, every geyser in the estate. Twelve
+                     same-evening requests arrive at once.
+
+Scenario 5 is the demo moment. Twelve requests collapse into one
+grouped card, one button staggers them into two groups, ₹3,891 becomes
+₹0, and Saturday settles at 90.8 kVA. Nobody is refused.
+
+
+WHAT THE SIMULATION IS HONEST ABOUT
+----------------------------------------------------------------------
+
+DETERMINISM. Everything is generated from a seeded load shape plus the
+tariff. The renderer computes nothing — it reads a day and draws it.
+Run it twice, get the same month. A demo that reshuffles on every
+reload is a demo you cannot be questioned about.
+
+THE GHOST. Every chart carries the schedule the society used before,
+drawn alongside the one it uses now. The saving is always stated
+against a real alternative, never against zero.
+
+THE FLOOR. Critical load has a floor the optimiser cannot go under. No
+flat can be deferred more than the cap in the constraints file, and a
+fairness ledger tracks who has been asked so the same flat is not
+deferred every month. Fairness is measured with a Jain index and
+reported per feeder and per block, not just as a single society
+number that can hide a badly-treated corner.
+
+THE OPT-OUTS. Some flats have opted out entirely and some meters are
+offline. Both are in the simulation by default, because a controller
+that only works when every flat participates and every meter reports
+is not a controller for a real building.
+
+
+WHAT IT IS NOT
+----------------------------------------------------------------------
+
+The society simulation is a simulation. The thermal physics and the
+tariff are real, the load shapes are calibrated against real
+residential patterns, and the household archetypes are drawn to sum
+correctly — but sixty real flats have not run this.
+
+The building results ARE on real metered data, held out, walk-forward.
+Those two claims stay separate in every document we produce.
+
+
+HOW TO DRIVE IT IN A DEMO
+----------------------------------------------------------------------
+
+  Keys 1–5     switch scenario
+  Space        play the day
+  Q W E R T Y  switch tabs
+  G            swap the scene treatment
+
+  1. Start on NOW, normal day. Sixty homes, live.
+  2. Press 2. Watch the band widen and the headroom shrink.
+  3. Press 3. Point at the band widening again — the model knows its
+     inputs went stale.
+  4. Go to COMPARE. Drag the split: 87.0 kVA forecast-only against
+     84.4 with this system.
+  5. Go to EVIDENCE. The calibration plot, the month carpet, the
+     rendered invoice, the fairness bars.
+  6. Press 5, go to REQUESTS, and stagger the festival.
+
+Six steps, about ninety seconds, and every number on screen came out
+of the same seeded model.

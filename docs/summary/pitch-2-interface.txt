@@ -1,0 +1,188 @@
+SAMANVAY — PITCH 2 OF 3
+The interface: two ends of one set of facts
+======================================================================
+
+
+THE ONE SENTENCE
+----------------------------------------------------------------------
+
+There are two apps — an operator console and a resident app — and they
+are not two apps. They are one set of facts seen from two ends, which
+is why the operator can never see a number the resident has not agreed
+to show them.
+
+
+WHY THE INTERFACE IS NOT DECORATION
+----------------------------------------------------------------------
+
+A demand-control system fails for social reasons long before it fails
+for technical ones. The optimiser can be correct and the product can
+still die, because:
+
+  - a resident does not believe you are only touching the geyser
+  - a resident thinks their neighbour is getting a better deal
+  - an operator cannot answer "why was my flat asked?"
+  - one flat is deferred every single month and nobody notices
+
+None of those are model problems. All of them are interface problems.
+So the interface carries the trust, and the rules are enforced in code
+rather than written in a policy document nobody reads.
+
+
+THE RESIDENT APP
+----------------------------------------------------------------------
+
+Five screens, one flat. What a flat owner sees, and nothing else.
+
+  MY FLAT      what was moved today, and what it saved
+  SUGGESTIONS  things worth doing, each with a price and a cost
+  SAVINGS      where the money came from, and what is still unclaimed
+  SOLAR        society solar today, and the case for their own panels
+  REQUESTS     ask for something; control what we can see
+
+THE HERO IS THE THESIS. The society is billed on its single highest
+fifteen minutes of the month, so the app opens on the resident's real
+day drawn as ninety-six intervals. The 6–10pm window is tinted amber,
+because that is where a unit costs 26 percent more. One interval is
+drawn as a hatched ghost, with the filled tick beside it showing where
+it went.
+
+That single figure says the entire product: we touched one of your
+ninety-six intervals, by twenty minutes, and it saved you ₹4.
+
+EDITORIAL RULES, HELD THROUGHOUT
+
+  - Every number is a rupee amount or a count of minutes. Never kWh
+    where money would do.
+  - Every automated action states its comfort cost BEFORE its saving.
+  - Every decline, toggle-off and pause is stated as free of penalty,
+    in the same place as the action.
+  - The boundary — lights, fans, TV, cooking, fridge — is repeated on
+    the home screen and again inside the consent tier.
+  - Contribution is participation, never consumption, and the formula
+    is published on the same screen as the rank.
+
+CONSENT IS A LADDER, NOT A SWITCH
+
+Four tiers, and the system works fully at tier 1 for everyone:
+
+  0  The society meter          always on, not a consent decision
+  1  Your flat counts in it     always on, never shown alone
+  2  Your flat's meter          optional — buys you your own figure
+  3  Appliance readings         optional — buys better timing
+
+Higher tiers buy better results, never basic function. Turn tier 2 off
+and your savings show as the society average instead of your own
+number, you stop being ranked, and nothing else changes. The
+degradation is honest and it is visible at the moment of choosing.
+
+DIGNITY, ENFORCED IN CODE
+
+The medical emergency button protects the flat immediately, tells
+management, and removes that flat from ranking. The operator has no
+control to override it. That is not a policy, it is an absent button.
+
+
+THE OPERATOR CONSOLE
+----------------------------------------------------------------------
+
+Six tabs. NOW, TIMELINE, COMPARE, EVIDENCE, REQUESTS, LOG.
+
+THE REQUESTS TAB IS THE DEEPEST THING IN THE PRODUCT.
+
+Three sections, in this order:
+
+  A  Needs your decision      typically zero to three cards
+  B  Approved automatically   31 of 34 this month. Deliberately dull.
+  C  Coming up                seven days, granted requests stacked
+                              over the forecast peak
+
+Section B should feel boring. Boring is the point: it is the section
+that proves the system is working without demanding attention. A queue
+that is always full stops being read, so anything fitting inside the
+forecast headroom is approved before the operator ever sees it.
+
+THE CLUSTER CARD IS THE ONE TO DEMO
+
+Two flats want the same Saturday evening. Approved alone, each costs
+the society ₹0 and ₹1,276. Approved together they cross the ceiling
+and cost ₹3,890.
+
+Deciding them one at a time produces two numbers that both go wrong
+the moment either is approved. So they are not two decisions. They are
+one card, showing all three figures and the sentence explaining why
+the first two mislead — and one button that staggers them into two
+groups, landing the evening at 90.8 kVA for nothing.
+
+Nobody is refused. Both flats get their evening; one starts two hours
+later than it asked.
+
+NO CONFIRMATION DIALOGUES ANYWHERE
+
+Every decision commits at once and carries a ten-second draining undo.
+After that window it is final. An operator making thirty decisions an
+hour does not read a modal, they dismiss it.
+
+WHAT THE OPERATOR IS NEVER SHOWN
+
+The flexibility budget shows the distribution — how many flats have
+used 0, 1–3, 4–5, or all 6 of their boost days. It never lists which
+flats. Auto-declined requests appear behind a toggle rather than being
+hidden, because automation you cannot see is automation you cannot
+answer for.
+
+
+THE LINK BETWEEN THEM — DEMO THIS
+----------------------------------------------------------------------
+
+The two apps share one store. Open them side by side and:
+
+  1. Send a request from the resident app. It arrives at the top of
+     the operator's decision queue as a real card with its own cost
+     arithmetic, instantly.
+
+  2. Accept a suggestion. The resident's headline climbs, the
+     operator's live feed gains a row reading ₹38/mo, and the badge
+     decrements — in the same frame, no refresh.
+
+  3. Raise the medical flag. A red banner appears on the operator's
+     queue and they have no way to override it.
+
+  4. Withdraw tier 2. The resident's figure drops to the society
+     average and the operator's consent coverage falls 47 → 46.
+
+THE LINE TO SAY WHILE DOING IT: "These aren't two apps talking to each
+other. It's one set of facts with two ends."
+
+
+DESIGN
+----------------------------------------------------------------------
+
+The ground is the cool pale slate of a meter cabinet, not paper,
+because this is a civic utility and not a consumer finance app.
+
+One accent. Amber means the hours between 6 and 10 in the evening,
+when a unit costs 26 percent more, and it is allowed to mean nothing
+else. Slate means society solar. Green means money saved. Red appears
+exactly once in the entire app, on the medical button.
+
+Money is set in Anek Latin — drawn in India by Ek Type — narrowed on
+its width axis so a large rupee figure is not a loud one. Meter
+readings, interval times and clock labels are set in mono, because
+machine data should never read as prose.
+
+No chart library anywhere. Six figures in CSS and inline SVG.
+
+Responsive to mobile, keyboard-navigable, visible focus, reduced
+motion respected. The ninety-six ticks draw themselves left to right
+once, and then hold still. That is the only orchestrated motion in the
+app.
+
+
+LIVE
+----------------------------------------------------------------------
+
+  Resident   /samanvay/resident
+  Operator   /samanvay?mode=REQUESTS
+
+  https://aethergrid-vert.vercel.app

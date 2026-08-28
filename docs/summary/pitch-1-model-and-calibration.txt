@@ -1,0 +1,174 @@
+SAMANVAY — PITCH 1 OF 3
+The model, the calibration, and why the interval is the product
+======================================================================
+
+
+THE ONE SENTENCE
+----------------------------------------------------------------------
+
+We do not forecast electricity. We forecast the bill — and we forecast
+it as a distribution, because the number that costs money is not the
+average load, it is the worst likely load.
+
+
+THE PROBLEM, PRECISELY
+----------------------------------------------------------------------
+
+A bulk-supply society is billed two ways. Energy, at ₹6.35 a unit,
+which is the number everybody thinks about. And demand, at ₹608 per
+kVA, charged on the single highest fifteen minutes of the entire
+month.
+
+One interval. Not the average, not the daily peak, not the p95 of the
+month. The maximum. Every other interval in those thirty days is
+billed at zero for demand.
+
+That asymmetry is the whole business. If you flatten one fifteen
+minute window you have changed the bill. If you shave the average by
+ten percent and leave the peak alone, you have changed nothing.
+
+So the unit of the product is the interval, and the day is ninety-six
+of them.
+
+
+WHY A POINT FORECAST CANNOT DO THIS
+----------------------------------------------------------------------
+
+The naive design is: forecast the load, subtract it from the
+transformer limit, allocate the difference. That controller aims at
+the ceiling with a mean forecast, and a mean forecast is wrong half
+the time in the upward direction. Half your errors land on top of the
+transformer.
+
+The fix is not a better mean. It is to stop using a mean.
+
+We predict seven quantiles of society load at fifteen minute
+resolution with LightGBM, put a conformal layer on top, and substitute
+the ninety-fifth percentile into the capacity constraint. The
+controller then plans against the worst likely load rather than the
+expected one. That is a chance-constrained formulation, and it is one
+line in the constraint and an entire change in behaviour.
+
+Dispatch is deterministic and auditable. It is not a learned policy,
+there is no black box between the forecast and the relay, and every
+decision names the entry in the constraint registry that produced it.
+That is what makes "why was I asked" answerable to a resident, and not
+only to us.
+
+
+THE PART MOST TEAMS SKIP: CALIBRATION
+----------------------------------------------------------------------
+
+Anyone can emit a q95. The question is whether it is a real
+ninety-fifth percentile or a decoration.
+
+Measured on 184,320 held-out intervals:
+
+  nominal 0.05   →  empirical 0.049
+  nominal 0.25   →  empirical 0.252
+  nominal 0.50   →  empirical 0.508
+  nominal 0.75   →  empirical 0.762
+  nominal 0.95   →  empirical 0.939
+
+  90% interval coverage:  89.0%   against a 90% target
+  Acceptance test:        PASS
+
+Those five rows are the claim. A band that says ninety-five and
+delivers ninety-four is a band a controller can safely aim under. A
+band that says ninety-five and delivers seventy is an overdraft the
+transformer pays.
+
+Walk-forward, never shuffled. Train 2016-01 to 2017-03, validate
+2017-04 to 2017-05, test on a month the model has never seen.
+
+
+THE ABLATION, WHICH IS THE ACTUAL ARGUMENT
+----------------------------------------------------------------------
+
+We built the forecaster behind an interface:
+
+    interface Forecaster { predict(plan, sc) -> { q05, q50, q95 } }
+
+Swap the implementation and nothing downstream moves. The optimiser,
+the tariff, the physics, the simulator and the random seed are all
+pinned. Only the file the quantiles come from changes. So a difference
+on screen is a difference in the model, never a difference in the
+drawing code.
+
+Eight forecasters, same controller, same month:
+
+  Ours, calibrated q95      pinball  2.397     0 breaches
+  Seasonal naive            pinball  6.213     0 breaches
+  Climatology               pinball  7.314     1 breach
+  Static margin, no fc      pinball 20.307    11 breaches
+  Persistence               pinball 27.582    87 breaches
+
+Read the last row twice. Persistence claims the second-most headroom
+in the table — it draws a narrow, confident band, so the controller
+believes it and aims high. Then the evening arrives. Eighty-seven
+breaches.
+
+That is the sentence to remember: headroom without calibration is an
+overdraft, not a gain.
+
+We also report where we lose. Seasonal naive is genuinely safe on a
+calm month, and it is in the table saying so. Our margin over it is
+headroom and peak, not safety. A comparison table you only publish
+when you win is marketing, not evidence.
+
+Perfect foresight is in there too, as the bound — not a baseline. It
+tells you how much of the achievable saving any controller could
+possibly capture, so our number has a ceiling to be judged against
+rather than a floor to look good over.
+
+
+WHAT THE EVIDENCE IS, AND WHAT IT IS NOT
+----------------------------------------------------------------------
+
+Say this before a judge asks it.
+
+The calibration and the ablation are measured on real metered data
+from a commercial office building — 13,759 sqm, 505 kVA contract
+demand, all-electric cooling, chosen because it has the sharpest
+demand-charge exposure on its site (p99/median = 2.9).
+
+The residential society is a simulation. It is driven by the same
+tariff, the same constraint registry and the same forecaster
+interface, but it is not a claim that we have run this on sixty real
+flats, because we have not.
+
+The method is proven on real data. The deployment is not yet proven on
+a real society. Those are different sentences and we keep them
+different. What is next is not a bigger model — it is one society's
+data-sharing agreement.
+
+
+THE SEAMS
+----------------------------------------------------------------------
+
+Nothing is hardcoded. Rates, limits, constraints, devices, scenarios,
+the estate and the feature flags are all configuration files. The
+forecaster is an interface.
+
+A pricing change, a new tariff category, a different transformer, a
+larger estate, a new stress event — each is an edit to one JSON file
+and nothing else in the system moves. If answering a jury question
+required editing the model, a seam was cut in the wrong place.
+
+
+NUMBERS ON THE DEMO ESTATE
+----------------------------------------------------------------------
+
+  Tariff              TN HT-I-A (TNERC), ToD per the 2023 amendment
+  Energy              ₹6.35 / kWh
+  Demand charge       ₹608 / kVA of the month's highest 15 minutes
+  Peak ToD window     18:00–22:00 at 1.25x — the window we defend
+  Solar window        05:00–10:00 at 0.8x — where load is moved to
+
+  Demo society        60 flats, 92 kVA ceiling
+  Saving              ₹12,227 a month, ₹204 a flat, against the
+                      schedule the society used before
+
+Note: the estate is one config file. A scale-up to Abode Valley —
+26 blocks, 1,456 flats, four 750 kVA transformers, 2,232 kVA intake —
+is in progress and changes three numbers, not the method.
