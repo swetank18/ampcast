@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink-900:#111111; --ink-700:#3A3A3A; --ink-500:#6B6B6B; --ink-350:#9A9A9A;
+  --ink-200:#C9C9C9; --ink-150:#DCDCDC; --ink-80:#EDEDEB; --ink-40:#F6F5F3; --paper:#FFFFFF;
+  --red-600:#C4392B; --red-700:#9A2C20; --red-100:#FBE9E6;
+  --green-600:#1E7A4B; --green-800:#145635; --green-100:#E7F3EC;
+  --amber-600:#B07000; --amber-800:#7A4D00; --amber-100:#FCF0DB;
+  --focus:#1F6FEB;
+}
+@keyframes drain{from{width:100%}to{width:0%}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.001ms !important;transition-duration:0.001ms !important}}
+html,body{margin:0;padding:0;background:var(--ink-40);}
+body{font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;color:var(--ink-900);}
+*{box-sizing:border-box;}
+button{font-family:inherit;font-variant-numeric:tabular-nums;cursor:pointer;}
+a{color:var(--ink-900);}
+a:hover{color:var(--ink-500);}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;height:16px;background-repeat:no-repeat;background-position:0 6px;background-size:100% 4px;}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:transparent;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#111111;border:0;border-radius:0;margin-top:-6px;}
+input[type=range]::-moz-range-track{height:4px;background:transparent;}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;background:#111111;border:0;border-radius:0;}
+@keyframes flow{to{stroke-dashoffset:-16;}}
+@keyframes tick{0%{width:4%}100%{width:100%}}
+@keyframes evpulse{0%,100%{opacity:.35}50%{opacity:1}}
+</style>
+</helmet>
+
+<div style="width:100%;min-width:1320px;background:var(--ink-40);padding-bottom:0;zoom:{{ zoom }}">
+
+  <div style="display:flex;align-items:center;height:48px;padding:0 24px;background:var(--paper);border-bottom:1px solid var(--ink-150)">
+    <div style="width:10px;height:10px;background:var(--ink-900)"></div>
+    <div style="margin-left:8px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Samanvay</div>
+    <div style="width:1px;height:16px;background:var(--ink-150);margin:0 16px"></div>
+    <div style="font-size:15px;line-height:22px;color:var(--ink-500);white-space:nowrap;flex:none">Anna Nagar Residency · common services connection · 60 flats</div>
+    <div style="flex:1"></div>
+    <button onClick="{{ openTariff }}" style="display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:4px 10px;font-size:12.5px;line-height:17px;color:var(--ink-900)" style-hover="border-color:var(--ink-900)">
+      <span style="white-space:nowrap">TN HT · ₹7.50/kWh · ₹608/kVA</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5.2" fill="none" style="stroke:var(--ink-500)" stroke-width="1"></circle><rect x="5.4" y="5" width="1.2" height="4" style="fill:var(--ink-500)"></rect><rect x="5.4" y="2.9" width="1.2" height="1.3" style="fill:var(--ink-500)"></rect></svg>
+    </button>
+    <div style="display:flex;margin-left:16px">
+      <button onClick="{{ goNow }}" style="height:32px;padding:0 14px;border:1px solid var(--ink-150);border-right:0;border-radius:2px 0 0 2px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;background:{{ tabNowBg }};color:{{ tabNowFg }}">Now</button>
+      <button onClick="{{ goTimeline }}" style="height:32px;padding:0 14px;border:1px solid var(--ink-150);border-right:0;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;background:{{ tabTlBg }};color:{{ tabTlFg }}">Timeline</button>
+      <button onClick="{{ goCompare }}" style="height:32px;padding:0 14px;border:1px solid var(--ink-150);border-right:0;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;background:{{ tabCmpBg }};color:{{ tabCmpFg }}">Compare</button>
+      <button onClick="{{ goEvidence }}" style="height:32px;padding:0 14px;border:1px solid var(--ink-150);border-right:0;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;background:{{ tabEvBg }};color:{{ tabEvFg }}">Evidence</button>
+      <button onClick="{{ goRequests }}" style="height:32px;padding:0 14px;border:1px solid var(--ink-150);border-radius:0 2px 2px 0;display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;background:{{ tabRqBg }};color:{{ tabRqFg }}">
+        <span>Requests</span>
+        <sc-if value="{{ reqBadge }}" hint-placeholder-val="{{ true }}">
+          <span style="width:16px;height:16px;flex:none;border-radius:8px;background:var(--red-600);color:var(--paper);font-size:10.5px;line-height:16px;text-align:center;letter-spacing:0;font-weight:500">{{ reqBadgeText }}</span>
+        </sc-if>
+      </button>
+    </div>
+    <button onClick="{{ toggleZoom }}" title="Presentation zoom" style="margin-left:8px;height:32px;padding:0 10px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900)" style-hover="border-color:var(--ink-900)">{{ zoomLabel }}</button>
+  </div>
+
+  <div style="padding:6px 24px;background:var(--paper);border-bottom:1px solid var(--ink-150);font-size:12.5px;line-height:17px;color:var(--ink-500)">We plan against the worst likely load, not the average one, so the monthly peak never gets set by accident.</div>
+
+  <div style="display:flex;gap:32px;padding:12px 24px">
+    <div style="display:flex;gap:12px;flex:1.25">
+      <div style="flex:1.35;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:10px 14px 12px">
+        <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Peak so far this month</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
+          <div style="font-size:44px;line-height:44px;font-weight:500;letter-spacing:-0.02em">{{ monthPeak }}</div>
+          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">kVA</div>
+        </div>
+        <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">The highest burst so far. It sets one charge on every bill this month.</div>
+      </div>
+      <div style="flex:1;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:10px 14px 12px;display:flex;flex-direction:column">
+        <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Headroom right now</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
+          <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ headroom }}</div>
+          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">kVA below the 92 kVA ceiling</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="position:relative;height:8px;background:var(--ink-80);margin-top:10px">
+          <div style="position:absolute;left:0;top:0;bottom:0;transition:background 240ms ease-out;width:{{ headroomPct }};background:{{ headroomFill }}"></div>
+          <div style="position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--red-600);left:{{ ceilingPct }}"></div>
+        </div>
+        <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500)">Room to spare. Nothing is close to the limit.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex:1">
+      <div style="flex:1.2;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:10px 14px 12px">
+        <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Common services bill, month to date</div>
+        <div style="margin-top:4px;font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:var(--green-600)">₹12,227 lower</div>
+        <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">₹2,16,924 now, against ₹2,29,151 the old way.</div>
+      </div>
+      <div style="flex:1;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:10px 14px 12px">
+        <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Kept off the maintenance charge</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
+          <div style="font-size:44px;line-height:44px;font-weight:500;letter-spacing:-0.02em;color:var(--green-600)">₹204</div>
+          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">per flat, this month</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;height:44px;padding:0 16px;border-top:1px solid var(--ink-150);border-bottom:1px solid var(--ink-150);border-left:3px solid {{ stEdge }};transition:background 240ms ease-out;background:{{ stBg }}">
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="{{ stIcon }}" style="fill:{{ stEdge }}"></path></svg>
+    <div style="font-size:15px;line-height:22px;font-weight:500;white-space:nowrap;color:{{ stHeadColor }}">{{ stHead }}</div>
+    <div style="font-size:15px;line-height:22px;color:var(--ink-700)">{{ stDetail }}</div>
+    <div style="flex:1"></div>
+    <sc-if value="{{ stHasButton }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ stAction }}" style="height:32px;padding:0 12px;border-radius:2px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;border:1px solid {{ stBtnBorder }};background:{{ stBtnBg }};color:{{ stBtnFg }}">{{ stBtnLabel }}</button>
+    </sc-if>
+    <sc-if value="{{ stHasStamp }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">Checked 6 min ago</div>
+    </sc-if>
+  </div>
+
+  <div style="display:flex;gap:20px;padding:14px 24px">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px">
+
+      <sc-if value="{{ isNow }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;gap:20px;height:{{ topRowH }}">
+            <div style="flex:1;min-width:0;background:{{ cardSky }};transition:background 600ms ease-out;border:1px solid var(--ink-150);border-radius:2px;padding:10px 14px 8px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap;">Society view</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-350);margin-left:10px;white-space:nowrap;">{{ sceneCaption }}</div>
+                <div style="flex:1"></div>
+                <button onClick="{{ toggleTiles }}" style="height:22px;padding:0 8px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900);margin-right:6px" style-hover="border-color:var(--ink-900)">{{ tilesLabel }}</button>
+                <button onClick="{{ toggleExpand }}" aria-label="Expand society view" style="width:22px;height:22px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);display:flex;align-items:center;justify-content:center" style-hover="border-color:var(--ink-900)">
+                  <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0h4v1.4H1.4V4H0V0zm10 0v4H8.6V1.4H6V0h4zM0 10V6h1.4v2.6H4V10H0zm10 0H6V8.6h2.6V6H10v4z" style="fill:var(--ink-500)"></path></svg>
+                </button>
+              </div>
+
+              <sc-if value="{{ showTiles }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(10,1fr);grid-auto-rows:1fr;gap:6px;margin-top:8px">
+                  <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="0">
+                    <button onClick="{{ t.onClick }}" title="{{ t.title }}" style="border:1px solid var(--ink-150);border-radius:0;padding:0;min-height:22px;background:{{ t.bg }}"></button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ showScene }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1;min-height:0;margin-top:6px;position:relative">
+                  <svg viewBox="0 0 1040 470" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:100%">
+                    <rect x="0" y="0" width="1040" height="470" style="fill:{{ sky }}"></rect>
+                    <ellipse cx="520" cy="298" rx="474" ry="186" style="fill:{{ groundFill }}"></ellipse>
+                    <ellipse cx="520" cy="298" rx="474" ry="186" fill="none" stroke-width="1" style="stroke:{{ plateEdge }}"></ellipse>
+                    <g transform="translate(430,96) scale(1.62)">
+                      <path d="M166.5 53.2 L211.5 75.7 L-13.5 187.5 L-58.5 165 Z" style="fill:{{ roadFill }}"></path>
+                      <sc-for list="{{ houses }}" as="h" hint-placeholder-count="0">
+                        <g transform="{{ h.tf }}" onClick="{{ h.onClick }}" style="cursor:pointer">
+                          <ellipse cx="0" cy="25" rx="25" ry="12" style="fill:#2A2320;opacity:{{ h.shadowOp }}"></ellipse>
+                          <path d="{{ h.body }}" stroke-width="0.7" style="fill:{{ h.bodyFill }};stroke:var(--ink-150)"></path>
+                          <path d="{{ h.roof }}" stroke-width="0.7" style="fill:{{ h.roofFill }};stroke:var(--ink-150)"></path>
+                          <path d="{{ h.solar }}" style="fill:{{ h.solarFill }}"></path>
+                          <path d="{{ h.win }}" style="fill:{{ h.winFill }}"></path>
+                          <ellipse cx="0" cy="24" rx="22" ry="11" fill="none" stroke-width="1.2" stroke-dasharray="3 3" style="stroke:var(--ink-500);opacity:{{ h.ringOp }}"></ellipse>
+                          <rect x="-30" y="14" width="9" height="5" style="fill:var(--ink-500);opacity:{{ h.evOp }};animation:{{ h.evAnim }}"></rect>
+                        </g>
+                      </sc-for>
+                      <sc-for list="{{ trees }}" as="t" hint-placeholder-count="0">
+                        <g transform="{{ t.tf }}">
+                          <ellipse cx="0" cy="2" rx="9" ry="4" style="fill:#2A2320;opacity:{{ t.shadowOp }}"></ellipse>
+                          <rect x="-1.2" y="-11" width="2.4" height="12" style="fill:{{ t.trunk }}"></rect>
+                          <circle cx="0" cy="-16" r="8.5" style="fill:{{ t.leafA }}"></circle>
+                          <circle cx="-4" cy="-11" r="6" style="fill:{{ t.leafB }}"></circle>
+                          <circle cx="4.5" cy="-12" r="5.5" style="fill:{{ t.leafB }}"></circle>
+                        </g>
+                      </sc-for>
+                      <sc-for list="{{ lights }}" as="l" hint-placeholder-count="0">
+                        <g>
+                          <rect x="{{ l.x }}" y="{{ l.y }}" width="1.2" height="16" style="fill:var(--ink-350)"></rect>
+                          <circle cx="{{ l.cx }}" cy="{{ l.cy }}" r="3.4" style="fill:{{ l.fill }}"></circle>
+                        </g>
+                      </sc-for>
+                      <sc-for list="{{ flows }}" as="f" hint-placeholder-count="0">
+                        <path d="{{ f.d }}" fill="none" stroke-dasharray="5 11" stroke-width="{{ f.w }}" style="stroke:var(--ink-350);animation:flow 1.1s linear infinite"></path>
+                      </sc-for>
+                    </g>
+                    <g transform="translate(120,392)">
+                      <path d="M0 0 L22 13 L0 26 L-22 13 Z" style="fill:var(--ink-200)"></path>
+                      <path d="M22 13 L0 26 L0 10 L22 -3 Z" style="fill:var(--ink-500)"></path>
+                      <path d="M-22 13 L0 26 L0 10 L-22 -3 Z" style="fill:var(--ink-700)"></path>
+                      <text x="0" y="48" text-anchor="middle" style="font-size:11px;fill:var(--ink-500)">Shared connection</text>
+                      <rect x="40" y="-40" width="14" height="66" style="fill:var(--ink-80)"></rect>
+                      <rect x="40" width="14" y="{{ nodeBarY }}" height="{{ nodeBarH }}" style="fill:{{ nodeBarFill }}"></rect>
+                      <rect x="36" y="-22.6" width="22" height="2" style="fill:var(--red-600)"></rect>
+                      <text x="62" y="-18" style="font-size:11px;fill:var(--red-600)">92 kVA ceiling</text>
+                    </g>
+                  </svg>
+                </div>
+              </sc-if>
+
+              <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">
+                <sc-for list="{{ legend }}" as="g" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <span style="width:8px;height:8px;display:block;border:{{ g.border }};background:{{ g.bg }}"></span>
+                    <span>{{ g.label }}</span>
+                    <span style="color:var(--ink-350)">{{ g.count }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTimeline }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+        <div onMouseMove="{{ onPlotMove }}" onMouseLeave="{{ onPlotLeave }}" style="position:relative;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:10px 14px 6px">
+          <div style="display:flex;align-items:baseline;gap:10px">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">Common services load · 15 min intervals</div>
+            <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap;flex:none">{{ chartCaption }}</div>
+            <div style="flex:1"></div>
+            <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">Rupees per interval, today to now</div>
+            <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ rupeesToNow }}</div>
+          </div>
+          <svg viewBox="0 0 1040 300" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block;margin-top:2px">
+            <line x1="56" x2="1000" y1="210" y2="210" stroke-width="1" style="stroke:var(--ink-80)"></line>
+            <text x="48" y="214" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">0</text>
+            <line x1="56" x2="1000" y1="170" y2="170" stroke-width="1" style="stroke:var(--ink-80)"></line>
+            <text x="48" y="174" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">25</text>
+            <line x1="56" x2="1000" y1="130" y2="130" stroke-width="1" style="stroke:var(--ink-80)"></line>
+            <text x="48" y="134" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">50</text>
+            <line x1="56" x2="1000" y1="90" y2="90" stroke-width="1" style="stroke:var(--ink-80)"></line>
+            <text x="48" y="94" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">75</text>
+            <line x1="56" x2="1000" y1="50" y2="50" stroke-width="1" style="stroke:var(--ink-80)"></line>
+            <text x="48" y="54" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">100</text>
+            <line x1="56" x2="1000" y1="10" y2="10" stroke-width="1" style="stroke:var(--ink-80)"></line>
+            <text x="48" y="14" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">125</text>
+            <text x="56" y="14" style="font-size:12.5px;fill:var(--ink-500)">kVA</text>
+
+            <path d="{{ bandPath }}" style="fill:var(--ink-80)"></path>
+            <path d="{{ ghostPath }}" fill="none" stroke-width="1.5" stroke-dasharray="4 2" style="stroke:var(--ink-350)"></path>
+            <path d="{{ oursPast }}" fill="none" stroke-width="2" style="stroke:var(--ink-900)"></path>
+            <path d="{{ oursFuture }}" fill="none" stroke-width="2" stroke-dasharray="6 3" style="stroke:{{ futureStroke }}"></path>
+
+            <line x1="56" x2="1000" y1="62.8" y2="62.8" stroke-width="2" style="stroke:var(--red-600)"></line>
+            <text x="60" y="56.8" style="font-size:12.5px;fill:var(--red-600)">DEMAND CEILING 92 kVA</text>
+
+            <line x1="{{ nowX }}" x2="{{ nowX }}" y1="8" y2="210" stroke-width="1" style="stroke:var(--ink-900)"></line>
+            {{ svgNow }}
+
+            <sc-for list="{{ nearMiss }}" as="n" hint-placeholder-count="0">
+              <circle cx="{{ n.x }}" cy="{{ n.y }}" r="4" fill="none" stroke-width="1.4" style="stroke:var(--red-600)"></circle>
+            </sc-for>
+
+            <sc-for list="{{ actions }}" as="a" hint-placeholder-count="0">
+              <line x1="{{ a.x }}" x2="{{ a.x }}" y1="76" y2="{{ a.py }}" stroke-width="1" style="stroke:var(--ink-200)"></line>
+            </sc-for>
+            <text x="676" y="72" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">Pump run moved here to catch the solar hour rate</text>
+            <text x="767" y="72" style="font-size:12.5px;fill:var(--ink-500)">Clubhouse cooling starts early</text>
+
+            <line x1="801.3" x2="801.3" y1="46" y2="71" stroke-width="1" style="stroke:var(--red-600)"></line>
+            <rect x="802" y="26" width="150" height="20" style="fill:var(--red-600)"></rect>
+            <text x="810" y="40" style="font-size:12.5px;fill:var(--paper)">₹51,313 · 18:45 peak</text>
+
+            <text x="996" y="176" text-anchor="end" style="font-size:12.5px;fill:var(--ink-900)">This system</text>
+            <text x="996" y="204" text-anchor="end" style="font-size:12.5px;fill:var(--ink-350)">Existing schedule</text>
+
+            <sc-if value="{{ staleNote }}" hint-placeholder-val="{{ false }}">
+              <text x="660" y="100" style="font-size:12.5px;fill:var(--ink-500)">Running on last good estimate. Sensor data went stale at 14:00.</text>
+            </sc-if>
+
+            <rect x="56" y="222" width="238.5" height="18" style="fill:var(--ink-80)"></rect>
+            <text x="175.3" y="235" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-700)">Night −6%</text>
+            <rect x="294.5" y="222" width="159" height="18" style="fill:var(--ink-80)"></rect>
+            <text x="374" y="235" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-700)">Solar hours −20%</text>
+            <rect x="453.5" y="222" width="317.9" height="18" style="fill:var(--ink-80)"></rect>
+            <text x="612.5" y="235" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-700)">Normal</text>
+            <rect x="771.4" y="222" width="159.1" height="18" style="fill:var(--ink-200)"></rect>
+            <text x="851" y="235" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-700)">Peak +26%</text>
+            <rect x="930.5" y="222" width="69.5" height="18" style="fill:var(--ink-80)"></rect>
+            <text x="965.3" y="235" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-700)">Night −6%</text>
+
+            <text x="56" y="256" style="font-size:12.5px;fill:var(--ink-500)">Rupees per interval</text>
+            <sc-for list="{{ rupeeBars }}" as="b" hint-placeholder-count="0">
+              <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" style="fill:{{ b.fill }}"></rect>
+            </sc-for>
+            <line x1="56" x2="1000" y1="286" y2="286" stroke-width="1" style="stroke:var(--ink-150)"></line>
+            <text x="56" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">00:00</text>
+            <text x="175.2" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">03:00</text>
+            <text x="294.5" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">06:00</text>
+            <text x="413.7" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">09:00</text>
+            <text x="532.9" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">12:00</text>
+            <text x="652.2" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">15:00</text>
+            <text x="771.4" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">18:00</text>
+            <text x="890.6" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">21:00</text>
+            <text x="1000" y="298" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">24:00</text>
+          </svg>
+
+          <sc-if value="{{ tip }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;pointer-events:none;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:8px 10px;width:250px;left:{{ tipLeft }};top:{{ tipTop }}">
+              <div style="font-size:15px;line-height:22px;font-weight:500">{{ tip.time }}</div>
+              <sc-for list="{{ tip.rows }}" as="r" hint-placeholder-count="6">
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px;line-height:17px">
+                  <span style="color:var(--ink-500)">{{ r.k }}</span>
+                  <span style="color:{{ r.color }};text-align:right">{{ r.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+          <div style="display:flex;gap:20px">
+            <div style="flex:1;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">The interval that sets the bill</div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
+                <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">₹51,313</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">demand charge, set at 18:45</div>
+              </div>
+              <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">One interval sets this charge for the whole month. The red marker is that interval.</div>
+            </div>
+            <div style="flex:1;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">Crossings avoided today</div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
+                <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:{{ avoidedColor }}">{{ avoidedCount }}</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">against the existing schedule</div>
+              </div>
+              <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ avoidedLine }}</div>
+            </div>
+            <div style="flex:1;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">Spent so far today</div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
+                <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ rupeesToNow }}</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">energy, to {{ clock }}</div>
+              </div>
+              <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ peakShareLine }}</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:10px 14px 10px">
+            <div style="display:flex">
+              <div style="flex:1">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Forecast only controller</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ cmpLeftPeak }} · plans against the average load</div>
+              </div>
+              <div style="flex:1;text-align:right">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900)">This system</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ cmpRightPeak }} · plans against the worst likely load</div>
+              </div>
+            </div>
+            <div onMouseMove="{{ onSplitMove }}" onMouseUp="{{ onSplitUp }}" onMouseLeave="{{ onSplitUp }}" style="position:relative;margin-top:4px;user-select:none">
+              <svg viewBox="0 0 1040 232" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">
+                <defs>
+                  <clipPath id="smvL"><rect x="0" y="0" width="{{ cmpClipW }}" height="232"></rect></clipPath>
+                  <clipPath id="smvR"><rect x="{{ cmpClipW }}" y="0" width="{{ cmpClipRW }}" height="232"></rect></clipPath>
+                </defs>
+                <line x1="56" x2="1000" y1="214" y2="214" stroke-width="1" style="stroke:var(--ink-80)"></line>
+                <text x="48" y="218" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">0</text>
+                <line x1="56" x2="1000" y1="174.8" y2="174.8" stroke-width="1" style="stroke:var(--ink-80)"></line>
+                <text x="48" y="178.8" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">25</text>
+                <line x1="56" x2="1000" y1="135.6" y2="135.6" stroke-width="1" style="stroke:var(--ink-80)"></line>
+                <text x="48" y="139.6" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">50</text>
+                <line x1="56" x2="1000" y1="96.4" y2="96.4" stroke-width="1" style="stroke:var(--ink-80)"></line>
+                <text x="48" y="100.4" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">75</text>
+                <line x1="56" x2="1000" y1="57.2" y2="57.2" stroke-width="1" style="stroke:var(--ink-80)"></line>
+                <text x="48" y="61.2" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">100</text>
+                <line x1="56" x2="1000" y1="18" y2="18" stroke-width="1" style="stroke:var(--ink-80)"></line>
+                <text x="48" y="22" text-anchor="end" style="font-size:12.5px;fill:var(--ink-500)">125</text>
+                <g clip-path="url(#smvL)">
+                  <path d="{{ cmpFcast }}" fill="none" stroke-width="2" style="stroke:var(--ink-350)"></path>
+                  <sc-for list="{{ cmpBreaches }}" as="b" hint-placeholder-count="0">
+                    <circle cx="{{ b.x }}" cy="{{ b.y }}" r="4" style="fill:var(--red-600)"></circle>
+                  </sc-for>
+                </g>
+                <g clip-path="url(#smvR)">
+                  <path d="{{ cmpOurs }}" fill="none" stroke-width="2" style="stroke:var(--ink-900)"></path>
+                </g>
+                <line x1="56" x2="1000" y1="{{ cmpCeilY }}" y2="{{ cmpCeilY }}" stroke-width="2" style="stroke:var(--red-600)"></line>
+                <text x="60" y="{{ cmpCeilY }}" dy="-6" style="font-size:12.5px;fill:var(--red-600)">DEMAND CEILING 92 kVA</text>
+                <line x1="{{ cmpDivX }}" x2="{{ cmpDivX }}" y1="0" y2="232" stroke-width="2" style="stroke:var(--ink-900)"></line>
+              </svg>
+              <button onMouseDown="{{ onSplitDown }}" aria-label="Drag to compare" style="position:absolute;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border:1px solid var(--ink-900);border-radius:2px;background:var(--paper);display:flex;align-items:center;justify-content:center;cursor:ew-resize;left:{{ cmpDivPct }}">
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 0v10H2V0h1zm5 0v10H7V0h1z" style="fill:var(--ink-900)"></path></svg>
+              </button>
+            </div>
+            <div style="margin-top:2px;font-size:12.5px;line-height:17px;color:var(--ink-500)">Drag the handle. Same day, same weather, same households, two controllers.</div>
+          </div>
+
+          <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px 14px">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Controller comparison</div>
+            <div style="display:flex;gap:12px;padding:8px 0 6px;border-bottom:1px solid var(--ink-150);font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">
+              <div style="flex:1;padding-left:12px">Controller</div>
+              <div style="width:120px;text-align:right">Peak kVA</div>
+              <div style="width:120px;text-align:right">Breaches</div>
+              <div style="width:120px;text-align:right">Bill</div>
+            </div>
+            <sc-for list="{{ controllers }}" as="c" hint-placeholder-count="5">
+              <div style="display:flex;gap:12px;align-items:center;height:40px;border-bottom:1px solid var(--ink-150);border-left:{{ c.edge }};background:{{ c.bg }}">
+                <div style="flex:1;padding-left:12px;font-size:15px;line-height:22px;font-weight:{{ c.weight }}">{{ c.name }}</div>
+                <div style="width:120px;text-align:right;font-size:15px;line-height:22px;font-weight:{{ c.weight }};color:{{ c.peakColor }}">{{ c.peak }}</div>
+                <div style="width:120px;text-align:right;font-size:15px;line-height:22px;font-weight:{{ c.weight }};color:{{ c.brColor }}">{{ c.br }}</div>
+                <div style="width:120px;text-align:right;font-size:15px;line-height:22px;font-weight:{{ c.weight }};padding-right:12px">{{ c.bill }}</div>
+              </div>
+            </sc-for>
+            <div style="display:flex;align-items:baseline;gap:24px;margin-top:10px">
+              <div style="flex:1;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">Best possible is an optimizer that knows the future perfectly. It is not achievable, it is there to show how much of the available saving we actually captured.</div>
+              <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:var(--green-600);flex:none">73% of the achievable saving</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isEvidence }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Is the forecast honest?</div>
+            <div style="display:flex;gap:20px;align-items:flex-start;margin-top:6px">
+              <svg viewBox="0 0 260 210" width="260" height="210" style="flex:none">
+                <line x1="40" y1="180" x2="240" y2="180" stroke-width="1" style="stroke:var(--ink-150)"></line>
+                <line x1="40" y1="20" x2="40" y2="180" stroke-width="1" style="stroke:var(--ink-150)"></line>
+                <line x1="40" y1="180" x2="240" y2="20" stroke-width="1" stroke-dasharray="4 3" style="stroke:var(--ink-150)"></line>
+                <sc-for list="{{ calDots }}" as="p" hint-placeholder-count="10">
+                  <circle cx="{{ p.x }}" cy="{{ p.y }}" r="3.4" style="fill:var(--ink-900)"></circle>
+                </sc-for>
+                <text x="140" y="204" text-anchor="middle" style="font-size:12.5px;fill:var(--ink-500)">Predicted probability</text>
+                <text x="12" y="100" text-anchor="middle" transform="rotate(-90 12 100)" style="font-size:12.5px;fill:var(--ink-500)">Observed frequency</text>
+              </svg>
+              <div style="flex:1">
+                <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">92%</div>
+                <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">Our 90 percent band actually covered 92 percent of intervals. Slightly cautious, which is the safe direction to be wrong in.</div>
+                <div style="margin-top:10px;font-size:12.5px;line-height:17px;color:var(--ink-350);text-wrap:pretty">Measured over the last 200 fifteen minute intervals. Points on the diagonal mean the stated probability matched what happened.</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">The month at a glance</div>
+            <div style="display:flex;gap:20px;margin-top:8px">
+              <div style="flex:1">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-350)">Before</div>
+                <svg viewBox="0 0 222 130" width="100%" style="display:block;margin-top:4px">
+                  <sc-for list="{{ carpetBefore }}" as="c" hint-placeholder-count="0">
+                    <rect x="{{ c.x }}" y="{{ c.y }}" width="8.4" height="5.4" style="fill:{{ c.fill }}"></rect>
+                  </sc-for>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900)">With this system</div>
+                <svg viewBox="0 0 222 130" width="100%" style="display:block;margin-top:4px">
+                  <sc-for list="{{ carpetAfter }}" as="c" hint-placeholder-count="0">
+                    <rect x="{{ c.x }}" y="{{ c.y }}" width="8.4" height="5.4" style="fill:{{ c.fill }}"></rect>
+                  </sc-for>
+                </svg>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:2px;font-size:12.5px;line-height:17px;color:var(--ink-350)">
+              <span>00:00</span><span>12:00</span><span>24:00</span>
+            </div>
+            <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">Each row is a day. The dark patches are the evening peaks. Notice they get lighter and flatter on the right.</div>
+          </div>
+
+          <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:14px 18px 16px">
+            <div style="display:flex;align-items:baseline;border-bottom:1px solid var(--ink-900);padding-bottom:6px">
+              <div style="font-size:15px;line-height:22px;font-weight:500;flex:1;white-space:nowrap">Common services connection · August 2026</div>
+              <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">TN HT · consumer 3104 8827 210</div>
+            </div>
+            <div style="display:flex;gap:12px;padding:6px 0;border-bottom:1px solid var(--ink-150);font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">
+              <div style="flex:1;padding-left:14px">Charge</div>
+              <div style="width:92px;text-align:right">Before</div>
+              <div style="width:92px;text-align:right">Now</div>
+            </div>
+            <sc-for list="{{ invoice }}" as="r" hint-placeholder-count="6">
+              <div style="display:flex;gap:12px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--ink-80)">
+                <div style="flex:1;display:flex;gap:6px;align-items:baseline">
+                  <span style="width:8px;flex:none;font-size:12.5px;color:{{ r.tick }}">✓</span>
+                  <span style="font-size:15px;line-height:22px">{{ r.line }}</span>
+                </div>
+                <div style="width:92px;text-align:right;font-size:15px;line-height:22px;color:var(--ink-500)">{{ r.before }}</div>
+                <div style="width:92px;text-align:right;font-size:15px;line-height:22px">{{ r.after }}</div>
+              </div>
+            </sc-for>
+            <div style="display:flex;gap:12px;align-items:baseline;padding:8px 0 0;border-top:1px solid var(--ink-900);margin-top:4px">
+              <div style="flex:1;padding-left:14px;font-size:15px;line-height:22px;font-weight:500">Total payable</div>
+              <div style="width:92px;text-align:right;font-size:15px;line-height:22px;color:var(--ink-500)">₹2,29,151</div>
+              <div style="width:92px;text-align:right;font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">₹2,16,924</div>
+            </div>
+            <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500)">Ticked lines changed. The demand charge is set by one fifteen minute interval on 20 August.</div>
+          </div>
+
+          <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Who carried the load</div>
+            <div style="margin-top:8px">
+              <sc-for list="{{ fairness }}" as="f" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:12px;padding:5px 0">
+                  <div style="width:150px;flex:none;font-size:12.5px;line-height:17px;color:var(--ink-700)">{{ f.g }}</div>
+                  <div style="flex:1;height:10px;background:var(--ink-80)">
+                    <div style="height:10px;background:var(--ink-900);width:{{ f.w }}"></div>
+                  </div>
+                  <div style="width:64px;text-align:right;font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ f.n }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:16px;margin-top:10px">
+              <div style="flex:1;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">You were asked to shift 3 times this month. The society average is 3.2.</div>
+              <div style="flex:none;text-align:right">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Fairness index</div>
+                <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">0.91</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isRequests }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:24px">
+
+          <sc-if value="{{ reqStale }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--amber-100);border-left:3px solid var(--amber-600);padding:8px 12px;font-size:12.5px;line-height:17px;color:var(--amber-800)">Showing data from 14:20. Reconnecting.</div>
+          </sc-if>
+
+          <sc-if value="{{ anticipation }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--amber-100);border-left:3px solid var(--amber-600);padding:16px;display:flex;gap:24px;align-items:flex-start">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:15px;line-height:22px;font-weight:500;color:var(--amber-800)">{{ antTitle }}</div>
+                <div style="font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ antBody }}</div>
+              </div>
+              <div style="display:flex;gap:8px;flex:none">
+                <button onClick="{{ antHeadsUp }}" style="height:40px;padding:0 16px;border:1px solid var(--amber-600);border-radius:2px;background:var(--amber-600);color:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Send a heads up</button>
+                <button onClick="{{ antDismiss }}" style="height:40px;padding:0 16px;border:1px solid var(--ink-150);border-radius:2px;background:transparent;color:var(--ink-500);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Dismiss</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="reqSearch" value="{{ search }}" onChange="{{ onSearch }}" placeholder="Search a flat, a reason or a type — press /" style="flex:1;height:36px;padding:0 10px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);font-size:15px;line-height:22px;color:var(--ink-900)"></input>
+            <sc-for list="{{ chipList }}" as="c" hint-placeholder-count="2">
+              <button onClick="{{ c.onClick }}" style="height:36px;padding:0 12px;border-radius:2px;white-space:nowrap;font-size:12.5px;line-height:17px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:baseline;gap:10px">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Needs your decision</div>
+              <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ reqCountLabel }}</div>
+            </div>
+
+            <sc-if value="{{ festCluster }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;background:var(--paper);border:1px solid var(--ink-900);border-radius:2px;padding:12px 14px;display:flex;align-items:center;gap:16px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:15px;line-height:22px;font-weight:500;text-wrap:pretty">Granting all twelve crosses the ceiling by 6.4 kVA. Granting them in two staggered groups does not.</div>
+                  <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">Six flats from 7pm, six from 9pm. Everyone still gets four hours.</div>
+                </div>
+                <button onClick="{{ onStagger }}" style="flex:none;height:40px;padding:0 16px;border:1px solid var(--ink-900);border-radius:2px;background:var(--ink-900);color:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Stagger and approve all</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ festDone }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;background:var(--green-100);border-left:3px solid var(--green-600);padding:10px 12px">
+                <div style="font-size:15px;line-height:22px;font-weight:500;color:var(--green-800);text-wrap:pretty">Staggered into two groups. Saturday now peaks at 90.8 kVA.</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">Nothing crosses the ceiling and nobody was refused.</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ reqEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;height:96px;border:1px dashed var(--ink-150);border-radius:2px;display:flex;align-items:center;justify-content:center;padding:0 32px">
+                <div style="font-size:15px;line-height:22px;color:var(--ink-500);text-align:center;text-wrap:pretty">{{ emptyLine }}</div>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+              <sc-for list="{{ clusters }}" as="c" hint-placeholder-count="0">
+                <div style="background:var(--paper);border:1px solid var(--ink-900);border-radius:2px;padding:20px">
+                  <div style="display:flex;align-items:baseline;gap:16px">
+                    <div style="flex:1;font-size:15px;line-height:22px;font-weight:500;text-wrap:pretty">{{ c.headline }}</div>
+                    <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">{{ c.when }}</div>
+                  </div>
+
+                  <div style="margin-top:12px;border-top:1px solid var(--ink-150)">
+                    <sc-for list="{{ c.members }}" as="m" hint-placeholder-count="2">
+                      <div style="display:flex;gap:24px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--ink-150)">
+                        <div style="width:200px;flex:none">
+                          <div style="font-size:15px;line-height:22px;font-weight:500">{{ m.flat }}</div>
+                          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ m.meta }}</div>
+                          <sc-if value="{{ m.hasAge }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-size:12.5px;line-height:17px;color:{{ m.ageColor }};text-wrap:pretty">{{ m.age }}</div>
+                          </sc-if>
+                        </div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ m.reason }}</div>
+                          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ m.mag }}</div>
+                        </div>
+                        <div style="width:140px;flex:none">
+                          <div style="font-size:15px;line-height:22px;font-weight:500;color:{{ m.color }}">{{ m.alone }}</div>
+                          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">if approved alone</div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="margin-top:14px;background:var(--ink-40);padding:16px">
+                    <div style="display:flex;gap:32px">
+                      <sc-for list="{{ c.figures }}" as="f" hint-placeholder-count="3">
+                        <div>
+                          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">{{ f.k }}</div>
+                          <div style="margin-top:2px;font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:{{ f.color }}">{{ f.v }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="margin-top:10px;font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ c.warning }}</div>
+                  </div>
+
+                  <div style="margin-top:14px">
+                    <div style="font-size:15px;line-height:22px;font-weight:500;text-wrap:pretty">{{ c.resTitle }}</div>
+                    <div style="font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ c.resBody }}</div>
+
+                    <sc-if value="{{ c.canStagger }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;gap:12px;align-items:flex-start;margin-top:12px">
+                        <div style="width:150px;flex:none">
+                          <div style="height:18px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">Peak window 6–10pm</div>
+                          <sc-for list="{{ c.stagger }}" as="s" hint-placeholder-count="2">
+                            <div style="height:36px">
+                              <div style="font-size:12.5px;line-height:17px;font-weight:500;color:var(--ink-900)">{{ s.flat }}</div>
+                              <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ s.note }}</div>
+                            </div>
+                          </sc-for>
+                        </div>
+                        <svg viewBox="0 0 512 114" width="512" height="114" style="display:block;flex:none">
+                          <rect x="64" y="0" width="256" height="92" style="fill:var(--ink-40)"></rect>
+                          <sc-for list="{{ c.stagger }}" as="s" hint-placeholder-count="2">
+                            <g>
+                              <rect x="{{ s.fromX }}" y="{{ s.fromY }}" width="{{ s.w }}" height="8" style="fill:var(--ink-350)"></rect>
+                              <rect x="{{ s.toX }}" y="{{ s.toY }}" width="{{ s.w }}" height="8" style="fill:var(--ink-900)"></rect>
+                            </g>
+                          </sc-for>
+                          <line x1="320" x2="320" y1="0" y2="92" stroke-width="1" style="stroke:var(--red-600)"></line>
+                          <text x="0" y="108" style="font-size:11px;fill:var(--ink-350)">17:00</text>
+                          <text x="192" y="108" text-anchor="middle" style="font-size:11px;fill:var(--ink-350)">20:00</text>
+                          <text x="384" y="108" text-anchor="middle" style="font-size:11px;fill:var(--ink-350)">23:00</text>
+                          <text x="512" y="108" text-anchor="end" style="font-size:11px;fill:var(--ink-350)">01:00</text>
+                        </svg>
+                      </div>
+                      <div style="font-size:12.5px;line-height:17px;color:var(--ink-350)">Grey is what they asked for. Black is what we would offer. The red line is where peak pricing ends.</div>
+                    </sc-if>
+
+                    <div style="display:flex;gap:8px;margin-top:12px">
+                      <button onClick="{{ c.onPrimary }}" onMouseEnter="{{ c.onHover }}" onMouseLeave="{{ c.offHover }}" style="height:40px;padding:0 16px;border-radius:2px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;border:1px solid {{ c.primaryBorder }};background:{{ c.primaryBg }};color:{{ c.primaryFg }}">{{ c.primaryLabel }}</button>
+                      <button onClick="{{ c.onSplit }}" style="height:40px;padding:0 16px;border:1px solid var(--ink-900);border-radius:2px;background:var(--paper);color:var(--ink-900);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Decide individually</button>
+                      <button onClick="{{ c.onDeclineAll }}" style="height:40px;padding:0 16px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Decline both</button>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+
+              <sc-for list="{{ queue }}" as="r" hint-placeholder-count="0">
+                <div onClick="{{ r.onFocus }}" style="position:relative;background:var(--paper);border:1px solid var(--ink-150);border-left:{{ r.edge }};border-radius:2px;padding:20px">
+                  <div style="position:absolute;top:14px;right:16px;font-size:12.5px;line-height:17px;color:var(--ink-500);border:1px solid var(--ink-150);border-radius:2px;padding:2px 6px">{{ r.source }}</div>
+                  <div style="display:flex;gap:24px;align-items:flex-start">
+                    <div style="width:220px;flex:none">
+                      <sc-if value="{{ r.hasAge }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:12.5px;line-height:17px;color:{{ r.ageColor }};text-wrap:pretty">{{ r.age }}</div>
+                      </sc-if>
+                      <div style="display:flex;align-items:center;gap:7px">
+                        <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ r.flat }}</div>
+                        <sc-if value="{{ r.medical }}" hint-placeholder-val="{{ false }}">
+                          <span title="Medical flagged. Always approved, never counted against their allowance, load never shifted, and not ranked." style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;background:var(--ink-900);color:var(--paper);padding:1px 4px">MED</span>
+                        </sc-if>
+                      </div>
+                      <div style="margin-top:2px;font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ r.meta }}</div>
+                      <div style="height:1px;background:var(--ink-150);margin:12px 0"></div>
+                      <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Requested for</div>
+                      <div style="margin-top:2px;font-size:15px;line-height:22px">{{ r.day }}</div>
+                      <div style="font-size:15px;line-height:22px">{{ r.time }}</div>
+                      <sc-if value="{{ r.hasDeadline }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:2px;font-size:12.5px;line-height:17px;font-weight:500;color:var(--ink-900)">{{ r.deadline }}</div>
+                      </sc-if>
+                    </div>
+
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:15px;line-height:22px;font-weight:500">{{ r.ask }}</div>
+                      <div style="margin-top:2px;font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ r.reason }}</div>
+                      <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ r.mag }}</div>
+                      <svg viewBox="0 0 200 56" width="200" height="56" style="display:block;margin-top:10px;overflow:visible">
+                        <line x1="0" x2="200" y1="{{ r.sparkCeil }}" y2="{{ r.sparkCeil }}" stroke-width="1" style="stroke:var(--red-600)"></line>
+                        <text x="200" y="{{ r.sparkCeil }}" dy="-3" text-anchor="end" style="font-size:9.5px;fill:var(--red-600)">92 ceiling</text>
+                        <path d="{{ r.sparkA }}" fill="none" stroke-width="1.4" stroke-dasharray="4 2" style="stroke:var(--ink-350)"></path>
+                        <path d="{{ r.sparkB }}" fill="none" stroke-width="2" style="stroke:var(--ink-900)"></path>
+                      </svg>
+                      <div style="margin-top:2px;font-size:12.5px;line-height:17px;color:var(--ink-350)">Dashed is the evening without them. Solid is with.</div>
+                    </div>
+
+                    <div style="width:280px;flex:none">
+                      <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:{{ r.moneyColor }}">{{ r.money }}</div>
+                      <div style="margin-top:4px;font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ r.arith }}</div>
+                      <div style="display:flex;gap:8px;margin-top:12px">
+                        <button onClick="{{ r.onApprove }}" onMouseEnter="{{ r.onHoverApprove }}" onMouseLeave="{{ r.offHover }}" style="height:40px;padding:0 12px;border-radius:2px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;border:1px solid {{ r.approveBorder }};background:{{ r.approveBg }};color:{{ r.approveFg }}">{{ r.approveLabel }}</button>
+                        <sc-if value="{{ r.hasCounter }}" hint-placeholder-val="{{ false }}">
+                          <button onClick="{{ r.onCounter }}" style="height:40px;padding:0 12px;border:1px solid var(--ink-900);border-radius:2px;background:var(--paper);color:var(--ink-900);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Counter offer</button>
+                        </sc-if>
+                        <sc-if value="{{ r.hasDecline }}" hint-placeholder-val="{{ true }}">
+                          <button onClick="{{ r.onDecline }}" onMouseEnter="{{ r.onHoverDecline }}" onMouseLeave="{{ r.offHover }}" style="height:40px;padding:0 12px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Decline</button>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{ r.declineHint }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">They lose the evening. Nearest free alternative is 8pm, which we can offer instead.</div>
+                      </sc-if>
+                      <sc-if value="{{ r.ruleNote }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">This request cannot be declined. Clause 4 of the house rules, ratified 14 Jun 2026.</div>
+                      </sc-if>
+                      <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-350);text-wrap:pretty">{{ r.budget }}</div>
+                      <sc-if value="{{ r.hasPrecedent }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:2px;font-size:12.5px;line-height:17px;color:{{ r.precColor }};text-wrap:pretty">{{ r.precedent }}</div>
+                      </sc-if>
+                      <sc-if value="{{ r.optedOut }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:2px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">This flat has opted out of load shifting. That does not affect their request.</div>
+                      </sc-if>
+                    </div>
+                  </div>
+
+                  <sc-if value="{{ r.counterOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--ink-150)">
+                      <div style="font-size:15px;line-height:22px;font-weight:500">{{ r.counterWindow }}</div>
+                      <div style="font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ r.counterLine }}</div>
+                      <svg viewBox="0 0 520 74" width="520" height="74" style="display:block;margin-top:10px">
+                        <rect x="65" y="0" width="260" height="56" style="fill:var(--ink-40)"></rect>
+                        <text x="71" y="11" style="font-size:10.5px;fill:var(--ink-350)">PEAK +26%</text>
+                        <text x="0" y="22" style="font-size:11px;fill:var(--ink-500)">Asked</text>
+                        <rect x="130" y="16" width="260" height="9" style="fill:var(--ink-350)"></rect>
+                        <text x="0" y="44" style="font-size:11px;fill:var(--ink-500)">Offered</text>
+                        <rect x="195" y="38" width="260" height="9" style="fill:var(--ink-900)"></rect>
+                        <line x1="325" x2="325" y1="0" y2="56" stroke-width="1" style="stroke:var(--red-600)"></line>
+                        <text x="0" y="70" style="font-size:11px;fill:var(--ink-350)">17:00</text>
+                        <text x="130" y="70" text-anchor="middle" style="font-size:11px;fill:var(--ink-350)">19:00</text>
+                        <text x="260" y="70" text-anchor="middle" style="font-size:11px;fill:var(--ink-350)">21:00</text>
+                        <text x="390" y="70" text-anchor="middle" style="font-size:11px;fill:var(--ink-350)">23:00</text>
+                        <text x="520" y="70" text-anchor="end" style="font-size:11px;fill:var(--ink-350)">01:00</text>
+                      </svg>
+                      <textarea value="{{ counterText }}" onChange="{{ onCounterInput }}" rows="2" style="width:100%;margin-top:10px;padding:8px 10px;border:1px solid var(--ink-150);border-radius:2px;font-family:inherit;font-size:15px;line-height:22px;color:var(--ink-900);resize:none"></textarea>
+                      <div style="display:flex;gap:8px;margin-top:10px">
+                        <button onClick="{{ r.onSend }}" style="height:40px;padding:0 16px;border:1px solid var(--ink-900);border-radius:2px;background:var(--ink-900);color:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Send offer</button>
+                        <button onClick="{{ r.onBack }}" style="height:40px;padding:0 16px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Back</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:baseline;gap:10px">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Approved automatically</div>
+              <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">These fitted inside the forecast headroom, so nobody had to decide.</div>
+            </div>
+            <div style="margin-top:8px;background:var(--ink-40);padding:10px 12px;font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">Yesterday’s broadcast went to 60 flats. 34 said they would try. Evening load dropped 6.2 kVA against the forecast.</div>
+            <div style="margin-top:8px">
+              <button onClick="{{ toggleAutoDeclined }}" style="border:0;background:none;padding:0;font-size:12.5px;line-height:17px;color:var(--ink-500);text-decoration:underline">{{ autoDeclinedLabel }}</button>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;height:32px;border-bottom:1px solid var(--ink-150);font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">
+              <div style="width:120px;flex:none">Flat</div>
+              <div style="flex:1;min-width:0">Ask</div>
+              <div style="width:200px;flex:none">Reason</div>
+              <div style="width:110px;flex:none">Source</div>
+              <div style="width:100px;flex:none;text-align:right">Peak impact</div>
+              <div style="width:90px;flex:none;text-align:right">Cost</div>
+              <div style="width:100px;flex:none;text-align:right">Decided</div>
+            </div>
+            <sc-for list="{{ autoRows }}" as="a" hint-placeholder-count="8">
+              <div style="display:flex;gap:12px;align-items:center;height:44px;border-bottom:1px solid var(--ink-150)">
+                <div style="width:120px;flex:none;display:flex;align-items:center;gap:6px;white-space:nowrap">
+                  <span style="font-size:15px;line-height:22px">{{ a.flat }}</span>
+                  <sc-if value="{{ a.medical }}" hint-placeholder-val="{{ false }}">
+                    <span title="Medical flagged. Always approved, never counted against their allowance, load never shifted, and not ranked." style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;background:var(--ink-900);color:var(--paper);padding:1px 4px">MED</span>
+                  </sc-if>
+                </div>
+                <div style="flex:1;min-width:0;font-size:15px;line-height:22px;color:var(--ink-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.ask }}</div>
+                <div title="{{ a.reason }}" style="width:200px;flex:none;font-size:12.5px;line-height:17px;color:var(--ink-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.reason }}</div>
+                <div style="width:110px;flex:none;font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">{{ a.source }}</div>
+                <div style="width:100px;flex:none;text-align:right;font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ a.imp }}</div>
+                <div style="width:90px;flex:none;text-align:right;font-size:{{ a.costSize }};line-height:22px;color:{{ a.costColor }}">{{ a.cost }}</div>
+                <div style="width:100px;flex:none;text-align:right;font-size:12.5px;line-height:17px;color:var(--ink-350)">{{ a.when }}</div>
+              </div>
+            </sc-for>
+            <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ showAllLine }}</div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:baseline;gap:10px">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Coming up</div>
+              <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">Granted requests laid over the forecast peak for each day.</div>
+            </div>
+            <div style="display:flex;gap:0;margin-top:10px;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:20px 8px 10px;position:relative">
+              <div style="position:absolute;left:8px;right:8px;bottom:37px;height:1px;background:var(--ink-150)"></div>
+              <div style="position:absolute;left:8px;bottom:40px;font-size:12.5px;line-height:17px;color:var(--ink-500)">60 kVA</div>
+              <sc-for list="{{ week }}" as="w" hint-placeholder-count="7">
+                <div title="{{ w.tip }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+                  <div style="height:8px;display:flex;align-items:center">
+                    <span style="width:6px;height:6px;border-radius:3px;display:block;background:{{ w.dot }}"></span>
+                  </div>
+                  <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ w.label }}</div>
+                  <div style="position:relative;width:40px;height:118px;display:flex;flex-direction:column;justify-content:flex-end">
+                    <div style="width:40px;background:var(--red-600);height:{{ w.overH }};transition:height 240ms ease-out"></div>
+                    <div style="width:40px;background:var(--ink-350);height:{{ w.grH }};transition:height 240ms ease-out"></div>
+                    <div style="width:40px;background:var(--ink-900);height:{{ w.baseH }}"></div>
+                    <div style="position:absolute;left:-4px;right:-4px;height:2px;background:var(--red-600);bottom:{{ ceilOffset }}"></div>
+                  </div>
+                  <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">{{ w.n }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-350)">Bars start at 60 kVA so the granted portion is visible. Grey is granted load, red is the part above the ceiling.</div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:baseline;gap:10px">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">What residents told us</div>
+              <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">Why suggestions were turned down. Use it to send a better one.</div>
+            </div>
+            <div style="margin-top:8px;font-size:15px;line-height:22px;color:var(--ink-900);text-wrap:pretty">3 of 5 declines this month said they need hot water earlier than we suggested.</div>
+            <div style="display:flex;gap:12px;align-items:center;height:32px;margin-top:6px;border-bottom:1px solid var(--ink-150);font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">
+              <div style="width:120px;flex:none">Flat</div>
+              <div style="flex:1;min-width:0">Suggestion</div>
+              <div style="width:160px;flex:none">Reason</div>
+              <div style="flex:2;min-width:0">In their words</div>
+              <div style="width:80px;flex:none">When</div>
+              <div style="width:120px;flex:none"></div>
+            </div>
+            <sc-for list="{{ declines }}" as="d" hint-placeholder-count="5">
+              <div style="display:flex;gap:12px;align-items:center;min-height:44px;padding:6px 0;border-bottom:1px solid var(--ink-150)">
+                <div style="width:120px;flex:none;font-size:15px;line-height:22px;white-space:nowrap">{{ d.flat }}</div>
+                <div style="flex:1;min-width:0;font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">{{ d.suggestion }}</div>
+                <div style="width:160px;flex:none;font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">{{ d.reason }}</div>
+                <div title="{{ d.words }}" style="flex:2;min-width:0;font-size:12.5px;line-height:17px;color:var(--ink-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.words }}</div>
+                <div style="width:80px;flex:none;font-size:12.5px;line-height:17px;color:var(--ink-350);white-space:nowrap">{{ d.when }}</div>
+                <button onClick="{{ d.onRevise }}" title="Send a revised suggestion" style="width:120px;flex:none;border:0;background:none;padding:0;text-align:left;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);text-decoration:underline">Revise</button>
+              </div>
+            </sc-for>
+            <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-350);text-wrap:pretty">What residents wrote is shown here only. It is never exported, broadcast or added to the audit log. The same suggestion is not re-sent to a flat within 90 days of a decline.</div>
+          </div>
+
+          <div style="display:flex;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px">
+            <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="6">
+              <div style="flex:1;padding:12px 14px;border-left:{{ m.edge }}">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">{{ m.k }}</div>
+                <div style="margin-top:2px;font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:{{ m.color }}">{{ m.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="width:300px;flex:none;display:flex;flex-direction:column;gap:20px">
+      <sc-if value="{{ isNow }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Forecast health</div>
+          <sc-if value="{{ calRest }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;margin-top:2px;color:{{ healthColor }}">{{ healthWord }}</div>
+              <div style="margin-top:2px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ healthLine }}</div>
+              <button onClick="{{ calibrate }}" style="width:100%;height:40px;margin-top:10px;border-radius:2px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;border:1px solid {{ calBorder }};background:{{ calBg }};color:{{ calFg }}">Auto calibrate</button>
+              <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-350)">Last calibrated {{ lastCal }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ calRunning }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:8px 0 4px">
+              <div style="font-size:15px;line-height:22px;color:var(--ink-900)">{{ calStepText }}</div>
+              <div style="height:2px;background:var(--ink-80);margin-top:10px">
+                <div style="height:2px;background:var(--ink-900);width:{{ calProgress }};transition:width 600ms linear"></div>
+              </div>
+              <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-350)">Step {{ calStepNo }} of 4</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ calResult }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:8px;background:var(--green-100);border-left:3px solid var(--green-600);padding:10px 12px">
+              <div style="font-size:15px;line-height:22px;font-weight:500;color:var(--green-800)">Calibrated. The plan is accurate again.</div>
+              <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-700)">Caution level moved from q85 to q88</div>
+              <div style="font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">Coverage measured 92%, target is 90%, so the forecast was running slightly wide</div>
+              <div style="font-size:12.5px;line-height:17px;color:var(--ink-700)">Breach risk 1.2% → 0.4% · costs ₹3 per flat per month</div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">Happening now</div>
+          <div style="margin-top:4px">
+            <sc-for list="{{ happening }}" as="a" hint-placeholder-count="2">
+              <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--ink-150)">
+                <div style="width:44px;flex:none;font-size:12.5px;line-height:22px;color:var(--ink-500)">{{ a.time }}</div>
+                <div style="flex:1;font-size:15px;line-height:22px;text-wrap:pretty">{{ a.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <button onClick="{{ goTimeline }}" style="width:100%;height:36px;margin-top:10px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900);text-align:left;padding:0 10px" style-hover="border-color:var(--ink-900)">See the whole day →</button>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Comfort budget, common areas</div>
+          <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;margin-top:2px">{{ comfort }}°C</div>
+          <input type="range" min="0.5" max="3" step="0.1" value="{{ comfort }}" onChange="{{ onComfort }}" onInput="{{ onComfort }}" aria-label="Comfort budget" style="width:100%;margin:10px 0 2px;background-image:{{ comfortTrack }}"></input>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;line-height:17px;color:var(--ink-500)">
+            <span style="white-space:nowrap;">Cooler, dearer</span><span style="white-space:nowrap;">Warmer, cheaper</span>
+          </div>
+          <div style="margin-top:10px;font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">One more degree of slack in the clubhouse and lobbies is worth about ₹126 per flat per month. Right now you are spending {{ comfortSpend }} per flat to stay this cool.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isTimeline }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">Critical services — never shed</div>
+          <div style="margin-top:6px">
+            <sc-for list="{{ critical }}" as="c" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;height:32px;border-bottom:1px solid var(--ink-150)">
+                <div style="font-size:15px;line-height:22px;white-space:nowrap">{{ c.name }}</div>
+                <div style="flex:1"></div>
+                <div style="font-size:12.5px;line-height:17px;letter-spacing:0.06em;white-space:nowrap;color:{{ c.color }}">{{ c.status }}</div>
+                <svg width="11" height="13" viewBox="0 0 11 13" aria-hidden="true" style="margin-left:10px"><path d="M2 5V3.4A3.5 3.5 0 0 1 9 3.4V5h.6v7.4H1.4V5H2zm1.4 0h4.2V3.4a2.1 2.1 0 0 0-4.2 0V5z" style="fill:var(--ink-500)"></path></svg>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">These five never wait, whatever the plan says.</div>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">How cautious the plan is</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
+            <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ cautionWord }}</div>
+            <div style="font-size:12.5px;line-height:17px;color:var(--ink-350)">q{{ q }}</div>
+          </div>
+          <input type="range" min="50" max="99" value="{{ q }}" onChange="{{ onQ }}" onInput="{{ onQ }}" aria-label="How cautious the plan is" style="width:100%;margin:10px 0 2px;background-image:{{ qTrack }}"></input>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;line-height:17px;color:var(--ink-500)">
+            <span style="white-space:nowrap;">Cheaper, riskier</span><span style="white-space:nowrap;">Safer, dearer</span>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:10px">
+            <div style="flex:1">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap;">Bill</div>
+              <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ qBill }}</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap;">Breaches</div>
+              <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:{{ qBreachColor }}">{{ qBreaches }}</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap;">Too warm</div>
+              <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ qWarm }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap">How to read this</div>
+          <div style="margin-top:8px">
+            <sc-for list="{{ readingKey }}" as="k" hint-placeholder-count="4">
+              <div style="display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--ink-150)">
+                <svg width="26" height="10" viewBox="0 0 26 10" aria-hidden="true" style="flex:none;margin-top:6px"><line x1="0" y1="5" x2="26" y2="5" stroke-width="{{ k.w }}" stroke-dasharray="{{ k.dash }}" style="stroke:{{ k.color }}"></line></svg>
+                <div style="flex:1">
+                  <div style="font-size:15px;line-height:22px">{{ k.name }}</div>
+                  <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ k.note }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">Hover anywhere on the chart for the load, the price window and what the system was doing at that minute.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">What changed</div>
+          <div style="margin-top:6px">
+            <sc-for list="{{ whatChanged }}" as="w" hint-placeholder-count="4">
+              <div style="padding:6px 0;border-bottom:1px solid var(--ink-150)">
+                <div style="font-size:15px;line-height:22px">{{ w.head }}</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ w.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEvidence }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">What is real and what is simulated</div>
+          <div style="margin-top:8px">
+            <sc-for list="{{ honesty }}" as="h" hint-placeholder-count="4">
+              <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--ink-150)">
+                <div style="font-size:12.5px;line-height:17px;letter-spacing:0.06em;color:{{ h.color }};width:64px;flex:none">{{ h.tag }}</div>
+                <div style="font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">{{ h.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isRequests }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">This month</div>
+          <div style="margin-top:6px">
+            <sc-for list="{{ monthRows }}" as="m" hint-placeholder-count="4">
+              <div style="display:flex;align-items:baseline;gap:10px;padding:3px 0">
+                <div style="flex:1;font-size:12.5px;line-height:17px;color:var(--ink-700)">{{ m.k }}</div>
+                <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ m.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500)">31 of 34 needed nobody.</div>
+          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">26 came in over WhatsApp, 8 through the app.</div>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Send a broadcast</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            <sc-for list="{{ bcButtons }}" as="b" hint-placeholder-count="3">
+              <button onClick="{{ b.onClick }}" style="width:100%;height:40px;padding:0 12px;text-align:left;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);font-size:15px;line-height:22px;color:var(--ink-900)" style-hover="border-color:var(--ink-900)">{{ b.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Last broadcast</div>
+          <div style="margin-top:2px;font-size:12.5px;line-height:17px;color:var(--ink-500)">Sent 2 hours ago to 60 flats</div>
+          <div style="display:flex;gap:28px;margin-top:8px">
+            <div>
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Will try</div>
+              <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">34</div>
+            </div>
+            <div>
+              <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Cannot</div>
+              <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">8</div>
+            </div>
+          </div>
+          <div style="display:flex;height:10px;margin-top:10px">
+            <div title="34 flats will try" style="height:10px;width:56.7%;background:var(--ink-900)"></div>
+            <div title="8 flats cannot" style="height:10px;width:13.3%;background:var(--ink-350)"></div>
+            <div title="18 flats have not answered" style="height:10px;width:30.0%;background:var(--ink-150)"></div>
+          </div>
+          <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-500)">18 have not answered.</div>
+          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">Load dropped 6.2 kVA against the forecast.</div>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Flexibility budget</div>
+          <div style="margin-top:6px;font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">Every flat has 6 boost days a year. A day is only spent when granting a request would cost the society money. Requests that fit inside spare capacity never use one.</div>
+          <div style="display:flex;height:10px;margin-top:10px">
+            <sc-for list="{{ budgetBars }}" as="b" hint-placeholder-count="4">
+              <div title="{{ b.tip }}" style="height:10px;width:{{ b.w }};background:{{ b.fill }}"></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px">
+            <sc-for list="{{ budgetBars }}" as="b" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:5px;font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">
+                <span style="width:8px;height:8px;flex:none;display:block;background:{{ b.fill }}"></span>
+                <span>{{ b.label }}</span>
+                <span style="color:var(--ink-350)">{{ b.n }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-500)">4 flats have used their full allowance.</div>
+        </div>
+
+        <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:12px 14px">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Consent coverage</div>
+          <div style="margin-top:2px;font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ consentHead }}</div>
+          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">flats share per flat readings or more. The rest count in the society total only.</div>
+          <div style="display:flex;height:10px;margin-top:10px">
+            <sc-for list="{{ consentTiers }}" as="t" hint-placeholder-count="3">
+              <div title="{{ t.tip }}" style="height:10px;width:{{ t.w }};background:{{ t.fill }}"></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px">
+            <sc-for list="{{ consentTiers }}" as="t" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:5px;font-size:12.5px;line-height:17px;color:var(--ink-500);white-space:nowrap">
+                <span style="width:8px;height:8px;flex:none;display:block;background:{{ t.fill }}"></span>
+                <span>{{ t.label }}</span>
+                <span style="color:var(--ink-350)">{{ t.n }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <button onClick="{{ askConsent }}" style="width:100%;height:40px;margin-top:10px;padding:0 12px;text-align:left;border:1px solid var(--ink-900);border-radius:2px;background:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900)">Ask for consent</button>
+          <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-350);text-wrap:pretty">Tier 3 includes Tier 2. Segments show the highest tier each flat has granted, so they add to 60.</div>
+          <sc-if value="{{ consentAskOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ consentAudiences }}" as="a" hint-placeholder-count="2">
+                <button onClick="{{ a.onClick }}" style="width:100%;padding:8px 10px;text-align:left;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper)" style-hover="border-color:var(--ink-900)">
+                  <div style="font-size:15px;line-height:22px;color:var(--ink-900)">{{ a.label }}</div>
+                  <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ a.sub }}</div>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-350);text-wrap:pretty">One ask per flat per quarter. Last asked 12 Jul.</div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="position:sticky;bottom:0;z-index:20;display:flex;height:92px;background:var(--paper);border-top:1px solid var(--ink-150)">
+    <div style="flex:1;min-width:0;padding:10px 20px 8px;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap;">Replay · 20 Aug</div>
+        <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em">{{ clock }}</div>
+        <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">Solid line is measured. Dashed line ahead of now is planned.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+        <button onClick="{{ play }}" aria-label="Play replay" style="width:28px;height:28px;flex:none;border:1px solid var(--ink-150);border-radius:2px;background:{{ playBg }};display:flex;align-items:center;justify-content:center" style-hover="border-color:var(--ink-900)">
+          <svg width="9" height="10" viewBox="0 0 9 10" aria-hidden="true"><path d="M0 0l9 5-9 5z" style="fill:{{ playFg }}"></path></svg>
+        </button>
+        <button onClick="{{ pause }}" aria-label="Pause replay" style="width:28px;height:28px;flex:none;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);display:flex;align-items:center;justify-content:center" style-hover="border-color:var(--ink-900)">
+          <svg width="8" height="10" viewBox="0 0 8 10" aria-hidden="true"><path d="M0 0h3v10H0zM5 0h3v10H5z" style="fill:var(--ink-900)"></path></svg>
+        </button>
+        <input type="range" min="0" max="95" value="{{ nowIdx }}" onChange="{{ onScrub }}" onInput="{{ onScrub }}" aria-label="Replay time" style="flex:1;background-image:{{ scrubTrack }}"></input>
+      </div>
+      <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500)">If this system goes offline, every load returns to its existing timer schedule. Nothing needs the optimizer to run.</div>
+    </div>
+
+    <div style="width:400px;flex:none;padding:10px 20px 8px;border-left:1px solid var(--ink-150);border-right:1px solid var(--ink-150)">
+      <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap;">Stress the day</div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <sc-for list="{{ scenarios }}" as="s" hint-placeholder-count="5">
+          <button onClick="{{ s.onClick }}" style="flex:1;height:40px;padding:0 4px;border-radius:2px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;border:1px solid {{ s.border }};background:{{ s.bg }};color:{{ s.fg }}">{{ s.label }}</button>
+        </sc-for>
+      </div>
+      <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ avoidedLine }}</div>
+    </div>
+
+    <div style="width:300px;flex:none;padding:10px 20px 8px">
+      <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500);white-space:nowrap;">Operator override</div>
+      <button onClick="{{ overrideClick }}" style="width:100%;height:52px;margin-top:4px;border:0;border-radius:2px;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;background:{{ overrideBg }};color:var(--paper)">{{ overrideLabel }}</button>
+      <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500)">One press. No confirmation, no login.</div>
+    </div>
+  </div>
+
+  <sc-if value="{{ resident }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;right:24px;top:254px;width:320px;height:620px;overflow:hidden;background:var(--paper);border:1px solid var(--ink-150);border-radius:20px;padding:16px 18px 14px;display:flex;flex-direction:column;z-index:40">
+      <div style="position:absolute;left:50%;top:10px;width:44px;height:4px;margin-left:-22px;background:var(--ink-900);border-radius:2px"></div>
+      <button onClick="{{ closeResident }}" aria-label="Close resident view" style="position:absolute;right:12px;top:12px;width:28px;height:28px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500);font-size:12.5px" style-hover="border-color:var(--ink-900)">✕</button>
+
+      <div style="margin-top:10px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-350)">{{ resident.flat }}</div>
+      <div style="margin-top:6px;font-size:15px;line-height:22px;font-weight:500">{{ resident.headline }}</div>
+      <div style="font-size:15px;line-height:22px;color:var(--ink-500)">{{ resident.sub }}</div>
+
+      <sc-if value="{{ resident.consent }}" hint-placeholder-val="{{ false }}">
+        <div>
+          <div style="margin-top:12px;border:1px solid var(--ink-150);border-radius:2px;padding:12px">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">A request from management</div>
+            <div style="margin-top:6px;font-size:15px;line-height:22px;font-weight:500;text-wrap:pretty">Can we see your flat’s meter readings?</div>
+            <div style="font-size:15px;line-height:22px;color:var(--ink-700);text-wrap:pretty">Not appliance level. Just the total for your flat, every 15 minutes.</div>
+            <div style="margin-top:10px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Why</div>
+            <div style="font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">So your savings can be shown separately instead of as a society average.</div>
+            <div style="margin-top:8px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">For how long</div>
+            <div style="font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">12 months. It expires on 26 Aug 2027 unless you renew it.</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px">
+              <button onClick="{{ onAllow }}" style="width:100%;height:40px;border:1px solid var(--ink-900);border-radius:2px;background:var(--ink-900);color:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Allow</button>
+              <button onClick="{{ onNotNow }}" style="width:100%;height:40px;border:1px solid var(--ink-900);border-radius:2px;background:var(--paper);color:var(--ink-900);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Not now</button>
+              <button onClick="{{ onNever }}" style="width:100%;height:40px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Never ask again</button>
+            </div>
+            <div style="margin-top:8px;font-size:12.5px;line-height:17px;color:var(--ink-350);text-wrap:pretty">You can withdraw this any time, in the same place you granted it.</div>
+          </div>
+          <div style="margin-top:12px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">How your data was used</div>
+          <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">Your readings were used 4 times this month, all to schedule your geyser.</div>
+          <button onClick="{{ toggleUses }}" style="margin-top:2px;border:0;background:none;padding:0;font-size:12.5px;line-height:17px;color:var(--ink-500);text-decoration:underline">See every use</button>
+          <sc-if value="{{ usesOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:4px">
+              <sc-for list="{{ dataUses }}" as="u" hint-placeholder-count="0">
+                <div style="display:flex;gap:8px;align-items:baseline;padding:3px 0;border-bottom:1px solid var(--ink-80);font-size:12.5px;line-height:17px">
+                  <span style="width:46px;flex:none;color:var(--ink-500)">{{ u.date }}</span>
+                  <span style="flex:1;color:var(--ink-700)">{{ u.purpose }}</span>
+                  <a href="#" style="flex:none;color:var(--ink-500)">Download</a>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ resident.normal }}" hint-placeholder-val="{{ true }}">
+        <div>
+      <div style="margin-top:12px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">We never touch these</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-top:6px">
+        <sc-for list="{{ neverTouch }}" as="n" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;line-height:17px">
+            <svg width="9" height="11" viewBox="0 0 11 13" aria-hidden="true"><path d="M2 5V3.4A3.5 3.5 0 0 1 9 3.4V5h.6v7.4H1.4V5H2zm1.4 0h4.2V3.4a2.1 2.1 0 0 0-4.2 0V5z" style="fill:var(--ink-500)"></path></svg>
+            <span>{{ n }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin-top:12px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">What we changed today</div>
+      <sc-if value="{{ resident.empty }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:6px;font-size:15px;line-height:22px;color:var(--ink-500);text-wrap:pretty">Nothing changed today. Your home ran exactly as it always does.</div>
+      </sc-if>
+      <sc-for list="{{ resident.changes }}" as="c" hint-placeholder-count="0">
+        <div style="margin-top:8px">
+          <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ c.time }}</div>
+          <div style="font-size:15px;line-height:22px;text-wrap:pretty">{{ c.text }}</div>
+          <button onClick="{{ c.onWhy }}" style="border:0;background:none;padding:0;font-size:12.5px;line-height:17px;color:var(--ink-500);text-decoration:underline">Why?</button>
+          <sc-if value="{{ c.whyOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">Because electricity costs 26 percent more between 6 and 10 pm.</div>
+          </sc-if>
+        </div>
+      </sc-for>
+      <sc-if value="{{ resident.undo }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ undoClick }}" style="align-self:flex-start;margin-top:6px;border:0;background:none;padding:0;font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900);text-decoration:underline">Undo</button>
+      </sc-if>
+
+      <div style="margin-top:10px;display:flex;align-items:baseline;gap:6px">
+        <div style="font-size:26px;line-height:30px;font-weight:500;letter-spacing:-0.01em;color:var(--green-600)">₹204</div>
+        <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">off your maintenance charge this month</div>
+      </div>
+        </div>
+      </sc-if>
+
+      <div style="flex:1"></div>
+
+      <sc-if value="{{ resident.normal }}" hint-placeholder-val="{{ true }}">
+        <div>
+
+      <button onClick="{{ snoozeClick }}" style="width:100%;height:44px;border:1px solid var(--ink-900);border-radius:2px;background:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-900)">{{ snoozeLabel }}</button>
+      <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">{{ snoozeSub }}</div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:8px;border-top:1px solid var(--ink-150)">
+        <div style="font-size:15px;line-height:22px;flex:1">Take part in load balancing</div>
+        <button onClick="{{ toggleOptIn }}" role="switch" aria-checked="{{ optIn }}" aria-label="Take part in load balancing" style="width:40px;height:22px;flex:none;border:1px solid var(--ink-150);border-radius:11px;padding:0 2px;display:flex;align-items:center;justify-content:{{ optJustify }};background:{{ optBg }}">
+          <span style="width:16px;height:16px;border-radius:50%;display:block;background:{{ optKnob }}"></span>
+        </button>
+      </div>
+      <div style="font-size:12.5px;line-height:17px;color:var(--ink-500)">Turn this off any time. Your bill goes back to normal.</div>
+      <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-500)">You were asked to shift 3 times this month. The society average is 3.2.</div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ bcOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(17,17,17,0.4);z-index:70;display:flex;align-items:center;justify-content:center">
+      <div style="width:560px;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:18px 20px 20px">
+        <div style="display:flex;align-items:center">
+          <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Send a broadcast</div>
+          <div style="flex:1"></div>
+          <button onClick="{{ closeBc }}" aria-label="Close composer" style="width:28px;height:28px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500);font-size:12.5px" style-hover="border-color:var(--ink-900)">✕</button>
+        </div>
+
+        <div style="margin-top:12px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Template</div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <sc-for list="{{ bcTemplateBtns }}" as="t" hint-placeholder-count="3">
+            <button onClick="{{ t.onClick }}" style="flex:1;height:36px;padding:0 10px;text-align:left;border-radius:2px;font-size:12.5px;line-height:17px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:14px;font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Audience</div>
+        <div style="display:flex;margin-top:6px">
+          <sc-for list="{{ bcAudOpts }}" as="o" hint-placeholder-count="4">
+            <button onClick="{{ o.onClick }}" style="flex:1;height:36px;padding:0 8px;border:1px solid var(--ink-150);border-left:{{ o.leftBorder }};border-radius:{{ o.radius }};font-size:12.5px;line-height:15px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button>
+          </sc-for>
+        </div>
+        <div style="margin-top:6px;font-size:12.5px;line-height:17px;color:var(--ink-500)">{{ bcAudLine }}</div>
+
+        <div style="display:flex;gap:16px;margin-top:14px;align-items:flex-start">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Message</div>
+            <textarea value="{{ bcMsg }}" onChange="{{ onBcMsg }}" rows="5" style="width:100%;margin-top:6px;padding:8px 10px;border:1px solid var(--ink-150);border-radius:2px;font-family:inherit;font-size:15px;line-height:22px;color:var(--ink-900);resize:none"></textarea>
+          </div>
+          <div style="width:200px;flex:none">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Preview</div>
+            <div style="margin-top:6px;border:1px solid var(--ink-150);border-radius:14px;padding:14px 12px 12px;background:var(--ink-40)">
+              <div style="width:32px;height:3px;margin:0 auto 10px;background:var(--ink-200);border-radius:2px"></div>
+              <div style="background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:8px 10px">
+                <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Samanvay</div>
+                <div style="margin-top:4px;font-size:12.5px;line-height:17px;color:var(--ink-900);text-wrap:pretty">{{ bcMsg }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button onClick="{{ sendBc }}" style="height:40px;padding:0 18px;border:1px solid var(--ink-900);border-radius:2px;background:var(--ink-900);color:var(--paper);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Send</button>
+          <button onClick="{{ closeBc }}" style="height:40px;padding:0 18px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500);font-size:10.5px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tariffOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;right:24px;top:96px;width:360px;background:var(--paper);border:1px solid var(--ink-150);border-radius:2px;padding:14px 16px;z-index:50">
+      <div style="display:flex;align-items:center">
+        <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-500)">Tariff · TN HT</div>
+        <div style="flex:1"></div>
+        <button onClick="{{ closeTariff }}" aria-label="Close tariff panel" style="width:28px;height:28px;border:1px solid var(--ink-150);border-radius:2px;background:var(--paper);color:var(--ink-500)" style-hover="border-color:var(--ink-900)">✕</button>
+      </div>
+      <div style="margin-top:8px;font-size:15px;line-height:22px;text-wrap:pretty">Energy is charged per unit. Demand is charged once, on the single highest fifteen minute peak of the month.</div>
+      <div style="margin-top:10px">
+        <sc-for list="{{ tariffRows }}" as="t" hint-placeholder-count="4">
+          <div style="display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid var(--ink-150)">
+            <div style="font-size:10.5px;line-height:14px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;width:96px;flex:none">{{ t.name }}</div>
+            <div style="font-size:12.5px;line-height:17px;color:var(--ink-500);flex:1">{{ t.hours }}</div>
+            <div style="font-size:15px;line-height:22px">{{ t.rate }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:10px;font-size:12.5px;line-height:17px;color:var(--ink-500);text-wrap:pretty">Demand charge ₹608 per kVA of monthly peak. At 84.4 kVA that is ₹51,313 for the month. One fifteen minute interval sets it.</div>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;right:24px;bottom:104px;display:flex;flex-direction:column-reverse;gap:8px;z-index:60">
+    <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+      <div style="width:340px;border-radius:2px;padding:12px;border:1px solid {{ t.edge }};background:{{ t.bg }};position:relative;overflow:hidden">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div style="font-size:15px;line-height:22px;font-weight:500;flex:1;color:{{ t.fg }}">{{ t.title }}</div>
+          <button onClick="{{ t.onClose }}" aria-label="Dismiss" style="border:0;background:none;padding:0;color:var(--ink-500);font-size:12.5px">✕</button>
+        </div>
+        <div style="font-size:12.5px;line-height:17px;color:var(--ink-700);text-wrap:pretty">{{ t.sub }}</div>
+        <sc-if value="{{ t.hasUndo }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <button onClick="{{ t.onUndo }}" style="margin-top:6px;border:0;background:none;padding:0;font-size:15px;line-height:22px;font-weight:500;color:var(--ink-900);text-decoration:underline">Undo</button>
+            <div style="position:absolute;left:0;bottom:0;height:2px;background:var(--ink-350);animation:drain 5s linear forwards"></div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1010},&quot;startMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;NOW&quot;,&quot;COMPARE&quot;,&quot;EVIDENCE&quot;],&quot;default&quot;:&quot;NOW&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo state&quot;},&quot;startScenario&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;heatwave&quot;,&quot;sensor_drop&quot;,&quot;grid_outage&quot;,&quot;festival&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo state&quot;},&quot;alertState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Auto&quot;,&quot;safe&quot;,&quot;watch&quot;,&quot;danger&quot;],&quot;default&quot;:&quot;Auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo state&quot;},&quot;societyView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;3D isometric&quot;,&quot;2D tiles&quot;],&quot;default&quot;:&quot;3D isometric&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo state&quot;}}">
+class Component extends DCLogic {
+  state = { toasts: [] };
+
+  g(k, d) { const v = this.state[k]; return v === undefined ? d : v; }
+  set(k, v) { this.setState({ [k]: v }); }
+
+  componentDidMount() {
+    this._t = [];
+    this._key = (e) => {
+      const tag = (e.target && e.target.tagName) || '';
+      const kk = (e.key || '').toLowerCase();
+      if ((tag === 'INPUT' || tag === 'TEXTAREA') && kk !== 'escape') return;
+      const map = { '1': 'normal', '2': 'heatwave', '3': 'sensor_drop', '4': 'grid_outage', '5': 'festival' };
+      if (map[e.key]) { this.applyScenario(map[e.key]); return; }
+      const k = kk;
+      if (k === 't') this.set('mode', 'requests');
+      if (this.g('mode', 'now') === 'requests') {
+        const qu = this._queue || [];
+        const cur = Math.min(this.g('focus', 0), Math.max(0, qu.length - 1));
+        if (k === 'j') { e.preventDefault(); this.set('focus', Math.min(qu.length - 1, cur + 1)); }
+        if (k === 'k') { e.preventDefault(); this.set('focus', Math.max(0, cur - 1)); }
+        const f = qu[cur];
+        if (f && k === 'a') this.decide(f, 'approved');
+        if (f && k === 'x') this.decide(f, 'declined');
+        if (f && k === 'c' && f.counter) this.setState({ counterOpen: f.id, cMsg: f.counter.msg });
+        if (e.key === '/') { e.preventDefault(); const el = document.getElementById('reqSearch'); if (el) el.focus(); }
+      }
+      if (k === 'q') this.set('mode', 'now');
+      if (k === 'w') this.set('mode', 'timeline');
+      if (k === 'e') this.set('mode', 'compare');
+      if (k === 'r') this.set('mode', 'evidence');
+      if (k === 'g') this.set('tiles', !this.g('tiles', false));
+      if (k === 'escape') this.setState({ resident: null, tariffOpen: false, bcOpen: null, counterOpen: null });
+      if (e.code === 'Space') { e.preventDefault(); this.g('playing', false) ? this.pause() : this.play(); }
+    };
+    window.addEventListener('keydown', this._key);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._key);
+    (this._t || []).forEach(clearTimeout);
+    clearInterval(this._iv);
+  }
+
+  /* ---------- data ---------- */
+
+  interp(pts, h) {
+    if (h <= pts[0][0]) return pts[0][1];
+    for (let i = 1; i < pts.length; i++) {
+      if (h <= pts[i][0]) {
+        const a = pts[i - 1], b = pts[i];
+        const t = (h - a[0]) / (b[0] - a[0]);
+        return a[1] + (b[1] - a[1]) * (t * t * (3 - 2 * t));
+      }
+    }
+    return pts[pts.length - 1][1];
+  }
+
+  win(h) {
+    if (h >= 22 || h < 6) return { name: 'night', mult: 0.94, label: 'Night, −6%' };
+    if (h < 10) return { name: 'solar', mult: 0.80, label: 'Solar hours, −20%' };
+    if (h < 18) return { name: 'normal', mult: 1.00, label: 'Normal' };
+    return { name: 'peak', mult: 1.26, label: 'Peak, +26%' };
+  }
+
+  day(sc) {
+    if (this._dc && this._dc.sc === sc) return this._dc.d;
+    const B = [[0,10],[3,8.5],[5,9],[6,14],[7,22],[8,26],[9,25],[10,28],[12,33],[14,40],[14.75,44],[16,52],[17,64],[18,84],[18.75,91.2],[19.5,88],[20.5,76],[21.5,58],[22,44],[23,26],[24,12]];
+    const O = [[0,10],[3,8.5],[5,9],[6,15],[7,24],[8,32],[9,31],[10,29],[12,33],[14,40],[14.75,43.4],[16,50],[17,58],[18,76],[18.75,84.4],[19.5,80],[20.5,70],[21.5,55],[22,48],[23,36],[24,16]];
+    const ev = sc === 'heatwave' ? 1.13 : sc === 'festival' ? 1.16 : 1;
+    const dayF = sc === 'heatwave' ? 1.08 : 1;
+    const ours = [], ghost = [], mult = [];
+    for (let i = 0; i < 96; i++) {
+      const h = i * 0.25;
+      let g = this.interp(B, h), o = this.interp(O, h);
+      if (h >= 16) { g *= ev; o *= 1 + (ev - 1) * 0.42; }
+      if (h >= 10 && h < 16) { g *= dayF; o *= dayF; }
+      const r = 1 + 0.014 * Math.sin(i * 2.7) + 0.008 * Math.cos(i * 1.3);
+      g *= r; o *= r;
+      if (sc === 'grid_outage' && h >= 19 && h < 19.75) { g = 13.5; o = 13.5; }
+      ours.push(o); ghost.push(g); mult.push(this.win(h).mult);
+    }
+    const tOurs = { normal: 84.4, heatwave: 89.6, festival: 88.9, sensor_drop: 84.4, grid_outage: 84.4 }[sc] || 84.4;
+    const tGhost = { normal: 91.2, heatwave: 103.1, festival: 99.4, sensor_drop: 91.2, grid_outage: 91.2 }[sc] || 91.2;
+    const so = tOurs / Math.max.apply(null, ours), sg = tGhost / Math.max.apply(null, ghost);
+    let peakIdx = 0, rupees = [];
+    for (let i = 0; i < 96; i++) {
+      ours[i] *= so; ghost[i] *= sg;
+      if (ours[i] > ours[peakIdx]) peakIdx = i;
+      rupees.push(Math.round(ours[i] * 1.875 * mult[i] * 2.066));
+    }
+    const pin = { normal: 43.4, sensor_drop: 43.4, grid_outage: 43.4, heatwave: 46.9, festival: 44.1 }[sc] || 43.4;
+    const pinR = pin / ours[59];
+    for (let k = 55; k <= 63; k++) ours[k] *= 1 + (pinR - 1) * (1 - Math.abs(k - 59) / 5);
+    const avoided = [];
+    for (let i = 0; i < 96; i++) if (ghost[i] > 92 && ours[i] <= 92) avoided.push(i);
+    const d = { ours, ghost, mult, rupees, peakIdx, peak: ours[peakIdx], ghostPeak: tGhost, avoided };
+    this._dc = { sc, d };
+    return d;
+  }
+
+  hex(c) { return { a: parseInt(c.slice(1, 3), 16), b: parseInt(c.slice(3, 5), 16), c: parseInt(c.slice(5, 7), 16) }; }
+  mix(c1, c2, t) {
+    const a = this.hex(c1), b = this.hex(c2), f = (x, y) => Math.round(x + (y - x) * Math.max(0, Math.min(1, t)));
+    return '#' + [f(a.a, b.a), f(a.b, b.b), f(a.c, b.c)].map(v => v.toString(16).padStart(2, '0')).join('');
+  }
+
+  clockOf(i) {
+    const m = i * 15;
+    return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+  }
+  inr(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+  lakh(n) { return '₹' + (n / 100000).toFixed(2) + 'L'; }
+
+  /* ---------- actions ---------- */
+
+  addToast(kind, title, sub, undo) {
+    const id = 'tst' + Math.random().toString(36).slice(2, 8);
+    this.setState(s => ({ toasts: [...(s.toasts || []), { id, kind, title, sub, undo: undo || null }] }));
+    this._t.push(setTimeout(() => this.dropToast(id), 5000));
+  }
+  dropToast(id) { this.setState(s => ({ toasts: (s.toasts || []).filter(t => t.id !== id) })); }
+
+  applyScenario(sc) {
+    const names = { normal: 'Normal day', heatwave: 'Heatwave', sensor_drop: 'Sensor drop', grid_outage: 'Grid outage', festival: 'Festival' };
+    this.setState({ scenario: sc, calibrated: false, override: false });
+    if (sc !== 'normal') this.addToast('ink', names[sc] + ' applied. Same day, harder conditions.', 'Everything on screen is the same society, replayed under this scenario.');
+  }
+
+  play() {
+    if (this._iv) clearInterval(this._iv);
+    this.set('playing', true);
+    this._iv = setInterval(() => this.setState(s => ({ nowIdx: ((s.nowIdx === undefined ? 59 : s.nowIdx) + 1) % 96 })), 220);
+  }
+  pause() { clearInterval(this._iv); this._iv = null; this.set('playing', false); }
+
+  calibrate() {
+    if (this.g('calState', 'rest') !== 'rest') return;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finish = () => {
+      this.setState({ calState: 'result', q: 88, calibrated: true, lastCal: this.clockOf(this.g('nowIdx', 59)) });
+      this.addToast('green', 'Calibrated. The plan is accurate again.', 'Caution level q85 → q88. Your saving is protected.');
+      this._t.push(setTimeout(() => this.set('calState', 'rest'), 8000));
+    };
+    this.setState({ calState: 'run', calStep: 0 });
+    if (reduce) { this._t.push(setTimeout(finish, 600)); return; }
+    [1, 2, 3].forEach(n => this._t.push(setTimeout(() => this.set('calStep', n), n * 600)));
+    this._t.push(setTimeout(finish, 2400));
+  }
+
+  overrideClick() {
+    const on = this.g('override', false);
+    if (on) { this.setState({ override: false }); this.addToast('ink', 'Optimizer running again.', 'The plan resumes from the next fifteen minute interval.'); }
+    else { this.setState({ override: true }); this.addToast('red', 'Returned to the existing schedule.', 'The optimizer is no longer running.'); }
+  }
+
+  openResident(id) {
+    const changed = (id * 7) % 4 !== 0;
+    this.setState({
+      resident: {
+        id, flat: 'Flat ' + String.fromCharCode(65 + (id % 6)) + '-' + (101 + (id % 30)),
+        headline: changed ? 'Your home is running normally.' : 'Your home is running normally.',
+        sub: changed ? 'One thing moved by a few minutes today.' : 'Nothing was changed today.',
+        empty: !changed,
+        undo: changed,
+        changes: changed ? [
+          { time: '11:20 pm', text: 'Your geyser started 20 minutes later than usual. Hot water was ready before 7 am. Saved you about ₹4.' }
+        ] : []
+      }, whyOpen: null
+    });
+  }
+
+  /* ---------- requests ---------- */
+
+  reqBase() {
+    return [
+      { id: 'r1', flat: 'A2 1204', meta: 'Tower A · 3BHK · 4 residents',
+        date: '2026-08-29', win: [19, 23], source: 'via WhatsApp', ageDays: 3,
+        day: 'Saturday 29 Aug', time: '7:00 pm to 11:00 pm',
+        ask: 'More power for an evening', reason: 'Housewarming, about 40 guests',
+        mag: 'Asked for a lot of extra power. About 6 kW above their normal evening.',
+        without: 84.4, peak: 88.2, cost: 0, per: 0, fits: true, used: 2, counter: null,
+        precedent: { flat: 'B2 0207', date: '2 Aug', decision: 'approved', cost: 800 } },
+      { id: 'r2', flat: 'B1 0402', meta: 'Tower B · 2BHK · 3 residents',
+        date: '2026-08-29', win: [19, 23], source: 'via WhatsApp', ageDays: 6, optedOut: true,
+        day: 'Saturday 29 Aug', time: '7:00 pm to 11:00 pm',
+        ask: 'More power for an evening', reason: 'Engagement party, the caterers bring their own ovens',
+        mag: 'Asked for a lot of extra power. About 8.5 kW above their normal evening.',
+        without: 88.2, peak: 94.1, cost: 1276, per: 21, fits: false, used: 4,
+        precedent: { flat: 'A1 0709', date: '12 Aug', decision: 'declined', cost: 1100 },
+        counter: { window: '8:00 pm to midnight',
+          line: 'Same length, one hour later, and it costs the society nothing.',
+          msg: 'We cannot do 7pm without a cost to everyone, but 8pm to midnight is completely free. Would that work?' } },
+      { id: 'r3', flat: 'A1 0308', meta: 'Tower A · 2BHK · 2 residents', medical: true, rule: true,
+        date: '2026-09-30', win: [22, 30], source: 'entered by operator', ageDays: 0,
+        day: 'Every night', time: '10:00 pm to 6:00 am',
+        ask: 'Uninterrupted power overnight, indefinitely',
+        reason: 'Home dialysis, five nights a week',
+        mag: 'About 1.4 kW held steady. It cannot be shifted or paused.',
+        without: 84.4, peak: 85.8, cost: 0, per: 0, fits: true, used: null, counter: null,
+        precedent: null }
+    ];
+  }
+
+  clusterOf(list) {
+    const groups = {};
+    list.forEach(r => {
+      const key = r.date + '|' + r.win[0];
+      (groups[key] = groups[key] || []).push(r);
+    });
+    return Object.keys(groups).map(k => groups[k]).filter(g => g.length > 1);
+  }
+
+  festivalReq() {
+    const st = this.g('staggered', false);
+    return [{ id: 'rf', flat: 'Twelve flats', meta: 'Six in tower A, six in tower B', group: true,
+      day: 'Saturday 29 Aug', time: '7:00 pm to 11:00 pm',
+      ask: 'More power for an evening', reason: 'Twelve separate requests for the same evening',
+      mag: 'Between 3 and 8 kW each, all inside the same four hours.',
+      without: 86.0, peak: st ? 90.8 : 98.4, cost: st ? 0 : 3891, per: st ? 0 : 65,
+      fits: st, used: null, counter: null }];
+  }
+
+  spark(without, peak) {
+    const W = 200, H = 56, base = 74, top = 100;
+    const yy = val => H - ((val - base) / (top - base)) * (H - 6) - 3;
+    const shape = [0.18, 0.42, 0.72, 1, 0.86, 0.52, 0.24];
+    const line = pk => shape.map((s, i) =>
+      (i ? 'L' : 'M') + ((i / 6) * W).toFixed(1) + ' ' + yy(base + 6 + (pk - base - 6) * s).toFixed(1)
+    ).join('');
+    return { a: line(without), b: line(peak), ceil: yy(92).toFixed(1) };
+  }
+
+  decide(r, kind) {
+    const prev = Object.assign({}, this.g('decided', {}));
+    const dec = Object.assign({}, prev);
+    dec[r.id] = kind;
+    this.setState({ decided: dec, counterOpen: null, preview: null });
+    const undo = () => this.setState({ decided: prev });
+    if (kind === 'approved') {
+      if (r.rule) {
+        this.addToast('ink', 'Acknowledged ' + r.flat + '.',
+          'It was already approved by house rule. The acknowledgement is recorded against your name.', undo);
+        return;
+      }
+      this.addToast('ink', 'Approved. ' + r.flat + ' has their Saturday evening.',
+        r.cost > 0
+          ? 'The society carries ' + this.inr(r.cost) + ' this month, ₹' + r.per + ' per flat. The resident has been told.'
+          : 'It fitted inside the headroom, so nothing was added to anyone\u2019s bill.', undo);
+    }
+    if (kind === 'countered') this.addToast('ink', 'Offer sent to ' + r.flat + '.', 'Same four hours, one hour later, at no cost to the society.', undo);
+    if (kind === 'declined') this.addToast('ink', 'Declined. ' + r.flat + ' has been told.', 'They were told why, and which window would have been free.', undo);
+  }
+
+  clusterAct(members, kind) {
+    const prev = Object.assign({}, this.g('decided', {}));
+    const dec = Object.assign({}, prev);
+    members.forEach(m => { dec[m.id] = kind === 'declined' ? 'declined' : 'approved'; });
+    const undo = () => this.setState({ decided: prev, splitCluster: false });
+    this.setState({ decided: dec, preview: null });
+    if (kind === 'stagger') this.addToast('green', 'Both approved, staggered.', 'Saturday peaks at 90.8 kVA against a 92 ceiling. Neither flat lost its evening.', undo);
+    if (kind === 'both') this.addToast('red', 'Both approved.', 'The society carries ₹3,890 this month, ₹65 per flat. Both residents have been told.', undo);
+    if (kind === 'declined') this.addToast('ink', 'Both declined.', 'Each was told why, and offered the nearest free window instead.', undo);
+  }
+
+  stagger() {
+    this.setState({ staggered: true });
+    this.addToast('green', 'Staggered into two groups.', 'Saturday now peaks at 90.8 kVA. Every flat still gets its evening.');
+  }
+
+  bcT() {
+    return {
+      heads: { label: 'Heads up about tomorrow', msg: 'Tomorrow is forecast at 41 degrees. If you can run washing machines and dishwashers after 10pm, we will avoid a peak that costs everyone.' },
+      thanks: { label: 'Thank the society', msg: 'Last night\u2019s coordination kept us 8 kVA under the limit. That is about ₹40 per flat off this month\u2019s maintenance.' },
+      maint: { label: 'Maintenance notice', msg: 'Water pump maintenance on Thursday, 2pm to 4pm. Supply to towers A and B will be intermittent.' }
+    };
+  }
+  openBc(k) { this.setState({ bcOpen: k, bcMsg: this.bcT()[k].msg, bcAud: this.g('bcAud', 0) }); }
+  sendBc() {
+    const n = [60, 30, 14, 9][this.g('bcAud', 0)];
+    this.setState({ bcOpen: null });
+    this.addToast('green', 'Sent to ' + n + ' flats.', 'Tomorrow\u2019s auto approved log will show how the load actually responded.');
+  }
+
+  askConsent() { this.setState({ resident: { flat: 'Flat B-214', consent: true }, usesOpen: false }); }
+  consentAnswer(kind) {
+    this.setState({ resident: null });
+    if (kind === 'allow') this.addToast('green', 'Consent granted for 12 months.', 'Coverage is now 48 of 60 flats. It expires 26 Aug 2027 unless it is renewed.');
+    if (kind === 'later') this.addToast('ink', 'Not now.', 'This flat will not be asked again before 26 Oct. One ask per quarter.');
+    if (kind === 'never') this.addToast('ink', 'Never ask again.', 'This flat stays at tier 1. Everything essential keeps working and it will not be asked again.');
+  }
+
+  /* ---------- render values ---------- */
+
+  renderVals() {
+    const P = this.props || {};
+    const CEIL = 92;
+    const mode = this.g('mode', String(P.startMode || 'NOW').toLowerCase());
+    const modeLabel = { now: 'Now', timeline: 'Timeline', compare: 'Compare', evidence: 'Evidence', requests: 'Requests' }[mode] || 'Now';
+    const sc = this.g('scenario', P.startScenario || 'normal');
+    const now = this.g('nowIdx', 59);
+    const q = this.g('q', 85);
+    const comfort = this.g('comfort', 1.5);
+    const d = this.day(sc);
+    const load = d.ours[now];
+    const hour = now * 0.25;
+    const w = this.win(hour);
+    const ov = this.g('override', false);
+    const calState = this.g('calState', 'rest');
+    const tiles = this.g('tiles', String(P.societyView || '') === '2D tiles');
+    const v = {};
+
+    /* chart geometry */
+    const X = i => 56 + (i / 95) * 944;
+    const Y = val => 210 - (val / 125) * 200;
+    const path = (arr, from, to) => {
+      let s = '';
+      for (let i = from; i <= to; i++) s += (i === from ? 'M' : 'L') + X(i).toFixed(1) + ' ' + Y(arr[i]).toFixed(1);
+      return s;
+    };
+    const wide = 1 + (sc === 'sensor_drop' ? 0.9 : 0);
+    let up = '', dn = '';
+    for (let i = now; i < 96; i++) {
+      const spread = (0.055 + (i - now) * 0.0035) * wide;
+      up += (i === now ? 'M' : 'L') + X(i).toFixed(1) + ' ' + Y(d.ours[i] * (1 + spread) + 2.2).toFixed(1);
+    }
+    for (let i = 95; i >= now; i--) {
+      const spread = (0.055 + (i - now) * 0.0035) * wide;
+      dn += 'L' + X(i).toFixed(1) + ' ' + Y(Math.max(0, d.ours[i] * (1 - spread) - 1.4)).toFixed(1);
+    }
+    v.bandPath = up + dn + 'Z';
+    v.ghostPath = path(d.ghost, 0, 95);
+    v.oursPast = path(d.ours, 0, now);
+    v.oursFuture = path(d.ours, now, 95);
+    v.futureStroke = sc === 'sensor_drop' ? 'var(--ink-350)' : 'var(--ink-900)';
+    v.staleNote = sc === 'sensor_drop';
+    v.staleX = X(now) + 8;
+    v.ceilY = Y(CEIL); v.ceilLabelY = Y(CEIL) - 6;
+    v.nowX = X(now); v.nowLabelX = Math.min(X(now) + 6, 880);
+    v.yGrid = [0, 25, 50, 75, 100, 125].map(val => ({ v: String(val), y: Y(val), ty: Y(val) + 4 }));
+    v.xTicks = [0, 12, 24, 36, 48, 60, 72, 84, 95].map(i => ({ x: X(i), label: this.clockOf(i === 95 ? 96 : i) }));
+    v.nearMiss = d.avoided.map(i => ({ x: X(i), y: Y(d.ghost[i]) }));
+    v.tombX = X(d.peakIdx); v.tombY = Y(d.peak) - 4; v.tombLineY = Y(d.peak) - 32;
+    v.tombRectX = Math.min(X(d.peakIdx) + 1, 848); v.tombRectY = Y(d.peak) - 52;
+    v.tombTextX = Math.min(X(d.peakIdx) + 9, 856); v.tombTextY = Y(d.peak) - 38;
+    v.oursLabelX = 996; v.oursLabelY = Y(d.ours[95]) - 8;
+    v.ghostLabelX = 996; v.ghostLabelY = Y(d.ghost[95]) + 16;
+    v.actions = [63, 71].map(i => ({ x: X(i), py: Y(d.ours[i]) - 4 }));
+    v.svgNow = React.createElement('text', { x: Math.min(X(now) + 6, 880), y: 14, style: { fontSize: '12.5px', fill: 'var(--ink-900)' } }, 'NOW ' + this.clockOf(now));
+
+    const segs = [[0, 6, 'Night −6%'], [6, 10, 'Solar hours −20%'], [10, 18, 'Normal'], [18, 22, 'Peak +26%'], [22, 24, 'Night −6%']];
+    v.todSegs = segs.map(s => {
+      const x0 = X(s[0] * 4), x1 = X(Math.min(95, s[1] * 4));
+      return { x: x0, w: x1 - x0, cx: (x0 + x1) / 2, label: s[2], fill: s[2].indexOf('Peak') === 0 ? 'var(--ink-200)' : 'var(--ink-80)' };
+    });
+    const maxR = Math.max.apply(null, d.rupees);
+    v.rupeeBars = d.rupees.map((r, i) => {
+      const h = Math.max(1, (r / maxR) * 26);
+      return { x: X(i) - 3.6, y: 286 - h, w: 7.2, h, fill: this.win(i * 0.25).name === 'peak' ? 'var(--ink-900)' : (i <= now ? 'var(--ink-500)' : 'var(--ink-200)') };
+    });
+    let tot = 0; for (let i = 0; i <= now; i++) tot += d.rupees[i];
+    v.rupeesToNow = this.inr(tot);
+    v.chartCaption = { normal: 'Ordinary weekday, replayed at speed', heatwave: 'Heatwave day, 4°C above normal', sensor_drop: 'Sensor feed lost at 14:00', grid_outage: 'Grid outage 19:00 to 19:45', festival: 'Festival evening, common areas fully lit' }[sc];
+
+    /* tooltip */
+    const hv = this.g('hover', null);
+    if (hv) {
+      const i = hv.i, hw = this.win(i * 0.25);
+      v.tip = {
+        time: this.clockOf(i),
+        rows: [
+          { k: 'Load', v: d.ours[i].toFixed(1) + ' kVA', color: 'var(--ink-900)' },
+          { k: 'Ceiling', v: '92.0 kVA', color: 'var(--red-600)' },
+          { k: 'Price window', v: hw.label, color: 'var(--ink-900)' },
+          { k: 'This interval', v: this.inr(d.rupees[i]), color: 'var(--ink-900)' },
+          { k: 'Doing', v: i > now ? 'Holding the clubhouse 0.8°C warmer' : 'Following the plan', color: 'var(--ink-900)' },
+          { k: 'Binding', v: d.ours[i] > 70 ? 'Demand ceiling' : 'Nothing binding', color: 'var(--ink-900)' }
+        ]
+      };
+      v.tipLeft = Math.min(hv.lx + 14, 700) + 'px';
+      v.tipTop = (hv.ly + 14) + 'px';
+    } else { v.tip = null; v.tipLeft = '0px'; v.tipTop = '0px'; }
+    v.onPlotMove = (e) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      const px = ((e.clientX - r.left) / r.width) * 1040;
+      const i = Math.round(((px - 56) / 944) * 95);
+      if (i < 0 || i > 95 || e.clientY - r.top > 300) { if (this.g('hover', null)) this.set('hover', null); return; }
+      this.set('hover', { i, lx: e.clientX - r.left, ly: e.clientY - r.top });
+    };
+    v.onPlotLeave = () => this.set('hover', null);
+
+    /* chrome */
+    v.zoom = this.g('zoom', 1);
+    v.zoomLabel = v.zoom === 1 ? 'Zoom 100%' : 'Zoom 120%';
+    v.toggleZoom = () => this.set('zoom', v.zoom === 1 ? 1.2 : 1);
+    v.monthPeak = Math.max(84.4, d.peak).toFixed(1);
+    v.headroom = (CEIL - load).toFixed(1);
+    v.loadNow = load.toFixed(1);
+    v.clock = this.clockOf(now);
+    v.headroomPct = Math.min(100, (load / 125) * 100).toFixed(1) + '%';
+    v.ceilingPct = ((CEIL / 125) * 100).toFixed(1) + '%';
+    v.headroomFill = load > CEIL ? 'var(--red-600)' : load > CEIL * 0.8 ? 'var(--amber-600)' : 'var(--ink-900)';
+    v.isNow = mode === 'now'; v.isTimeline = mode === 'timeline'; v.isCompare = mode === 'compare'; v.isEvidence = mode === 'evidence';
+    v.goNow = () => this.set('mode', 'now');
+    v.goTimeline = () => this.set('mode', 'timeline');
+    v.goCompare = () => this.set('mode', 'compare');
+    v.goEvidence = () => this.set('mode', 'evidence');
+    v.tabNowBg = v.isNow ? 'var(--ink-900)' : 'var(--paper)'; v.tabNowFg = v.isNow ? 'var(--paper)' : 'var(--ink-900)';
+    v.tabTlBg = v.isTimeline ? 'var(--ink-900)' : 'var(--paper)'; v.tabTlFg = v.isTimeline ? 'var(--paper)' : 'var(--ink-900)';
+    v.tabCmpBg = v.isCompare ? 'var(--ink-900)' : 'var(--paper)'; v.tabCmpFg = v.isCompare ? 'var(--paper)' : 'var(--ink-900)';
+    v.tabEvBg = v.isEvidence ? 'var(--ink-900)' : 'var(--paper)'; v.tabEvFg = v.isEvidence ? 'var(--paper)' : 'var(--ink-900)';
+    v.openTariff = () => this.set('tariffOpen', true);
+    v.closeTariff = () => this.set('tariffOpen', false);
+    v.tariffOpen = this.g('tariffOpen', false);
+    v.tariffRows = [
+      { name: 'Night', hours: '22:00 – 06:00', rate: '₹7.05' },
+      { name: 'Solar hours', hours: '06:00 – 10:00', rate: '₹6.00' },
+      { name: 'Normal', hours: '10:00 – 18:00', rate: '₹7.50' },
+      { name: 'Peak', hours: '18:00 – 22:00', rate: '₹9.45' }
+    ];
+
+    /* status strip */
+    let st = { normal: 'safe', heatwave: 'watch', festival: 'watch', sensor_drop: 'danger', grid_outage: 'danger' }[sc];
+    if (this.g('calibrated', false) && st === 'watch') st = 'safe';
+    if (st === 'safe' && load > CEIL * 0.8) st = 'watch';
+    const forced = String(P.alertState || 'Auto').toLowerCase();
+    if (['safe', 'watch', 'danger'].indexOf(forced) >= 0) st = forced;
+    if (ov) st = 'off';
+    const S = {
+      safe: { bg: 'var(--green-100)', edge: 'var(--green-600)', head: 'All good — forecast is accurate', headColor: 'var(--green-800)',
+        detail: 'Load is ' + (CEIL - load).toFixed(1) + ' kVA under the limit. The plan has been right 92 times out of 100. Nothing for you to do.',
+        icon: 'M9 0a9 9 0 1 0 0 18A9 9 0 0 0 9 0zm4.6 6.6-5.4 5.6-3-2.9 1.2-1.3 1.8 1.7 4.2-4.3 1.2 1.2z', btn: null },
+      watch: { bg: 'var(--amber-100)', edge: 'var(--amber-600)', head: 'Load is running higher than expected', headColor: 'var(--amber-800)',
+        detail: 'Still safe, but the plan is being surprised more often than usual. Recalibrating takes about 3 seconds.',
+        icon: 'M9 0 18 17H0L9 0zm-.9 6v5.4h1.8V6H8.1zm0 6.6v1.8h1.8v-1.8H8.1z', btn: { label: 'Recalibrate', bg: 'transparent', fg: 'var(--amber-800)', border: 'var(--amber-600)' } },
+      danger: { bg: 'var(--red-100)', edge: 'var(--red-600)', head: 'Recalibrate now — the plan is out of date', headColor: 'var(--red-700)',
+        detail: 'Load came within 4 kVA of the limit twice today. One crossing sets the charge for the whole month.',
+        icon: 'M9 0a9 9 0 1 0 0 18A9 9 0 0 0 9 0zm-.9 3.6h1.8v6.3H8.1V3.6zm0 8.1h1.8v1.8H8.1v-1.8z', btn: { label: 'Recalibrate now', bg: 'var(--red-600)', fg: 'var(--paper)', border: 'var(--red-600)' } },
+      off: { bg: 'var(--red-100)', edge: 'var(--red-600)', head: 'Running on the existing schedule', headColor: 'var(--red-700)',
+        detail: 'The optimizer is not running. Every load is back on its own timer, exactly as before this system was installed.',
+        icon: 'M9 0a9 9 0 1 0 0 18A9 9 0 0 0 9 0zM4.5 8.1h9v1.8h-9V8.1z', btn: { label: 'Resume optimizer', bg: 'var(--red-600)', fg: 'var(--paper)', border: 'var(--red-600)' } }
+    }[st];
+    v.stBg = S.bg; v.stEdge = S.edge; v.stHead = S.head; v.stHeadColor = S.headColor; v.stDetail = S.detail; v.stIcon = S.icon;
+    v.stHasButton = !!S.btn; v.stHasStamp = !S.btn;
+    v.stBtnLabel = S.btn ? S.btn.label : ''; v.stBtnBg = S.btn ? S.btn.bg : 'transparent';
+    v.stBtnFg = S.btn ? S.btn.fg : 'var(--ink-900)'; v.stBtnBorder = S.btn ? S.btn.border : 'var(--ink-150)';
+    v.stAction = st === 'off' ? () => this.overrideClick() : () => this.calibrate();
+
+    /* society scene */
+    const dark = hour >= 18.6 || hour < 6.2;
+    const skyStops = [[0, '#232B45'], [5, '#3E4368'], [6.5, '#F0B183'], [8, '#F6E3C4'], [11, '#EAF1F6'], [16, '#F6EFE2'], [18.3, '#F2B075'], [19.8, '#7C5A6B'], [21.5, '#333A57'], [24, '#232B45']];
+    let sky = '#F4F3F1';
+    for (let i = 1; i < skyStops.length; i++) {
+      if (hour <= skyStops[i][0]) { const a = skyStops[i - 1], b = skyStops[i]; sky = this.mix(a[1], b[1], (hour - a[0]) / (b[0] - a[0])); break; }
+    }
+    const outage = sc === 'grid_outage' && hour >= 19 && hour < 19.75;
+    v.sky = outage ? '#2B2F38' : sky;
+    v.groundFill = this.mix(v.sky, dark ? '#3B3F4E' : '#DFD6C4', 0.62);
+    v.roadFill = this.mix(v.sky, dark ? '#4A4E5C' : '#B9B2A5', 0.72);
+    v.cardSky = this.mix(v.sky, '#FFFFFF', 0.86);
+    v.plateEdge = this.mix(v.groundFill, dark ? '#0F1220' : '#8A7F6C', 0.35);
+    v.sceneCaption = outage ? 'Grid outage — streetlights out, critical services on backup' : this.clockOf(now) + ' · ' + w.label;
+    const counts = { normal: 0, shift: 0, hard: 0, out: 0, off: 0 };
+    const houses = [], flows = [];
+    for (let r = 0; r < 6; r++) for (let c = 0; c < 10; c++) {
+      const id = r * 10 + c;
+      const cx = c < 5 ? c : c + 1.6;
+      const u = (cx - r) * 30, y = (cx + r) * 15;
+      const floors = (id * 7) % 5 === 0 ? 2 : 1;
+      const H = floors === 2 ? 32 : 21;
+      const phase = ((id * 37) % 100) / 100;
+      const optOut = (id * 13) % 17 === 0;
+      const offline = outage && (id % 3 !== 0);
+      let kw = 0.4 + 3.6 * Math.max(0, this.interp([[0,0.1],[5,0.08],[7,0.5],[9,0.35],[13,0.3],[17,0.5],[19,1],[21,0.8],[23,0.35],[24,0.12]], hour)) * (0.55 + phase * 0.9);
+      if (offline) kw = 0.05;
+      const shifting = !optOut && !offline && ((id * 7 + now) % 11 === 0) && hour > 17;
+      const hard = kw > 3.1;
+      if (offline) counts.off++; else if (optOut) counts.out++; else if (shifting) counts.shift++; else if (hard) counts.hard++; else counts.normal++;
+      const glow = Math.max(0, Math.min(1, kw / 4));
+      const lit = dark && !offline;
+      const winFill = lit ? this.mix('#E8B06A', '#FFEFC9', 0.2 + glow * 0.8) : this.mix('#9AA3AE', '#5E6672', 0.3 + glow * 0.4);
+      let tone = ['#F6F1E8', '#EDE5D9', '#E3D9CB', '#D8CDBD'][id % 4];
+      let roofTone = [ '#C9764F', '#B9BFC4', '#C9764F', '#9E8B7A', '#8FA0AC', '#C9764F' ][id % 6];
+      if (dark) { tone = this.mix(tone, '#252B42', 0.62); roofTone = this.mix(roofTone, '#1E2438', 0.55); }
+      const t1 = 0.25, t2 = 0.62;
+      houses.push({
+        tf: 'translate(' + u.toFixed(1) + ',' + y.toFixed(1) + ')',
+        body: 'M19 11 L0 22 L0 ' + (22 - H) + ' L19 ' + (11 - H) + ' Z M-19 11 L0 22 L0 ' + (22 - H) + ' L-19 ' + (11 - H) + ' Z',
+        bodyFill: optOut ? this.mix(tone, '#FFFFFF', 0.55) : tone,
+        roof: 'M0 ' + (-H) + ' L19 ' + (11 - H) + ' L0 ' + (22 - H) + ' L-19 ' + (11 - H) + ' Z',
+        roofFill: optOut ? this.mix(tone, '#FFFFFF', 0.6) : roofTone,
+        shadowOp: dark ? 0.05 : 0.11,
+        solar: floors === 2 ? 'M0 ' + (2 - H) + ' L11 ' + (8 - H) + ' L0 ' + (14 - H) + ' L-11 ' + (8 - H) + ' Z' : '',
+        solarFill: this.mix('#2F3A4C', '#9FC6E8', hour > 7 && hour < 17 ? 0.7 : 0.12),
+        win: 'M' + (19 - 19 * t1) + ' ' + (11 + 11 * t1 - H * 0.3) + ' L' + (19 - 19 * t2) + ' ' + (11 + 11 * t2 - H * 0.3) + ' L' + (19 - 19 * t2) + ' ' + (11 + 11 * t2 - H * 0.62) + ' L' + (19 - 19 * t1) + ' ' + (11 + 11 * t1 - H * 0.62) + ' Z',
+        winFill: optOut ? '#EDEDEB' : winFill,
+        ringOp: shifting ? 0.9 : 0,
+        evOp: (id % 4 === 0 && !offline) ? 1 : 0,
+        evAnim: (id % 4 === 0 && hour > 22) ? 'evpulse 1.6s ease-in-out infinite' : 'none',
+        onClick: () => this.openResident(id)
+      });
+    }
+    v.houses = houses;
+    v.lights = [0, 1, 2, 3, 4, 5].map(r => {
+      const u = (5.3 - r) * 30, y = (5.3 + r) * 15;
+      return { x: u, y: y - 16, cx: u + 0.6, cy: y - 17, fill: outage ? '#C9C9C9' : (dark ? '#FFF3DA' : '#EDEDEB') };
+    });
+    v.flows = [0, 1, 2].map(k => {
+      const tgt = [12, 34, 47][k];
+      const r = Math.floor(tgt / 10), c = tgt % 10, cx = c < 5 ? c : c + 1.6;
+      const u = (cx - r) * 30, y = (cx + r) * 15;
+      return { d: 'M-191 183 Q ' + ((u - 191) / 2) + ' ' + ((y + 183) / 2 - 30) + ' ' + u + ' ' + y, w: (1.2 + k * 0.5).toFixed(1) };
+    });
+    v.trees = [[-1.2, 0.4], [-1.2, 2.4], [-1.2, 4.4], [11.6, 1.4], [11.6, 3.4], [4.6, -1.1], [7.6, -1.1], [1.6, 6.6], [8.6, 6.6]].map(p => {
+      const u = (p[0] - p[1]) * 30, y = (p[0] + p[1]) * 15;
+      return {
+        tf: 'translate(' + u.toFixed(1) + ',' + y.toFixed(1) + ')',
+        trunk: dark ? '#3A3226' : '#6E5B45',
+        leafA: dark ? this.mix('#4B6B4F', '#1E2438', 0.55) : '#6F9364',
+        leafB: dark ? this.mix('#3E5A43', '#1E2438', 0.55) : '#87A876',
+        shadowOp: dark ? 0.05 : 0.12
+      };
+    });
+    v.nodeBarH = Math.max(2, (load / 125) * 66).toFixed(1);
+    v.nodeBarY = (26 - Math.max(2, (load / 125) * 66)).toFixed(1);
+    v.nodeBarFill = load > CEIL ? 'var(--red-600)' : load > CEIL * 0.8 ? 'var(--amber-600)' : 'var(--ink-700)';
+    v.legend = [
+      { label: 'Normal', bg: 'var(--ink-200)', border: '0', count: counts.normal },
+      { label: 'Shifting now', bg: '#3E7BB8', border: '0', count: counts.shift },
+      { label: 'Drawing hard', bg: 'var(--ink-900)', border: '0', count: counts.hard },
+      { label: 'Opted out', bg: 'var(--ink-80)', border: '1px solid var(--ink-150)', count: counts.out },
+      { label: 'Offline', bg: 'var(--ink-150)', border: '0', count: counts.off }
+    ];
+    v.showTiles = tiles; v.showScene = !tiles;
+    v.tilesLabel = tiles ? 'Iso view' : '2D grid';
+    v.toggleTiles = () => this.set('tiles', !tiles);
+    v.toggleExpand = () => this.set('expanded', !this.g('expanded', false));
+    v.topRowH = this.g('expanded', false) ? '640px' : '536px';
+    v.tiles = houses.map((h, i) => ({
+      bg: h.winFill, title: 'Flat ' + (i + 1), onClick: h.onClick
+    }));
+
+    v.criticalLine = outage ? 'Critical services on backup' : 'Water, lifts, fire and STP all running';
+    v.critical = [
+      { name: 'Water pumps', status: outage ? 'ON BACKUP' : 'RUNNING', color: outage ? 'var(--amber-600)' : 'var(--green-600)' },
+      { name: 'Lifts, both towers', status: outage ? 'ON BACKUP' : 'RUNNING', color: outage ? 'var(--amber-600)' : 'var(--green-600)' },
+      { name: 'Fire systems', status: 'ARMED', color: 'var(--green-600)' },
+      { name: 'STP', status: 'RUNNING', color: 'var(--green-600)' },
+      { name: 'Tank level', status: '78%', color: 'var(--green-600)' }
+    ];
+
+    /* rail */
+    v.calRest = calState === 'rest'; v.calRunning = calState === 'run'; v.calResult = calState === 'result';
+    const health = ov ? 'off' : { normal: 'ok', heatwave: 'drift', festival: 'drift', sensor_drop: 'stale', grid_outage: 'drift' }[sc];
+    const hMap = {
+      ok: { word: 'Accurate', color: 'var(--green-600)', line: 'Last checked against the last 200 intervals.', border: 'var(--ink-900)', bg: 'var(--paper)', fg: 'var(--ink-900)' },
+      drift: { word: 'Drifting', color: 'var(--amber-600)', line: 'Worth a recalibrate.', border: 'var(--amber-600)', bg: 'var(--paper)', fg: 'var(--amber-600)' },
+      stale: { word: 'Out of date', color: 'var(--red-600)', line: 'Running on the last good estimate.', border: 'var(--red-600)', bg: 'var(--red-600)', fg: 'var(--paper)' },
+      off: { word: 'Not running', color: 'var(--ink-500)', line: 'The optimizer is on manual override. Nothing is being planned.', border: 'var(--ink-150)', bg: 'var(--paper)', fg: 'var(--ink-500)' }
+    }[this.g('calibrated', false) && !ov ? 'ok' : health];
+    v.healthWord = hMap.word; v.healthColor = hMap.color; v.healthLine = hMap.line;
+    v.calBorder = hMap.border; v.calBg = hMap.bg; v.calFg = hMap.fg;
+    v.lastCal = this.g('lastCal', '14:12 today');
+    v.calibrate = () => this.calibrate();
+    v.calStepText = ['Reading the last 200 intervals', 'Measuring how often the forecast was right', 'Searching for the least cautious safe setting', 'Applying'][this.g('calStep', 0)];
+    v.calStepNo = this.g('calStep', 0) + 1;
+    v.calProgress = ((this.g('calStep', 0) + 1) * 25) + '%';
+
+    v.q = q;
+    v.cautionWord = q <= 65 ? 'Cheapest' : q <= 80 ? 'Relaxed' : q <= 90 ? 'Balanced' : 'Safest';
+    v.onQ = (e) => this.set('q', Number(e.target.value));
+    const trk = p => 'linear-gradient(to right, #111111 0%, #111111 ' + p.toFixed(1) + '%, #EDEDEB ' + p.toFixed(1) + '%, #EDEDEB 100%)';
+    v.qTrack = trk(((q - 50) / 49) * 100);
+    v.comfortTrack = trk(((comfort - 0.5) / 2.5) * 100);
+    v.scrubTrack = trk((now / 95) * 100);
+    v.qBill = this.lakh(216924 - (85 - q) * 260);
+    const br = q >= 78 ? 0 : q >= 70 ? 1 : q >= 62 ? 2 : 3;
+    v.qBreaches = String(br);
+    v.qBreachColor = br > 0 ? 'var(--red-600)' : 'var(--ink-900)';
+    v.qWarm = ((q - 45) * 0.03).toFixed(1) + '%';
+    v.comfort = comfort.toFixed(1);
+    v.onComfort = (e) => this.set('comfort', Number(e.target.value));
+    v.comfortSpend = this.inr(84 * comfort);
+
+    const acts = [
+      { t: 15.75, text: 'Pump run moved here to catch the cheaper solar hour rate.' },
+      { t: 17.75, text: 'Clubhouse cooling starts early, so nothing has to be cut at 18:45.' },
+      { t: 22.25, text: 'Geysers wait for the night rate. Hot water is ready before 7 am.' }
+    ];
+    v.happening = acts.slice(0, 2).map(a => ({
+      time: this.clockOf(Math.round(a.t * 4)),
+      text: (a.t * 4 <= now ? a.text.replace('moved here', 'moved').replace('starts', 'started').replace('wait', 'waited') : a.text)
+    }));
+    v.readingKey = [
+      { name: 'This system', note: 'Solid to now, dashed for the rest of the plan.', color: 'var(--ink-900)', w: '2', dash: 'none' },
+      { name: 'Existing schedule', note: 'What the timers would have drawn. The gap is the saving.', color: 'var(--ink-350)', w: '1.5', dash: '4 2' },
+      { name: 'Demand ceiling', note: 'Cross this once and the charge is set for the month.', color: 'var(--red-600)', w: '2', dash: 'none' },
+      { name: 'Likely range', note: 'Where the load should land, worst case to best.', color: 'var(--ink-80)', w: '8', dash: 'none' }
+    ];
+    v.whatChanged = [
+      { head: 'Peak 87.0 → 84.4 kVA', sub: 'The forecast only controller plans against the average load. This one plans against the worst likely load.' },
+      { head: 'Bill ₹2.19L → ₹2.17L', sub: '₹2,276 lower on the month, almost all of it demand charge.' },
+      { head: 'Shifting starts 45 minutes earlier', sub: 'Cheaper to start early and gently than to cut hard at 18:45.' },
+      { head: 'Same comfort budget', sub: 'Both controllers were held to 1.5°C of slack in the common areas.' }
+    ];
+    v.honesty = [
+      { tag: 'Real', color: 'var(--green-600)', text: 'The forecast model, the calibration figures and the bill engine. Coverage is measured, not asserted.' },
+      { tag: 'Real', color: 'var(--green-600)', text: 'The tariff structure and the demand charge arithmetic, taken from the current TN HT order.' },
+      { tag: 'Simulated', color: 'var(--ink-500)', text: 'Household level load traces for 60 flats, generated from published appliance profiles.' },
+      { tag: 'Simulated', color: 'var(--ink-500)', text: 'The society itself. No meter data from a real building has been used in this build.' }
+    ];
+
+    /* bottom bar */
+    v.nowIdx = now;
+    v.onScrub = (e) => this.set('nowIdx', Number(e.target.value));
+    v.play = () => this.play(); v.pause = () => this.pause();
+    v.playBg = this.g('playing', false) ? 'var(--ink-80)' : 'var(--paper)';
+    v.playFg = 'var(--ink-900)';
+    v.scenarios = [['normal', 'Normal day'], ['heatwave', 'Heatwave'], ['sensor_drop', 'Sensor drop'], ['grid_outage', 'Grid outage'], ['festival', 'Festival']].map(s => ({
+      label: s[1],
+      onClick: () => this.applyScenario(s[0]),
+      bg: sc === s[0] ? 'var(--ink-900)' : 'var(--paper)',
+      fg: sc === s[0] ? 'var(--paper)' : 'var(--ink-900)',
+      border: sc === s[0] ? 'var(--ink-900)' : 'var(--ink-150)'
+    }));
+    v.avoidedLine = d.avoided.length === 0 ? 'No avoided breaches on this day yet.'
+      : d.avoided.length + ' breaches avoided on this day. The existing schedule would have crossed ' + d.avoided.length + ' times, peaking at ' + d.ghostPeak.toFixed(1) + ' kVA.';
+    v.avoidedCount = String(d.avoided.length);
+    v.avoidedColor = d.avoided.length > 0 ? 'var(--green-600)' : 'var(--ink-900)';
+    let peakSpend = 0, allSpend = 0;
+    for (let i = 0; i <= now; i++) { allSpend += d.rupees[i]; if (this.win(i * 0.25).name === 'peak') peakSpend += d.rupees[i]; }
+    v.peakShareLine = peakSpend > 0
+      ? this.inr(peakSpend) + ' of that fell in the expensive evening window, which is ' + Math.round((peakSpend / allSpend) * 100) + ' percent of the day\u2019s cost.'
+      : 'The expensive evening window has not started yet. Most of today\u2019s cost so far is ordinary daytime running.';
+    v.overrideBg = ov ? 'var(--ink-900)' : 'var(--red-600)';
+    v.overrideLabel = ov ? 'Resume the optimizer' : 'Return to existing schedule';
+    v.overrideClick = () => this.overrideClick();
+
+    /* resident panel */
+    const res = this.g('resident', null);
+    v.resident = res ? Object.assign({}, res, {
+      normal: !res.consent,
+      changes: (res.changes || []).map((c, i) => ({
+        time: c.time, text: c.text, whyOpen: this.g('whyOpen', null) === i,
+        onWhy: () => this.set('whyOpen', this.g('whyOpen', null) === i ? null : i)
+      }))
+    }) : null;
+    v.closeResident = () => this.set('resident', null);
+    v.neverTouch = ['Lights', 'Fans', 'TV', 'Cooking', 'Fridge'];
+    const sn = this.g('snoozed', false);
+    v.snoozeLabel = sn ? 'Paused until 6 pm' : 'Pause for 3 hours';
+    v.snoozeSub = sn ? 'Nothing will be changed until 6 pm. You can resume any time.' : 'Guests coming? Someone unwell? Nothing will be changed until 6 pm.';
+    v.snoozeClick = () => { this.set('snoozed', !sn); if (!sn) this.addToast('ink', 'Paused for 3 hours.', 'Nothing in this home will be changed until 6 pm.'); };
+    const oi = this.g('optIn', true);
+    v.optIn = oi ? 'true' : 'false';
+    v.optBg = oi ? 'var(--ink-900)' : 'var(--ink-80)';
+    v.optKnob = oi ? 'var(--paper)' : 'var(--ink-350)';
+    v.optJustify = oi ? 'flex-end' : 'flex-start';
+    v.toggleOptIn = () => this.set('optIn', !oi);
+    v.undoClick = () => this.addToast('ink', 'Undone.', 'Your geyser is back on its usual timer for tonight.');
+
+    /* toasts */
+    const tk = { green: { bg: 'var(--green-100)', edge: 'var(--green-600)', fg: 'var(--green-800)' }, red: { bg: 'var(--red-100)', edge: 'var(--red-600)', fg: 'var(--red-700)' }, ink: { bg: 'var(--paper)', edge: 'var(--ink-150)', fg: 'var(--ink-900)' } };
+    v.toasts = (this.state.toasts || []).map(t => Object.assign({}, t, tk[t.kind] || tk.ink, {
+      onClose: () => this.dropToast(t.id),
+      hasUndo: !!t.undo,
+      onUndo: () => { if (t.undo) t.undo(); this.dropToast(t.id); this.addToast('ink', 'Restored.', 'The request is back in the queue where it was.'); }
+    }));
+
+    /* ---- COMPARE ---- */
+    const CX = i => 56 + (i / 95) * 944;
+    const CY = val => 214 - (val / 125) * 196;
+    const cpath = arr => { let s = ''; for (let i = 0; i < 96; i++) s += (i ? 'L' : 'M') + CX(i).toFixed(1) + ' ' + CY(arr[i]).toFixed(1); return s; };
+    const dv = this.g('divider', 0.5);
+    v.cmpClipW = (dv * 1040).toFixed(1);
+    v.cmpClipRW = ((1 - dv) * 1040).toFixed(1);
+    v.cmpDivX = (dv * 1040).toFixed(1);
+    v.cmpDivPct = (dv * 100).toFixed(1) + '%';
+    const fo = d.ours.map((o, i) => o + (d.ghost[i] - o) * 0.45);
+    const foS = 87.0 / Math.max.apply(null, fo);
+    for (let i = 0; i < 96; i++) fo[i] *= foS;
+    v.cmpFcast = cpath(fo);
+    v.cmpGhost = cpath(d.ghost);
+    v.cmpOurs = cpath(d.ours);
+    v.cmpCeilY = CY(CEIL);
+    v.cmpNowX = CX(now);
+    v.cmpYGrid = [0, 25, 50, 75, 100, 125].map(val => ({ v: String(val), y: CY(val), ty: CY(val) + 4 }));
+    v.cmpBreaches = [];
+    for (let i = 0; i < 96; i++) if (fo[i] > CEIL) v.cmpBreaches.push({ x: CX(i), y: CY(fo[i]) });
+    v.cmpLeftPeak = 'Peaks at ' + Math.max.apply(null, fo).toFixed(1) + ' kVA';
+    v.cmpRightPeak = 'Peaks at ' + d.peak.toFixed(1) + ' kVA';
+    v.onSplitDown = () => { this._drag = true; };
+    v.onSplitUp = () => { this._drag = false; };
+    v.onSplitMove = (e) => {
+      if (!this._drag) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      this.set('divider', Math.max(0.12, Math.min(0.88, (e.clientX - r.left) / r.width)));
+    };
+    v.controllers = [
+      { name: 'No control', peak: '97.8', br: '3', bill: '₹2.29L' },
+      { name: 'Rule based timers', peak: '93.5', br: '1', bill: '₹2.25L' },
+      { name: 'Forecast only controller', peak: '87.0', br: '0', bill: '₹2.19L' },
+      { name: 'This system', peak: '84.4', br: '0', bill: '₹2.17L' },
+      { name: 'Best possible, knows the future', peak: '79.6', br: '0', bill: '₹2.13L' }
+    ].map(c => ({
+      name: c.name, peak: c.peak, br: c.br, bill: c.bill,
+      peakColor: Number(c.peak) > CEIL ? 'var(--red-600)' : 'var(--ink-900)',
+      brColor: Number(c.br) > 0 ? 'var(--red-600)' : 'var(--ink-900)',
+      bg: c.name === 'This system' ? 'var(--ink-40)' : 'var(--paper)',
+      edge: c.name === 'This system' ? '3px solid var(--ink-900)' : '3px solid transparent',
+      weight: c.name === 'This system' ? '500' : '400'
+    }));
+
+    /* ---- EVIDENCE ---- */
+    const calPts = [[0.05, 0.04], [0.15, 0.17], [0.25, 0.29], [0.35, 0.38], [0.45, 0.49], [0.55, 0.59], [0.65, 0.70], [0.75, 0.78], [0.85, 0.88], [0.95, 0.96]];
+    v.calDots = calPts.map(p => ({ x: (40 + p[0] * 200).toFixed(1), y: (180 - p[1] * 160).toFixed(1) }));
+    v.calAxis = [0, 0.5, 1].map(t => ({ x: (40 + t * 200).toFixed(1), y: (180 - t * 160).toFixed(1), lx: (40 + t * 200).toFixed(1), ly: 196, label: Math.round(t * 100) + '%' }));
+    const carpet = (mitigated) => {
+      const cells = [];
+      for (let dd = 0; dd < 20; dd++) for (let hh = 0; hh < 24; hh++) {
+        const seed = Math.sin(dd * 12.9898 + hh * 78.233) * 43758.5453;
+        const n = seed - Math.floor(seed);
+        let val = this.interp([[0, 0.08], [5, 0.05], [8, 0.3], [12, 0.28], [16, 0.42], [19, 1], [21, 0.8], [23, 0.3], [24, 0.1]], hh) * (0.8 + n * 0.4);
+        if (mitigated && hh >= 17 && hh <= 22) val *= 0.62;
+        if (mitigated && hh >= 6 && hh <= 10) val *= 1.25;
+        cells.push({ x: (hh * 9.2).toFixed(1), y: (dd * 6.2).toFixed(1), fill: this.mix('#F6F5F3', '#111111', Math.min(1, val)) });
+      }
+      return cells;
+    };
+    v.carpetBefore = carpet(false);
+    v.carpetAfter = carpet(true);
+    v.invoice = [
+      { line: 'Energy · night, 22:00–06:00', before: '₹29,469', after: '₹33,558', changed: true },
+      { line: 'Energy · solar hours, 06:00–10:00', before: '₹17,880', after: '₹21,840', changed: true },
+      { line: 'Energy · normal, 10:00–18:00', before: '₹71,400', after: '₹70,575', changed: true },
+      { line: 'Energy · peak, 18:00–22:00', before: '₹57,173', after: '₹44,604', changed: true },
+      { line: 'Demand charge · 91.2 → 84.4 kVA at ₹608', before: '₹55,450', after: '₹51,315', changed: true },
+      { line: 'Power factor incentive', before: '−₹2,221', after: '−₹4,968', changed: true }
+    ].map(r => ({ line: r.line, before: r.before, after: r.after, tick: r.changed ? 'var(--green-600)' : 'transparent' }));
+    v.fairness = [
+      { g: 'Tower A · floors 1–4', n: 3, w: '60%' },
+      { g: 'Tower A · floors 5–8', n: 4, w: '80%' },
+      { g: 'Tower B · floors 1–4', n: 3, w: '60%' },
+      { g: 'Tower B · floors 5–8', n: 2, w: '40%' },
+      { g: 'Homes with an EV', n: 5, w: '100%' },
+      { g: 'Homes opted out', n: 0, w: '2%' }
+    ].map(f => ({ g: f.g, n: f.n + ' times', w: f.w }));
+    /* ---- REQUESTS ---- */
+    v.isRequests = mode === 'requests';
+    v.goRequests = () => this.set('mode', 'requests');
+    v.tabRqBg = v.isRequests ? 'var(--ink-900)' : 'var(--paper)';
+    v.tabRqFg = v.isRequests ? 'var(--paper)' : 'var(--ink-900)';
+    v.reqStale = sc === 'sensor_drop';
+    const fest = sc === 'festival';
+    const staggered = this.g('staggered', false);
+    const decided = this.g('decided', {});
+    const src = fest ? this.festivalReq() : this.reqBase();
+    const term = String(this.g('search', '') || '').toLowerCase();
+    const chipState = this.g('chips', {});
+    const anyFilter = !!(term || chipState.cost || chipState.medical);
+    const pending = src.filter(r => {
+      if (decided[r.id]) return false;
+      if (term && (r.flat + ' ' + r.reason + ' ' + r.ask).toLowerCase().indexOf(term) < 0) return false;
+      if (chipState.cost && r.fits) return false;
+      if (chipState.medical && !r.medical) return false;
+      return true;
+    }).sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+
+    const split = this.g('splitCluster', false);
+    const groups = (fest || anyFilter || split) ? [] : this.clusterOf(pending);
+    const clustered = {};
+    groups.forEach(g => g.forEach(m => { clustered[m.id] = true; }));
+    const queue = pending.filter(r => !clustered[r.id]);
+    this._queue = queue;
+    v.reqBadge = pending.length > 0;
+    v.reqBadgeText = String(pending.length);
+    v.reqCountLabel = pending.length === 1 ? '1 request' : pending.length + ' requests';
+    v.reqEmpty = pending.length === 0;
+    v.emptyLine = anyFilter
+      ? 'Nothing matches this filter.'
+      : 'Nothing needs you right now. Every request this week fitted inside the headroom and was approved automatically.';
+    const focus = Math.min(this.g('focus', 0), Math.max(0, queue.length - 1));
+    const cOpen = this.g('counterOpen', null);
+    const hov = this.g('preview', null);
+    v.counterText = this.g('cMsg', '');
+    v.onCounterInput = (e) => this.set('cMsg', e.target.value);
+    v.offHover = () => this.set('preview', null);
+
+    v.clusters = groups.map(g => {
+      const together = 3890, staggerFits = true;
+      const figures = g.map(m => ({ k: m.flat + ' alone', v: m.fits ? '₹0' : this.inr(m.cost),
+        color: m.fits ? 'var(--green-600)' : 'var(--red-600)' }))
+        .concat([{ k: g.length > 2 ? 'All together' : 'Both together', v: this.inr(together), color: 'var(--red-600)' }]);
+      const x = h => ((h - 17) / 8) * 512;
+      return {
+        headline: g.length + ' requests want the same 4 hours on Saturday',
+        when: 'Saturday 29 Aug · 7:00 pm to 11:00 pm',
+        members: g.map(m => ({ flat: m.flat, meta: m.meta, reason: '\u201C' + m.reason + '\u201D', mag: m.mag,
+          hasAge: (m.ageDays || 0) > 1,
+          age: (m.ageDays || 0) > 5 ? 'Asked ' + m.ageDays + ' days ago · they need an answer' : 'Asked ' + m.ageDays + ' days ago',
+          ageColor: (m.ageDays || 0) > 5 ? 'var(--red-600)' : 'var(--amber-600)',
+          alone: m.fits ? '₹0' : this.inr(m.cost), color: m.fits ? 'var(--green-600)' : 'var(--red-600)' })),
+        figures: figures,
+        warning: 'Together they cross the ceiling by 6.4 kVA. Approving them one at a time hides this, because each card only sees itself.',
+        canStagger: staggerFits,
+        resTitle: staggerFits ? 'Staggered, both fit and it costs nothing.' : 'No arrangement of these two fits under the ceiling on Saturday.',
+        resBody: staggerFits
+          ? 'A2 1204 keeps 7 to 11. B1 0402 moves to 8 to midnight. Peak reaches 90.8 kVA against a 92 ceiling.'
+          : 'Approving both costs ₹3,890, which is ₹65 per flat.',
+        stagger: g.map((m, i) => ({ flat: m.flat,
+          note: i === 0 ? 'keeps 7 to 11' : 'moves to 8 to midnight',
+          w: (4 * 64).toFixed(0),
+          fromX: x(19).toFixed(0), fromY: 22 + i * 36,
+          toX: x(19 + i).toFixed(0), toY: 34 + i * 36 })),
+        primaryLabel: staggerFits ? 'Stagger and approve both' : 'Approve both anyway',
+        primaryBg: staggerFits ? 'var(--ink-900)' : 'var(--paper)',
+        primaryFg: staggerFits ? 'var(--paper)' : 'var(--red-600)',
+        primaryBorder: staggerFits ? 'var(--ink-900)' : 'var(--red-600)',
+        onPrimary: () => this.clusterAct(g, staggerFits ? 'stagger' : 'both'),
+        onHover: () => this.set('preview', { label: 'Sat 29', granted: staggerFits ? 4.8 : 12.4 }),
+        offHover: () => this.set('preview', null),
+        onSplit: () => this.setState({ splitCluster: true }),
+        onDeclineAll: () => this.clusterAct(g, 'declined')
+      };
+    });
+    v.queue = queue.map((r, i) => {
+      const sp = this.spark(r.without, r.peak);
+      return {
+        flat: r.flat, meta: r.meta, day: r.day, time: r.time, ask: r.ask,
+        medical: !!r.medical, hasDecline: !r.rule,
+        reason: '\u201C' + r.reason + '\u201D', mag: r.mag,
+        edge: i === focus ? '2px solid var(--ink-900)' : '1px solid var(--ink-150)',
+        source: r.source || 'via app',
+        hasAge: (r.ageDays || 0) > 1,
+        age: (r.ageDays || 0) > 5 ? 'Asked ' + r.ageDays + ' days ago · they need an answer' : 'Asked ' + r.ageDays + ' days ago',
+        ageColor: (r.ageDays || 0) > 5 ? 'var(--red-600)' : 'var(--amber-600)',
+        hasDeadline: r.date === '2026-08-29',
+        deadline: 'Needed in 2 days',
+        optedOut: !!r.optedOut,
+        ruleNote: !!r.rule,
+        hasPrecedent: !!r.precedent,
+        precedent: r.precedent
+          ? 'You ' + r.precedent.decision + ' a similar request from ' + r.precedent.flat + ' on ' + r.precedent.date + ' at ' + this.inr(r.precedent.cost) + '.'
+          : '',
+        precColor: r.precedent && r.precedent.decision === 'declined' ? 'var(--amber-600)' : 'var(--ink-500)',
+        declineHint: hov && hov.decline === r.id,
+        onHoverApprove: () => this.set('preview', { label: 'Sat 29', granted: r.peak - r.without }),
+        onHoverDecline: () => this.set('preview', { decline: r.id }),
+        offHover: () => this.set('preview', null),
+        sparkA: sp.a, sparkB: sp.b, sparkCeil: sp.ceil,
+        money: r.fits ? '₹0' : this.inr(r.cost),
+        moneyColor: r.fits ? 'var(--green-600)' : 'var(--red-600)',
+        arith: r.rule
+          ? 'Approved by house rule. Medical loads are never refused and never counted against a flat\u2019s boost days.'
+          : r.fits
+          ? 'Fits inside the headroom. Peak would reach ' + r.peak.toFixed(1) + ' kVA against a 92 ceiling.'
+          : 'Would push the peak to ' + r.peak.toFixed(1) + ' kVA, past the 92 ceiling. That is ₹' + r.per + ' per flat this month.',
+        approveLabel: r.rule ? 'Acknowledge' : r.fits ? 'Approve' : 'Approve anyway',
+        approveBg: r.fits ? 'var(--ink-900)' : 'var(--paper)',
+        approveFg: r.fits ? 'var(--paper)' : 'var(--red-600)',
+        approveBorder: r.fits ? 'var(--ink-900)' : 'var(--red-600)',
+        budget: r.rule
+          ? 'Exempt from the flexibility budget.'
+          : r.used === null
+          ? 'Between 1 and 5 boost days used across the twelve flats.'
+          : 'This flat has used ' + r.used + ' of 6 boost days this year.',
+        hasCounter: !!r.counter,
+        counterOpen: cOpen === r.id,
+        counterWindow: r.counter ? 'The nearest free window is ' + r.counter.window + '.' : '',
+        counterLine: r.counter ? r.counter.line : '',
+        onApprove: () => this.decide(r, 'approved'),
+        onCounter: () => (cOpen === r.id
+          ? this.set('counterOpen', null)
+          : this.setState({ counterOpen: r.id, cMsg: r.counter ? r.counter.msg : '' })),
+        onDecline: () => this.decide(r, 'declined'),
+        onSend: () => this.decide(r, 'countered'),
+        onBack: () => this.set('counterOpen', null),
+        onFocus: () => this.set('focus', i)
+      };
+    });
+    v.festCluster = fest && !staggered && !decided.rf;
+    v.festDone = fest && staggered;
+    v.onStagger = () => this.stagger();
+
+    v.search = this.g('search', '');
+    v.onSearch = (e) => this.set('search', e.target.value);
+    v.chipList = [['cost', 'Costs money'], ['medical', 'Medical flagged']].map(c => {
+      const on = !!chipState[c[0]];
+      return { label: c[1], bg: on ? 'var(--ink-900)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink-700)',
+        border: on ? 'var(--ink-900)' : 'var(--ink-150)',
+        onClick: () => { const m = Object.assign({}, chipState); m[c[0]] = !m[c[0]]; this.setState({ chips: m, focus: 0 }); } };
+    });
+
+    const done = src.filter(r => decided[r.id]).map(r => ({
+      flat: r.flat, ask: r.ask, reason: 'Decided by you · ' + decided[r.id],
+      imp: '+' + (r.peak - r.without).toFixed(1) + ' kVA',
+      cost: decided[r.id] === 'approved' && r.cost > 0 ? this.inr(r.cost) : '₹0',
+      costColor: decided[r.id] === 'approved' && r.cost > 0 ? 'var(--red-600)' : 'var(--green-600)',
+      when: 'just now', medical: false
+    }));
+    v.autoRows = done.concat([
+      { flat: 'B1 0703', ask: 'Car charged by 8am, Thursday', reason: 'Early flight', imp: '+0.4 kVA', when: '2 min ago', source: 'via app' },
+      { flat: 'A1 0206', ask: 'Hot water by 6:30 am', reason: 'Night shift', imp: '+0.2 kVA', when: '18 min ago', source: 'via WhatsApp' },
+      { flat: 'A2 0901', ask: 'More power this evening', reason: 'Guests for dinner', imp: '+0.9 kVA', when: '1 hr ago', source: 'via WhatsApp' },
+      { flat: 'B2 1104', ask: 'More power for an evening', reason: 'Always approved. Not counted against their allowance.', imp: '+0.6 kVA', when: '2 hr ago', medical: true, source: 'via app' },
+      { flat: 'B1 0308', ask: 'Pause my participation for a week', reason: 'Travelling', imp: '\u22121.1 kVA', when: '3 hr ago', source: 'via WhatsApp' },
+      { flat: 'A1 1102', ask: 'Car charged by 7am, Friday', reason: 'School run', imp: '+0.5 kVA', when: '5 hr ago', source: 'via WhatsApp' },
+      { flat: 'A2 0505', ask: 'Hot water by 7am', reason: '', imp: '+0.3 kVA', when: 'yesterday', source: 'entered by operator' },
+      { flat: 'B2 0207', ask: 'More power tomorrow evening', reason: 'Small gathering', imp: '+0.8 kVA', when: 'yesterday', source: 'via WhatsApp' }
+    ].map(a => ({ flat: a.flat, ask: a.ask, reason: a.reason, imp: a.imp, when: a.when, source: a.source,
+      medical: !!a.medical, cost: '₹0', costColor: 'var(--green-600)', costSize: '15px' })))
+      .concat(this.g('showAutoDeclined', false) ? [
+        { flat: 'A2 0710', ask: 'More power Friday evening', reason: 'Day already at ceiling. Offered 8pm instead.',
+          source: 'via WhatsApp', imp: '—', cost: 'Auto declined', costColor: 'var(--ink-500)', costSize: '12.5px', when: '40 min ago', medical: false },
+        { flat: 'B1 0905', ask: 'Car charged by 6am, Friday', reason: 'Day already at ceiling. Offered 8pm instead.',
+          source: 'via app', imp: '—', cost: 'Auto declined', costColor: 'var(--ink-500)', costSize: '12.5px', when: '2 hr ago', medical: false }
+      ] : []).slice(0, 10);
+    v.autoDeclinedLabel = this.g('showAutoDeclined', false) ? 'Hide 2 auto declined' : 'Show 2 auto declined';
+    v.toggleAutoDeclined = () => this.set('showAutoDeclined', !this.g('showAutoDeclined', false));
+    v.showAllLine = 'Show all ' + (fest ? 45 : 34) + ' this month';
+
+    const PH = 112, FLOOR = 60, SPAN = 40;
+    const hpx = kva => Math.max(0, (kva / SPAN) * PH);
+    v.ceilOffset = hpx(CEIL - FLOOR).toFixed(1) + 'px';
+    v.week = [['Thu 27', 82.1, 1.2, 2], ['Fri 28', 84.6, 0.6, 1], ['Sat 29', 86.0, 2.2, 3],
+      ['Sun 30', 79.4, 0, 0], ['Mon 31', 83.2, 0.5, 1], ['Tue 1', 85.1, 1.4, 2], ['Wed 2', 81.0, 0.4, 1]
+    ].map(row => {
+      const label = row[0], base = row[1];
+      let gr = row[2], n = row[3];
+      if (fest && label === 'Sat 29') { gr = staggered ? 4.8 : 12.4; n = 12; }
+      if (hov && hov.label === label && hov.granted) gr = hov.granted;
+      const total = base + gr;
+      const over = Math.max(0, total - CEIL);
+      const under = Math.max(0, gr - over);
+      return { label: label, n: n === 0 ? 'none granted' : n + ' granted',
+        baseH: hpx(base - FLOOR).toFixed(1) + 'px',
+        grH: hpx(under).toFixed(1) + 'px',
+        overH: hpx(over).toFixed(1) + 'px',
+        dot: over > 0 ? 'var(--red-600)' : 'transparent',
+        tip: label + ' · forecast peak ' + total.toFixed(1) + ' kVA · ' + n + ' granted' + (over > 0 ? ' · crosses by ' + over.toFixed(1) + ' kVA' : '') };
+    });
+
+    v.metrics = [
+      { k: 'Requests', v: fest ? '45' : '34', color: 'var(--ink-900)' },
+      { k: 'Auto approved', v: fest ? '76%' : '91%', color: 'var(--ink-900)' },
+      { k: 'Counter offers accepted', v: '78%', color: 'var(--ink-900)' },
+      { k: 'Cost of grants', v: fest && !staggered ? '₹3,891' : '₹1,276', color: 'var(--red-600)' },
+      { k: 'Breaches avoided', v: '2', color: 'var(--ink-900)' },
+      { k: 'Broadcast compliance', v: '6.2 kVA', color: 'var(--ink-900)' }
+    ].map((m, i) => ({ k: m.k, v: m.v, color: m.color, edge: i === 0 ? '0' : '1px solid var(--ink-80)' }));
+
+    const antDismissed = this.g('antDismissed', false);
+    v.anticipation = !fest && !antDismissed && pending.length > 0;
+    v.antTitle = 'Saturday 29 Aug is filling up.';
+    v.antBody = '3 requests granted already and the forecast peak is at 89 kVA against a 92 ceiling. One more evening request will likely cost money.';
+    v.antHeadsUp = () => { this.openBc('heads'); this.setState({ bcAud: 0, bcMsg: 'Saturday 29 Aug is forecast close to our limit. If you can run washing machines and dishwashers after 10pm that evening, we will avoid a peak that costs everyone.' }); };
+    v.antDismiss = () => this.set('antDismissed', true);
+
+    v.monthRows = [{ k: 'Requests received', v: '34' }, { k: 'Approved automatically', v: '31' },
+      { k: 'Decided by you', v: '3' }, { k: 'Median response', v: '4 min' }];
+    v.bcButtons = ['heads', 'thanks', 'maint'].map(k => ({ label: this.bcT()[k].label, onClick: () => this.openBc(k) }));
+    v.budgetBars = [{ label: 'None used', n: 22, w: '36.7%', fill: 'var(--ink-150)' },
+      { label: '1 to 3', n: 24, w: '40.0%', fill: 'var(--ink-350)' },
+      { label: '4 to 5', n: 10, w: '16.7%', fill: 'var(--ink-500)' },
+      { label: 'All 6', n: 4, w: '6.6%', fill: 'var(--ink-900)' }
+    ].map(b => ({ label: b.label, n: b.n, w: b.w, fill: b.fill, tip: b.n + ' flats · ' + b.label }));
+    v.consentHead = '47 of 60';
+    v.consentTiers = [{ label: 'Tier 1', n: 13, w: '21.7%', fill: 'var(--ink-150)' },
+      { label: 'Tier 2', n: 32, w: '53.3%', fill: 'var(--ink-500)' },
+      { label: 'Tier 3', n: 15, w: '25.0%', fill: 'var(--ink-900)' }
+    ].map(t => ({ label: t.label, n: t.n, w: t.w, fill: t.fill, tip: t.n + ' flats at ' + t.label }));
+    v.consentAskOpen = this.g('consentAskOpen', false);
+    v.askConsent = () => this.set('consentAskOpen', !this.g('consentAskOpen', false));
+    v.consentAudiences = [
+      { label: 'Flats at Tier 1 only', sub: '13 flats \u00b7 asking for Tier 2' },
+      { label: 'Flats at Tier 2 but not Tier 3', sub: '32 flats \u00b7 asking for Tier 3' }
+    ].map(a => ({ label: a.label, sub: a.sub, onClick: () => { this.set('consentAskOpen', false); this.askConsent(); } }));
+    v.declines = [
+      { flat: 'B2 0207', suggestion: 'Move water heater to solar hours', reason: 'I need hot water earlier than that',
+        words: 'We leave by 6:30, the tank is cold by then', when: '3 days ago' },
+      { flat: 'A1 0904', suggestion: 'Move water heater to solar hours', reason: 'I need hot water earlier than that',
+        words: '', when: '5 days ago' },
+      { flat: 'A2 0505', suggestion: 'Shift the washing machine after 10pm', reason: 'It does not suit my routine',
+        words: 'Machine is too loud at night, the baby sleeps in that room', when: '1 week ago' },
+      { flat: 'B1 1207', suggestion: 'Move water heater to solar hours', reason: 'I need hot water earlier than that',
+        words: '', when: '2 weeks ago' },
+      { flat: 'A1 0206', suggestion: 'Delay car charging to midnight', reason: 'I cannot plan that far ahead',
+        words: 'Shifts change weekly, I never know the night before', when: '3 weeks ago' }
+    ].map(d => Object.assign({}, d, { onRevise: () => this.openBc('heads') }));
+    v.onAllow = () => this.consentAnswer('allow');
+    v.onNotNow = () => this.consentAnswer('later');
+    v.onNever = () => this.consentAnswer('never');
+    v.usesOpen = this.g('usesOpen', false);
+    v.toggleUses = () => this.set('usesOpen', !this.g('usesOpen', false));
+    v.dataUses = [
+      { date: '24 Aug', purpose: 'Scheduled your geyser for the night rate' },
+      { date: '20 Aug', purpose: 'Scheduled your geyser for the night rate' },
+      { date: '14 Aug', purpose: 'Scheduled your geyser for the night rate' },
+      { date: '07 Aug', purpose: 'Scheduled your geyser for the night rate' }
+    ];
+
+    const bcK = this.g('bcOpen', null);
+    v.bcOpen = !!bcK;
+    v.bcTemplateBtns = ['heads', 'thanks', 'maint'].map(k => ({
+      label: this.bcT()[k].label,
+      bg: bcK === k ? 'var(--ink-900)' : 'var(--paper)',
+      fg: bcK === k ? 'var(--paper)' : 'var(--ink-900)',
+      border: bcK === k ? 'var(--ink-900)' : 'var(--ink-150)',
+      onClick: () => this.openBc(k)
+    }));
+    const aud = this.g('bcAud', 0);
+    v.bcAudOpts = ['Everyone', 'One tower', 'Flats drawing hard right now', 'Flats with an upcoming request'].map((l, i) => ({
+      label: l, bg: aud === i ? 'var(--ink-900)' : 'var(--paper)', fg: aud === i ? 'var(--paper)' : 'var(--ink-900)',
+      leftBorder: i === 0 ? '1px solid var(--ink-150)' : '0',
+      radius: i === 0 ? '2px 0 0 2px' : i === 3 ? '0 2px 2px 0' : '0',
+      onClick: () => this.set('bcAud', i)
+    }));
+    v.bcAudLine = 'Goes to ' + [60, 30, 14, 9][aud] + ' flats.';
+    v.bcMsg = this.g('bcMsg', '');
+    v.onBcMsg = (e) => this.set('bcMsg', e.target.value);
+    v.sendBc = () => this.sendBc();
+    v.closeBc = () => this.set('bcOpen', null);
+
+    return v;
+  }
+}
+
+</script>
+</body>
+</html>
