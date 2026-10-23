@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="_ds/modernist-1d311682-f087-44ad-93b8-5d5880c07a60/styles.css"><script src="_ds/modernist-1d311682-f087-44ad-93b8-5d5880c07a60/_ds_bundle.js"></script><script src="./doc-page.js"></script><style>doc-page:not(:defined){visibility:hidden}body{font-family:Archivo,system-ui,sans-serif;color:#201e1d}a{color:#201e1d}a:hover{color:#ec3013}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:9px;font-weight:800;letter-spacing:.14em;color:#7d7979;padding:8px 10px 8px 0;border-bottom:2px solid #201e1d;white-space:nowrap}td{font-size:11.5px;padding:9px 10px 9px 0;border-bottom:1px solid #d7d3d3;vertical-align:top}td:first-child{white-space:nowrap}h2{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#201e1d;margin:30px 0 12px;padding-bottom:8px;border-bottom:2px solid #201e1d;break-after:avoid}h3{font-size:12px;font-weight:700;margin:18px 0 8px;break-after:avoid}p{font-size:11.5px;line-height:1.5;margin:0 0 10px;max-width:46em}.sw{width:34px;height:18px;border:1px solid #d7d3d3;display:inline-block;vertical-align:middle}.mono{font-variant-numeric:tabular-nums;font-weight:600}</style></helmet>
+<doc-page margin="0.7in">
+
+<div style="display:flex;align-items:baseline;gap:12px;border-bottom:3px solid #201e1d;padding-bottom:10px">
+<span style="font-size:24px;font-weight:800;letter-spacing:-.01em">Samanvay Resident App</span>
+<span style="font-size:11px;color:#7d7979">Style and feature reference</span>
+<span style="flex:1"></span>
+<span style="font-size:10px;font-weight:800;letter-spacing:.14em;color:#7d7979">MODERNIST · AUG 2026</span>
+</div>
+<p style="margin-top:14px">A resident-facing dashboard for a 60-flat housing society running automated electricity load balancing. Built as one interactive desktop mockup at a fixed 1280px on the Modernist design system: flat, architectural, Archivo throughout, zero corner radius, 2px rules between sections, everything flush left, nothing floating.</p>
+
+<h2>Core palette</h2>
+<table>
+<thead><tr><th>Swatch</th><th>Hex</th><th>Role</th><th>Where it is used</th></tr></thead>
+<tbody>
+<tr><td><span class="sw" style="background:#201e1d"></span></td><td class="mono">#201e1d</td><td>Ink</td><td>All primary text, active tab and tier fills, 2px section rules</td></tr>
+<tr><td><span class="sw" style="background:#f3f2f2"></span></td><td class="mono">#f3f2f2</td><td>Ground</td><td>Page background outside the app column; tinted request panels</td></tr>
+<tr><td><span class="sw" style="background:#ffffff"></span></td><td class="mono">#ffffff</td><td>Surface</td><td>The app column and every card</td></tr>
+<tr><td><span class="sw" style="background:#ec3013"></span></td><td class="mono">#ec3013</td><td>Accent</td><td>Used once as a field, on the medical emergency button. Otherwise notification badges and the focus ring only</td></tr>
+<tr><td><span class="sw" style="background:#15703f"></span></td><td class="mono">#15703f</td><td>Money green</td><td>Every rupee figure that represents a saving, and confirmation banners</td></tr>
+<tr><td><span class="sw" style="background:#a86a05"></span></td><td class="mono">#a86a05</td><td>Caution amber</td><td>Paused state, "offered a different time instead"</td></tr>
+</tbody>
+</table>
+
+<h3>Neutral ramp</h3>
+<table>
+<thead><tr><th>Swatch</th><th>Hex</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><span class="sw" style="background:#444141"></span></td><td class="mono">#444141</td><td>Secondary body copy</td></tr>
+<tr><td><span class="sw" style="background:#7d7979"></span></td><td class="mono">#7d7979</td><td>Meta text, kickers, captions, table headers</td></tr>
+<tr><td><span class="sw" style="background:#9b9797"></span></td><td class="mono">#9b9797</td><td>Disabled and inactive marks, chevrons</td></tr>
+<tr><td><span class="sw" style="background:#d7d3d3"></span></td><td class="mono">#d7d3d3</td><td>All 1px borders and rules</td></tr>
+<tr><td><span class="sw" style="background:#eae9e9"></span></td><td class="mono">#eae9e9</td><td>Inert fills, the solar payback panel</td></tr>
+<tr><td><span class="sw" style="background:#f8f4f4"></span></td><td class="mono">#f8f4f4</td><td>Row hover, open accordion rows</td></tr>
+</tbody>
+</table>
+
+<h3>Status tints</h3>
+<table>
+<thead><tr><th>Swatch</th><th>Fill / border</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><span class="sw" style="background:#e4efe6;border-left:3px solid #15703f"></span></td><td class="mono">#e4efe6 / #15703f</td><td>Running normally, approved, protected</td></tr>
+<tr><td><span class="sw" style="background:#f6edda;border-left:3px solid #a86a05"></span></td><td class="mono">#f6edda / #a86a05</td><td>Paused, counter-offered</td></tr>
+<tr><td><span class="sw" style="background:#eae9e9;border-left:3px solid #201e1d"></span></td><td class="mono">#eae9e9 / #201e1d</td><td>Something was changed today</td></tr>
+</tbody>
+</table>
+
+<h2>Warm sub-palette</h2>
+<p>Used only in the isometric flat drawing and the solar charts. Slate always means society solar; green always means money saved. The two never mix in one figure.</p>
+<table>
+<thead><tr><th>Swatch</th><th>Hex</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><span class="sw" style="background:#efe3d4"></span><span class="sw" style="background:#e5d2ba"></span><span class="sw" style="background:#dcc6ab"></span></td><td class="mono">#efe3d4 · #e5d2ba · #dcc6ab</td><td>Sand — the plot the flat sits on</td></tr>
+<tr><td><span class="sw" style="background:#c25a33"></span></td><td class="mono">#c25a33</td><td>Terracotta — roof, and "your own roof is empty"</td></tr>
+<tr><td><span class="sw" style="background:#5d6b7a"></span><span class="sw" style="background:#7b8794"></span><span class="sw" style="background:#9aa8b5"></span></td><td class="mono">#5d6b7a · #7b8794 · #9aa8b5</td><td>Slate — society solar in every context</td></tr>
+<tr><td><span class="sw" style="background:#eae5dd"></span><span class="sw" style="background:#ded5c8"></span><span class="sw" style="background:#c9c1b4"></span></td><td class="mono">#eae5dd · #ded5c8 · #c9c1b4</td><td>Cream and stone — walls and shaded faces</td></tr>
+<tr><td><span class="sw" style="background:#f0b95c"></span></td><td class="mono">#f0b95c</td><td>Lamp amber — lit windows</td></tr>
+<tr><td><span class="sw" style="background:#8a9c7a"></span><span class="sw" style="background:#7d9070"></span></td><td class="mono">#8a9c7a · #7d9070</td><td>Sage — trees and planting</td></tr>
+<tr><td><span class="sw" style="background:#f7f2ea"></span></td><td class="mono">#f7f2ea</td><td>Warm tint behind the reassurance card</td></tr>
+</tbody>
+</table>
+
+<h2>Type and spacing</h2>
+<p>Archivo at every level. Kickers are 10.5–11px at 800 weight with .14–.16em tracking, uppercase. Body is 15–16px, meta and captions 13px. Metrics step 28 / 32 / 40px at 800, with a single 72px hero figure. Section headings that need presence are 20px at 800 with a one-line subhead rather than a small-caps kicker.</p>
+<p>Radius is 0 everywhere. Rules are 2px between major sections and 1px within them. Sibling groups are laid out with flex or grid and <span class="mono">gap</span>, never margins.</p>
+
+<h2>Interaction states</h2>
+<table>
+<thead><tr><th>State</th><th>Treatment</th></tr></thead>
+<tbody>
+<tr><td>Primary hover</td><td>Ink fill darkens to <span class="mono">#000</span></td></tr>
+<tr><td>Secondary hover</td><td>Border goes ink, or fill takes <span class="mono">#eae9e9</span></td></tr>
+<tr><td>Row hover</td><td><span class="mono">#f8f4f4</span> tint</td></tr>
+<tr><td>Keyboard focus</td><td><span class="mono">outline: 2px solid #ec3013; outline-offset: 2px</span> on everything</td></tr>
+<tr><td>Cross-highlight</td><td>Hovering a chart segment or its legend row highlights both and dims the rest to 35–50%</td></tr>
+</tbody>
+</table>
+
+<h2>Frontend features</h2>
+<h3>Five screens, one component</h3>
+<p>MY FLAT, SUGGESTIONS, SAVINGS, SOLAR and REQUESTS, reachable by click or the keyboard shortcuts Q W E R T, plus a settings modal that closes on backdrop click, the cross, or Escape. Tabs are boxed pills with the shortcut shown as a dimmed glyph and live count badges on the corner.</p>
+
+<h3>Live consent queue</h3>
+<p>Five suggestion types in a single-open accordion. Accepting or declining moves the item between arrays, auto-opens the next one, decrements the badge, and updates two running totals — what you save now, and what you would save if you took everything below. Declining opens a structured reason picker rather than just dismissing.</p>
+
+<h3>Tier cards</h3>
+<p>Four data-consent tiers as a 2×2 grid. Tier state is structural: an active tier gets a black 56px numeral block, black border and 3px black top rule; an inactive one goes grey. Tiers 2 and 3 are labelled buttons reading ON or TURN ON, not bare switches. Turning tier 2 off recomputes savings across the whole app.</p>
+
+<h3>Charts, all hand-built</h3>
+<p>No chart library. A day profile of 24 generation bars with usage as one continuous SVG polyline; a stacked savings bar wired to its legend by shared hover state; a contribution band strip with an over-hanging marker; a twelve-month bar chart; and a suggestion timeline strip.</p>
+
+<h2>Reference data in the mockup</h2>
+<table>
+<thead><tr><th>Figure</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Society size</td><td>60 flats, Anna Nagar Residency, Tower A</td></tr>
+<tr><td>Persona</td><td>Flat A2 0202 — 3BHK, four residents, no rooftop panels</td></tr>
+<tr><td>Saved this month</td><td>₹204, of which ₹86 society solar, ₹68 accepted suggestions, ₹50 peak control</td></tr>
+<tr><td>Society average</td><td>₹198 — what a resident sees if they turn tier 2 off</td></tr>
+<tr><td>Society solar</td><td>412 units generated, covering 9% of the flat's use</td></tr>
+<tr><td>Own panels case</td><td>3 kW, 340 units a month, ₹1,240 saved, ₹1,80,000 to install, 4 years 1 month payback</td></tr>
+<tr><td>Contribution</td><td>14th of 60 — participation, adjusted for flat size, never consumption</td></tr>
+<tr><td>Unclaimed</td><td>₹1,278 a month across three routes</td></tr>
+</tbody>
+</table>
+
+<h2>Rules worth carrying to other projects</h2>
+<p>Money is always rupees, never kWh. Every automated action states its comfort cost before its saving. Every decline, toggle-off and pause is stated as free of penalty in the same place as the action. Estimates are labelled as estimates. Red appears as a field exactly once, on the emergency control — everywhere else the page is ink on ground.</p>
+
+</doc-page>
+</x-dc>
+</body>
+</html>
